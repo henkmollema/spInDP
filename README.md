@@ -1,2 +1,2 @@
-# :ant: SpidR
-IDP 2016 - NHL
+# SpidR
+:ant: IDP 2016 - NHL
