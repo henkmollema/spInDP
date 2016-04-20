@@ -14,8 +14,8 @@ class Spider(object):
         self.remoteController = RemoteController(self)
 
     def updateLoop(self):
+        # Simulate 60fps update.
         while (self.stopLoop == False):
-            #print("update loop " + str(self))
             self.behavior.update()
             time.sleep(0.0166667)
 

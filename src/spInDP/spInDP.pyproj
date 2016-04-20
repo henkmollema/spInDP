@@ -22,11 +22,26 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AppController.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="AutonomeBehavior.py" />
     <Compile Include="Behavior.py" />
     <Compile Include="BehaviorType.py" />
     <Compile Include="ManualBehavior.py" />
+    <Compile Include="RemoteContext.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="RemoteController.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SensorDataProvider.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SequenceController.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServoController.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Spider.py">
