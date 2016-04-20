@@ -7,6 +7,7 @@
 			"request": "launch",
 			"stopOnEntry": true,
 			"program": "${file}",
+			"pythonPath": "/usr/local/bin/python3",
 			"debugOptions": [
 				"WaitOnAbnormalExit",
 				"WaitOnNormalExit",
@@ -20,6 +21,7 @@
 			"stopOnEntry": true,
 			"program": "${file}",
 			"externalConsole": true,
+			"pythonPath": "/usr/local/bin/python3",
 			"debugOptions": [
 				"WaitOnAbnormalExit",
 				"WaitOnNormalExit"
@@ -31,6 +33,7 @@
 			"request": "launch",
 			"stopOnEntry": true,
 			"program": "${workspaceRoot}/manage.py",
+			"pythonPath": "python3",
 			"args": [
 				"runserver",
 				"--noreload"
