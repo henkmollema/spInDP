@@ -22,6 +22,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AutonomeBehavior.py" />
+    <Compile Include="Behavior.py" />
+    <Compile Include="BehaviorType.py" />
+    <Compile Include="ManualBehavior.py" />
     <Compile Include="RemoteController.py">
       <SubType>Code</SubType>
     </Compile>
