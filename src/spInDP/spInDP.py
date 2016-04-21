@@ -6,9 +6,13 @@ from BehaviorType import BehaviorType
 def main(argv):
     spider = Spider()
     spider.initBevahiorLoop()
+    
     time.sleep(1)
+    
     spider.switchBehavior(BehaviorType.Autonome)
+    
     time.sleep(1)
+    
     spider.stop()
     print("program ended")
 

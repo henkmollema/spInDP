@@ -24,12 +24,12 @@ class Spider(object):
         self.thread.start()
 
     def initBevahiorLoop(self):
-        print("initBevahiorLoop")
-        self.behavior = ManualBehavior()
+        print("Initialize the behavior loop")
+        self.behavior = ManualBehavior(self.remoteController.Context)
         self.startUpdateLoopThread()
 
     def switchBehavior(self, behaviorType):
-        print("switchBehavior invoked")
+        print("SwitchBehavior invoked")
 
         # Stop the update loop
         self.stopLoop = True
@@ -39,7 +39,7 @@ class Spider(object):
         # Switch to the desired behavior
         if (behaviorType == BehaviorType.Manual):
             print("Switched to manual behavior")
-            self.behavior = ManualBehavior()
+            self.behavior = ManualBehavior(self.remoteController.Context)
         elif (behaviorType == BehaviorType.Autonome):
             print("Autonome behavior not implemented")
             self.behavior = AutonomeBehavior()
