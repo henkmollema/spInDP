@@ -177,7 +177,8 @@ class Ax12:
         try:
             assert ord(reply[0]) == 0xFF
         except:
-            e = "Timeout on servo " + str(id)
+            print ("got bytes: " + str(len(reply)))
+            e = "Timeout on servo " + str(id) + "".join(map(chr, reply))
             raise Ax12.timeoutError(e)
 
         try :
