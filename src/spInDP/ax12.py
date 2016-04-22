@@ -124,6 +124,7 @@ class Ax12:
     RIGTH = 1
     RX_TIME_OUT = 10
     TX_DELAY_TIME = 0.00002
+    #TX_DELAY_TIME = 0.2
 
     # RPi constants
     RPI_DIRECTION_PIN = 18
@@ -137,7 +138,7 @@ class Ax12:
 
     def __init__(self):
         if(Ax12.port == None):
-            Ax12.port = Serial("/dev/ttyAMA0", baudrate=1000000, timeout=0.001)
+            Ax12.port = Serial("/dev/ttyAMA0", baudrate=1000000, timeout=0.5)
         if(not Ax12.gpioSet):
             GPIO.setwarnings(False)
             GPIO.setmode(GPIO.BCM)
@@ -168,6 +169,9 @@ class Ax12:
         sleep(Ax12.RPI_DIRECTION_SWITCH_DELAY)
 
     def readData(self,id):
+        # TODO: HACK: remove this
+        return -1;
+        
         self.direction(Ax12.RPI_DIRECTION_RX)
         reply = Ax12.port.read(5) # [0xff, 0xff, origin, length, error]
         try:
@@ -181,7 +185,7 @@ class Ax12:
             error = ord(reply[4])
 
             if(error != 0):
-                print "Error from servo: " + Ax12.dictErrors[error] + ' (code  ' + hex(error) + ')'
+                print("Error from servo: " + Ax12.dictErrors[error] + ' (code  ' + hex(error) + ')')
                 return -error
             # just reading error bit
             elif(length == 0):
@@ -226,7 +230,7 @@ class Ax12:
             sleep(Ax12.TX_DELAY_TIME)
             return self.readData(id)
         else:
-            print "nothing done, please send confirm = True as this fuction reset to the factory default value, i.e reset the motor ID"
+            print("nothing done, please send confirm = True as this fuction reset to the factory default value, i.e reset the motor ID")
             return
 
     def setID(self, id, newId):
@@ -694,11 +698,11 @@ class Ax12:
             try :
                 temp = self.ping(i)
                 servoList.append(i)
-                if verbose: print "Found servo #" + str(i)
+                if verbose: print("Found servo #" + str(i))
                 time.sleep(0.1)
 
             except Exception, detail:
-                if verbose : print "Error pinging servo #" + str(i) + ': ' + str(detail)
+                if verbose : print("Error pinging servo #" + str(i) + ': ' + str(detail))
                 pass
         return servoList
 
