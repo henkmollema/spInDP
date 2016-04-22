@@ -1,5 +1,3 @@
-from enum import Enum
-
-class BehaviorType(Enum):
-    Manual = 1
-    Autonome = 2
+class BehaviorType(object):
+    Manual = "Manual"
+    Autonome = "Autonome"
