@@ -1,14 +1,11 @@
-﻿# This is the main file
-import sys, getopt, time
+﻿import time
 from Spider import Spider
 from BehaviorType import BehaviorType
 
-def main(argv):
+def main():
     spider = Spider()
     spider.start()
     spider.initBevahiorLoop()
-
-    test = 1
 
     time.sleep(1)
 
@@ -21,4 +18,4 @@ def main(argv):
 
 # Call main function when called from the command line
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
