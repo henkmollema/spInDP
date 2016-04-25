@@ -1,3 +1,4 @@
 language: python
+install: "pip install pylint"
 script:
-  - pylint --errors-only
+  - pylint src/spInDP

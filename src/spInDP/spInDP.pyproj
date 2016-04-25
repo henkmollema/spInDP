@@ -41,10 +41,6 @@
     <Compile Include="RemoteController.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="RPi\__init__.py" />
-    <Compile Include="RPi\GPIO.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="SensorDataProvider.py">
       <SubType>Code</SubType>
     </Compile>
@@ -58,15 +54,13 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="spInDP.py" />
+    <Compile Include="__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\2.7" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="sequence_walk.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="RPi\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

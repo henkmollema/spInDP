@@ -8,10 +8,12 @@ def main(argv):
     spider.start()
     spider.initBevahiorLoop()
 
+    test = 1
+
     time.sleep(1)
-    
+
     spider.switchBehavior(BehaviorType.Autonome)
-    
+
     time.sleep(1)
 
     spider.stop()
