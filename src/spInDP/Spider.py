@@ -1,6 +1,8 @@
 import threading, time
 from threading import Thread
 from RemoteController import RemoteController
+from ServoController import ServoController
+from SequenceController import SequenceController
 from ManualBehavior import ManualBehavior
 from AutonomeBehavior import AutonomeBehavior
 from BehaviorType import BehaviorType
@@ -12,6 +14,12 @@ class Spider(object):
 
     def __init__(self):
         self.remoteController = RemoteController(self)
+        self.servoController = ServoController()
+        self.sequenceController = SequenceController(self)
+        
+    def start(self):
+        print("Starting the spider")
+        self.sequenceController.execute("startup")
 
     def updateLoop(self):
         # Simulate 60fps update.

@@ -1,0 +1,29 @@
+{
+    "Blocks": [
+        {
+            "Moves": [
+                {
+                    "Servo": 18,
+                    "Angle": 70,
+                    "Speed": 500
+                },
+                {
+                    "Servo": 17,
+                    "Angle": 300
+                }
+            ]
+        },
+        {
+            "Moves": [
+                {
+                    "Servo": 4,
+                    "Angle": 10
+                },
+                {
+                    "Servo": 7,
+                    "Angle": 255
+                }
+            ]
+        }
+    ]
+}

@@ -1,18 +1,19 @@
-# This is the main file
+﻿# This is the main file
 import sys, getopt, time
 from Spider import Spider
 from BehaviorType import BehaviorType
 
 def main(argv):
     spider = Spider()
+    spider.start()
     spider.initBevahiorLoop()
-    
+
     time.sleep(1)
     
     spider.switchBehavior(BehaviorType.Autonome)
     
     time.sleep(1)
-    
+
     spider.stop()
     print("program ended")
 

@@ -1,6 +1,6 @@
 {
 	"version": "0.1.0",
-	"command": "python3",
+	"command": "python",
 	"isShellCommand": true,
 	"args": ["${workspaceRoot}/src/spInDP/spInDP.py"],
 	"showOutput": "always"
