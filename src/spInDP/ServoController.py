@@ -18,7 +18,7 @@ class ServoController(object):
         return self.connection.get_present_temperature(servo)
 
     #def angleToPosition(angle):
-    #    return 1024 * (abs(angle) / 360)
+    #    return 1024 * (abs(angle) / 300)
 
     #def positionToAngle(position):
-    #    return 360 * (abs(position) / 1024)
+    #    return 300 * (abs(position) / 1024)
