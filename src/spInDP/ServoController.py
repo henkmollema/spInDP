@@ -10,7 +10,7 @@ class ServoController(object):
     #def getData(self, servo):
     #    return -1
 
-    def write(self, servo, angle):
+    def move(self, servo, angle):
         self.connection.goto(servo, angle, speed=512, degrees=True)
         #time.sleep(angle * 0.0004)
 

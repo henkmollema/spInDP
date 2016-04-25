@@ -15,5 +15,16 @@
     def executeStartup(self):
         print("Executing startup sequence")
 
-        self.servoController.write(17, 90)
+        """
+
+                   V 90
+          /\  O_o /\
+         /  \____/  \
+        /        ^   \
+                 60
+
+        """
+
+        self.servoController.move(17, 60)
+        self.servoController.move(18, 90)
 
