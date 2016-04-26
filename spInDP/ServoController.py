@@ -1,6 +1,7 @@
 ﻿import time
 from pyax12.connection import Connection
 import RPi.GPIO as GPIO
+import math
 
 class ServoController(object):
     """Provides interaction with the physical servos."""
