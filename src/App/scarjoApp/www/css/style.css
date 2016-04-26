@@ -1,0 +1,99 @@
+/* All custom CSS here */
+
+.fullwidthImage{
+	width:100%;
+	height: auto;
+	
+}
+
+.spiderImage{
+	position:relative;
+	height:100%;
+}
+
+.spiderImage .fullwidthImage{
+	position: absolute;
+	top:0px;
+	left:0px;
+}
+
+.servoBlock{
+	display: block;
+	position: absolute;
+	Color: red;
+	background: white;
+	font-weight: bold;
+}
+
+.servo1{
+	margin-left:42%;
+	margin-top:32%;
+}
+.servo2{
+	margin-left:35%;
+	margin-top:25%;
+}
+.servo3{
+	margin-left:25%;
+	margin-top:12%;
+}
+.servo4{
+	margin-left:59%;
+	margin-top:32%;
+}
+.servo5{
+	margin-left:66%;
+	margin-top:25%;
+}
+.servo6{
+	margin-left:76%;
+	margin-top:12%;
+}
+.servo7{
+	margin-left:64%;
+	margin-top:48%;
+}
+.servo8{
+	margin-left:75%;
+	margin-top:48%;
+}
+.servo9{
+	margin-left:89%;
+	margin-top:48%;
+}
+.servo10{
+	margin-left:59%;
+	margin-top:69%;
+}
+.servo11{
+	margin-left:67%;
+	margin-top:78%;
+}
+.servo12{
+	margin-left:76%;
+	margin-top:88%;
+}
+.servo13{
+	margin-left:42%;
+	margin-top:69%;
+}
+.servo14{
+	margin-left:35%;
+	margin-top:78%;
+}
+.servo15{
+	margin-left:25%;
+	margin-top:88%;
+}
+.servo16{
+	margin-left:37%;
+	margin-top:48%;
+}
+.servo17{
+	margin-left:26%;
+	margin-top:48%;
+}
+.servo18{
+	margin-left:11%;
+	margin-top:48%;
+}
