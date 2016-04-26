@@ -7,7 +7,7 @@
 			"request": "launch",
 			"stopOnEntry": true,
 			"program": "${file}",
-			"pythonPath": "/usr/local/bin/python3",
+			"pythonPath": "/usr/local/bin/python2",
 			"debugOptions": [
 				"WaitOnAbnormalExit",
 				"WaitOnNormalExit",
@@ -20,7 +20,7 @@
 			"request": "launch",
 			"stopOnEntry": true,
 			"program": "${file}",
-			"pythonPath": "C:/Python34/",
+			"pythonPath": "C:/Python27/",
 			"debugOptions": [
 				"WaitOnAbnormalExit",
 				"WaitOnNormalExit",
