@@ -9,8 +9,7 @@ class SequenceController(object):
 
     def execute(self, sequenceName):
         print("Executing sequence: " + sequenceName)
-        #print("Servo temp: " + str(self.servoController.getTemp(10)))
-
+        
         if sequenceName == "startup":
             self.executeStartup()
 
