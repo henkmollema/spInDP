@@ -1,9 +1,14 @@
-#CONFIGURATION
-1. Add your python script to "startspider"
-2. Open spiderboot.service and change the line containing "ExecStart" to:
+# Configuration
+
+1. Add your python script to `startspider`
+2. Open `spiderboot.service` and change the line containing `ExecStart` to:
+	```
 	ExecStart=<Path to file>/startspider
+	```
 3. Add the service to systemd with the following line:
+	```
 	sudo systemctl enable /<Path to Service>/spiderboot.service
+	```
 4. Test if the service is working with:
 	sudo systemctl start spiderboot.service
 5. Reboot to check if the service starts on boot.
