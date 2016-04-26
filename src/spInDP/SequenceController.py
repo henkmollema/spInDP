@@ -1,4 +1,6 @@
-﻿class SequenceController(object):
+﻿import time
+
+class SequenceController(object):
     """Executes sequences using servos."""
 
     def __init__(self, spider):
@@ -7,7 +9,7 @@
 
     def execute(self, sequenceName):
         print("Executing sequence: " + sequenceName)
-        print("Servo temp: " + self.servoController.getTemp(17))
+        #print("Servo temp: " + str(self.servoController.getTemp(17)))
 
         if sequenceName == "startup":
             self.executeStartup()
@@ -17,14 +19,31 @@
 
         """
 
-                   V 90
+                   V 120
           /\  O_o /\
          /  \____/  \
         /        ^   \
-                 60
+                 -65
 
         """
-
-        self.servoController.move(17, 60)
-        self.servoController.move(18, 90)
+        
+        self.servoController.move(16, 0)
+        self.servoController.move(17, -65)
+        self.servoController.move(18, 120, speed=512)
+                
+        for x in range(0, 3):
+            self.servoController.move(16, -25)
+            self.servoController.move(17, 0)
+            self.servoController.move(18, 0, speed=512)
+            
+            time.sleep(0.5)
+            
+            self.servoController.move(16, 25)
+            self.servoController.move(17, -65)
+            self.servoController.move(18, 120, speed=512)
+        
+        self.servoController.move(16, 0)
+        self.servoController.move(17, -65)
+        self.servoController.move(18, 120, speed=512)
+        
 

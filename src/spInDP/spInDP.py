@@ -1,19 +1,19 @@
 ﻿import time
-from Spider import Spider
-from BehaviorType import BehaviorType
+from spInDP.Spider import Spider
+from spInDP.BehaviorType import BehaviorType
 
 def main():
     spider = Spider()
     spider.start()
-    spider.initBevahiorLoop()
+    #spider.initBevahiorLoop()
 
-    time.sleep(1)
+    #time.sleep(1)
 
-    spider.switchBehavior(BehaviorType.Autonome)
+    #spider.switchBehavior(BehaviorType.Autonome)
 
-    time.sleep(1)
+    #time.sleep(1)
 
-    spider.stop()
+    #spider.stop()
     print("program ended")
 
 # Call main function when called from the command line
