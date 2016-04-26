@@ -7,7 +7,7 @@
 			"request": "launch",
 			"stopOnEntry": true,
 			"program": "${file}",
-			"pythonPath": "C:/Python27",
+			"pythonPath": "/usr/local/bin/python3",
 			"debugOptions": [
 				"WaitOnAbnormalExit",
 				"WaitOnNormalExit",
@@ -15,35 +15,17 @@
 			]
 		},
 		{
-			"name": "Python Console App",
+			"name": "Python Windows",
 			"type": "python",
 			"request": "launch",
 			"stopOnEntry": true,
 			"program": "${file}",
-			"externalConsole": true,
-			"pythonPath": "python",
-			"debugOptions": [
-				"WaitOnAbnormalExit",
-				"WaitOnNormalExit"
-			]
-		},
-		{
-			"name": "Django",
-			"type": "python",
-			"request": "launch",
-			"stopOnEntry": true,
-			"program": "${workspaceRoot}/manage.py",
-			"pythonPath": "python",
-			"args": [
-				"runserver",
-				"--noreload"
-			],
+			"pythonPath": "C:/Python34/",
 			"debugOptions": [
 				"WaitOnAbnormalExit",
 				"WaitOnNormalExit",
-				"RedirectOutput",
-				"DjangoDebugging"
+				"RedirectOutput"
 			]
-		}
+		},
 	]
 }

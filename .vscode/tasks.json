@@ -1,7 +1,7 @@
 {
 	"version": "0.1.0",
-	"command": "python",
+	"command": "pylint",
 	"isShellCommand": true,
-	"args": ["${workspaceRoot}/src/spInDP/spInDP.py"],
+	"args": ["${workspaceRoot}/src/spInDP", "--errors-only"],
 	"showOutput": "always"
 }

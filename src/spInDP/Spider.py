@@ -1,11 +1,11 @@
 import time
 from threading import Thread
-from RemoteController import RemoteController
-from ServoController import ServoController
-from SequenceController import SequenceController
-from ManualBehavior import ManualBehavior
-from AutonomeBehavior import AutonomeBehavior
-from BehaviorType import BehaviorType
+from spInDP.RemoteController import RemoteController
+from spInDP.ServoController import ServoController
+from spInDP.SequenceController import SequenceController
+from spInDP.ManualBehavior import ManualBehavior
+from spInDP.AutonomeBehavior import AutonomeBehavior
+from spInDP.BehaviorType import BehaviorType
 
 class Spider(object):
     """Encapsulates the interaction with the spider."""
@@ -17,7 +17,7 @@ class Spider(object):
         self.servoController = ServoController()
         self.sequenceController = SequenceController(self)
 
-        self.behavior = (self.remoteController.Context)
+        self.behavior = ManualBehavior(self.remoteController.Context)
         self.thread = None
 
     def start(self):

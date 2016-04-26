@@ -1,4 +1,4 @@
-from Behavior import Behavior
+from spInDP.Behavior import Behavior
 
 class ManualBehavior(Behavior):
     """Provides manual behavior of a spider."""

@@ -1,4 +1,4 @@
-from Behavior import Behavior
+from spInDP.Behavior import Behavior
 
 class AutonomeBehavior(Behavior):
     """Provides autonome behavior of a spider"""

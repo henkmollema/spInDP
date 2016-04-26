@@ -1,4 +1,4 @@
-from RemoteContext import RemoteContext
+from spInDP.RemoteContext import RemoteContext
 
 class RemoteController(object):
     """Provides interaction with the physical remote controller."""

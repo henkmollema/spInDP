@@ -1,4 +1,6 @@
 language: python
-install: "pip install pylint"
+python:
+  - "3.4"
+install: "pip3 install pylint"
 script:
-  - pylint src/spInDP --errors-only || exit 0
+  - pylint src/spInDP --errors-only
