@@ -2,6 +2,6 @@
 	"version": "0.1.0",
 	"command": "pylint",
 	"isShellCommand": true,
-	"args": ["${workspaceRoot}/src/spInDP", "--errors-only"],
+	"args": ["${workspaceRoot}/spInDP", "--errors-only"],
 	"showOutput": "always"
 }

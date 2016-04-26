@@ -3,4 +3,4 @@ python:
   - "3.4"
 install: "pip3 install pylint pyax12"
 script:
-  - pylint src/spInDP --errors-only
+  - pylint spInDP --errors-only
