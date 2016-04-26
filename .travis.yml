@@ -1,6 +1,6 @@
 language: python
 python:
   - "3.4"
-install: "pip3 install pylint pyax12"
+install: "pip3 install pylint"
 script:
   - pylint spInDP --errors-only
