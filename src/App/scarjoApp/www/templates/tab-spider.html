@@ -3,8 +3,23 @@
     <h2>Sacrjo Monitor</h2>
     <div class='spiderImage'>
 		<img class="fullwidthImage" src="img/spider_render.png"/>
-		<div class='servoBlock servo1' >Hoi</div>
-		<div class='servoBlock servo2' >Hoi</div>
+		<div class='' ng-repeat="servo in servodata">
+			<div class='servoBlock servo{{$index + 1}}' >
+				<b>Position:</b> {{servo.PresentPosition}}
+				<br>
+				<b>Speed:</b> {{servo.PresentSpeed}}
+				<br>
+				<b>Load:</b> {{servo.PresentLoad}}
+				<br>
+				<b>Voltage:</b> {{servo.PresentVoltage}}
+				<br>
+				<b>Temp:</b> {{servo.PresentTemp}}
+				<br>
+			</div>
+		</div>
+		
+		
+		<!--<div class='servoBlock servo2' >Hoi</div>
 		<div class='servoBlock servo3' >Hoi</div>
 		<div class='servoBlock servo4' >Hoi</div>
 		<div class='servoBlock servo5' >Hoi</div>
@@ -20,7 +35,7 @@
 		<div class='servoBlock servo15' >Hoi</div>
 		<div class='servoBlock servo16' >Hoi</div>
 		<div class='servoBlock servo17' >Hoi</div>
-		<div class='servoBlock servo18' >Hoi</div>
+		<div class='servoBlock servo18' >Hoi</div>-->
     </div>
 	
 	<button class="button button-block button-positive" ng-click="testConnection()">Test Connection</button>

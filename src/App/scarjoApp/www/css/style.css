@@ -20,9 +20,12 @@
 .servoBlock{
 	display: block;
 	position: absolute;
-	Color: red;
+	Color: black;
 	background: white;
-	font-weight: bold;
+	font-weight: normal;
+	border-radius: 4px;
+	background: rgba(255,255,255,0.8);
+	padding: 2px;
 }
 
 .servo1{
@@ -31,7 +34,7 @@
 }
 .servo2{
 	margin-left:35%;
-	margin-top:25%;
+	margin-top:22%;
 }
 .servo3{
 	margin-left:25%;
@@ -42,7 +45,7 @@
 	margin-top:32%;
 }
 .servo5{
-	margin-left:66%;
+	margin-left:68%;
 	margin-top:25%;
 }
 .servo6{
@@ -63,27 +66,27 @@
 }
 .servo10{
 	margin-left:59%;
-	margin-top:69%;
+	margin-top:66%;
 }
 .servo11{
 	margin-left:67%;
-	margin-top:78%;
+	margin-top:75%;
 }
 .servo12{
 	margin-left:76%;
-	margin-top:88%;
+	margin-top:85%;
 }
 .servo13{
 	margin-left:42%;
-	margin-top:69%;
+	margin-top:66%;
 }
 .servo14{
 	margin-left:35%;
-	margin-top:78%;
+	margin-top:75%;
 }
 .servo15{
 	margin-left:25%;
-	margin-top:88%;
+	margin-top:85%;
 }
 .servo16{
 	margin-left:37%;
