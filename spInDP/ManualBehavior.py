@@ -4,7 +4,7 @@ class ManualBehavior(Behavior):
     """Provides manual behavior of a spider."""
 
     def __init__(self, remoteContext):
-        super().__init__()
+        super(ManualBehavior, self).__init__()
         self.remoteContext = remoteContext
 
     def update(self):
