@@ -26,11 +26,12 @@ class SequenceController(object):
 
         """
 
-        self.servoController.move(10, -100)
-        time.sleep(0.5)
-        self.servoController.move(10, 0)
-        time.sleep(0.5)
-        self.servoController.move(10, 100)
+        self.parseSequence("../sequences/testseq.txt")
+        #self.servoController.move(10, -100)
+        #time.sleep(0.5)
+        #self.servoController.move(10, 0)
+        #time.sleep(0.5)
+        #self.servoController.move(10, 100)
 
         #self.servoController.move(17, -65)
         #self.servoController.move(18, 120, speed=512)
@@ -50,12 +51,12 @@ class SequenceController(object):
         # self.servoController.move(17, -65)
         # self.servoController.move(18, 120, speed=512)
         
-	def parseSequence(filePath, validate=False):
-    print("Parsing sequence at: " + filePath)
-    hasHeader = False
-    lineNr = 0
-    
-    with open(filePath, 'r') as f:
+    def parseSequence(self, filePath, validate=False):
+        print("Parsing sequence at: " + filePath)
+        hasHeader = False
+        lineNr = 0
+
+        with open(filePath, 'r') as f:
         for line in f:
             lineNr += 1
             words = line.split(' ')
@@ -93,6 +94,6 @@ class SequenceController(object):
                     if(speed > 0):
                         s = speed
                     
-					self.servoController(servoID, int(coords[0]), s)
+                    self.servoController.move(servoID, int(coords[0]), s)
                     #hier de servocontroller aanroepen met de variabelen wanneer not validate
 
