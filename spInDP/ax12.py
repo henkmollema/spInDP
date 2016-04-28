@@ -123,8 +123,7 @@ class Ax12:
     LEFT = 0
     RIGTH = 1
     RX_TIME_OUT = 10
-    TX_DELAY_TIME = 0.00002
-    #TX_DELAY_TIME = 0.5
+    TX_DELAY_TIME = 0.00004
 
     # RPi constants
     RPI_DIRECTION_PIN = 18
@@ -138,7 +137,7 @@ class Ax12:
 
     def __init__(self):
         if(Ax12.port == None):
-            Ax12.port = Serial("/dev/ttyAMA0", baudrate=1000000, timeout=0.001)
+            Ax12.port = Serial("/dev/ttyAMA0", baudrate=1000000, timeout=0.1)
         if(not Ax12.gpioSet):
             GPIO.setwarnings(False)
             GPIO.setmode(GPIO.BCM)
@@ -173,12 +172,12 @@ class Ax12:
         reply = Ax12.port.read(5) # [0xff, 0xff, origin, length, error]
         
         #print ("reply bytes len: " + str(len(reply)))
-        #print (str(ord(reply[0])))
+        #print ("first byte: " + str(ord(reply[0])))
         
         try:
             assert ord(reply[0]) == 0xFF
         except:
-            e = "Timeout on servo " + str(id)
+            e = "Timeout on servo (first byte != 0xFF) " + str(id)
             raise Ax12.timeoutError(e)
 
         try :
@@ -334,7 +333,7 @@ class Ax12:
         return self.readData(id)
 
     def moveSpeed(self, id, position, speed):
-        self.direction(Ax12.RPI_DIRECTION_TX)
+        self.direction(Ax12.RPI_DIRECTION_TX)        
         Ax12.port.flushInput()
         p = [position&0xff, position>>8]
         s = [speed&0xff, speed>>8]
@@ -351,7 +350,7 @@ class Ax12:
         outData += chr(s[1])
         outData += chr(checksum)
         Ax12.port.write(outData)
-        sleep(Ax12.TX_DELAY_TIME)
+        sleep(Ax12.TX_DELAY_TIME)        
         return self.readData(id)
 
     def moveRW(self, id, position):
