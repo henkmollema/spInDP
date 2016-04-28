@@ -1,0 +1,10 @@
+[Unit]
+Description=SpiderScriptService
+After=multi.user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python3 /home/pi/file.py
+
+[Install]
+WantedBy=multi-user.target
