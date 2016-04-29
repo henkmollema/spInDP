@@ -1,6 +1,4 @@
 ﻿import time
-#from spInDP.pyax12.connection import Connection
-#import RPi.GPIO as GPIO
 import math
 from spInDP.ax12 import Ax12
 
@@ -8,19 +6,14 @@ class ServoController(object):
     """Provides interaction with the physical servos."""
 
     def __init__(self):
-        #self.connection = Connection(port="/dev/ttyAMA0", baudrate=1000000, timeout=0.001)
         self.ax12 = Ax12()
 
     def move(self, servo, angle, speed=200):
-        #print("servo move " + str(servo) + ": " + str(angle))
         pos = int(degrees_to_dxl_angle(angle))
-        self.ax12.moveSpeed(servo, pos, speed)        
-        time.sleep(abs(angle) * 0.0033)
+        self.ax12.moveSpeed(servo, pos, speed)
 
     def getTemp(self, servo):
         return self.ax12.readTemperature(servo)
-        return -1
-        #return self.connection.get_present_temperature(servo)
         
 def dxl_angle_to_degrees(dxl_angle):
     """Normalize the given angle.

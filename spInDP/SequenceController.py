@@ -11,89 +11,69 @@ class SequenceController(object):
         print("Executing sequence: " + sequenceName)
         
         if sequenceName == "startup":
+            #self.executeServosTest()
+            self.executeWalk()
             self.executeStartup()
+            
+    def executeServosTest(self):
+        print("Execute servos test")
+        self.parseSequence("sequences/test-all-servo.txt")
+        
+    def executeWalk(self):
+        print("Execute walk")
+        self.parseSequence("sequences/walk.txt", repeat=6)        
 
     def executeStartup(self):
         print("Executing startup sequence")
-
-        """
-
-                   V 120
-          /\  O_o /\
-         /  \____/  \
-        /        ^   \
-                 -65
-
-        """
-
-        self.parseSequence("../sequences/testseq.txt")
-        #self.servoController.move(10, -100)
-        #time.sleep(0.5)
-        #self.servoController.move(10, 0)
-        #time.sleep(0.5)
-        #self.servoController.move(10, 100)
-
-        #self.servoController.move(17, -65)
-        #self.servoController.move(18, 120, speed=512)
-                
-        # for x in range(0, 3):
-        #     self.servoController.move(16, -25)
-        #     self.servoController.move(17, 0)
-        #     self.servoController.move(18, 0, speed=512)
-            
-        #     time.sleep(0.5)
-            
-        #     self.servoController.move(16, 25)
-        #     self.servoController.move(17, -65)
-        #     self.servoController.move(18, 120, speed=512)
+        self.parseSequence("sequences/startup.txt")
         
-        # self.servoController.move(16, 0)
-        # self.servoController.move(17, -65)
-        # self.servoController.move(18, 120, speed=512)
-        
-    def parseSequence(self, filePath, validate=False):
+    def parseSequence(self, filePath, validate=False, repeat=1):
         print("Parsing sequence at: " + filePath)
-        hasHeader = False
-        lineNr = 0
+                
+        for x in range(0, repeat):        
+            hasHeader = False
+            lineNr = 0
+            
+            with open(filePath, 'r') as f:
+                for line in f:
+                    lineNr += 1
+                    words = line.split(' ')
+                    if (lineNr == 0 and words[0].lower() != "sequence"):
+                        raise("Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
+                    elif (lineNr == 0):
+                        continue
 
-        with open(filePath, 'r') as f:
-            for line in f:
-                lineNr += 1
-                words = line.split(' ')
-                #if(not hasHeader and words[0].lower() != "sequence"):
-                #    raise("Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
-                #else:
-                #    hasHeader = True
-                #    continue
-                    
-                if(words[0].lower() == "delay"):
-                    if(len(words) != 2):
-                        raise NameError("No argument given for delay at line: " + str(lineNr))
-                    seconds = float(words[1]) / 1000
-                    
-                    if(not validate):
-                        print("Will delay " + str(seconds) + " seconds")
-                        time.sleep(seconds)
-                    
-                if(words[0].lower().startswith('s:')):
-                    if(len(words) < 2 or len(words) > 3):
-                        raise NameError("Wrong amount of arguments for servo control: " + str(len(words)) + " at line: " + str(lineNr))
+                    if(words[0].lower() == "delay"):
+                        if(len(words) != 2):
+                            raise NameError("No argument given for delay at line: " + str(lineNr))
+                        seconds = float(words[1]) / 1000
                         
-                    servoID = int(words[0].split(':')[1]);
-                    coords = words[1].split(',');
-                    if(len(coords) != 3):
-                        raise NameError("Wrong amount of coords: "+str(len(coords))+" at line: " + str(lineNr))
-                    
-                    speed = -1
-                    if(len(words) == 3):
-                        speed = int(words[2])
+                        if(not validate):
+                            print("Will delay " + str(seconds) + " seconds")
+                            time.sleep(seconds)
+                        
+                    if(words[0].lower().startswith('s:')):
+                        if(len(words) < 2 or len(words) > 3):
+                            raise NameError("Wrong amount of arguments for servo control: " + str(len(words)) + " at line: " + str(lineNr))
+                            
+                        servoID = int(words[0].split(':')[1]);
+                        coords = words[1].split(',');
+                        if(len(coords) != 3):
+                            raise NameError("Wrong amount of coords: "+str(len(coords))+" at line: " + str(lineNr))
+                        
+                        speed = -1
+                        if(len(words) == 3):
+                            speed = int(words[2])
 
-                    if(not validate):
-                        print("Will control servo {0}, coords: {1}, speed: {2}".format(servoID, coords, speed) )
-                        s = 200
-                        if(speed > 0):
-                            s = speed
-                        
-                        self.servoController.move(servoID, int(coords[0]), s)
-                        #hier de servocontroller aanroepen met de variabelen wanneer not validate
+                        if(not validate):
+                            print("Will control servo {0}, coords: {1}, speed: {2}".format(servoID, coords, speed) )
+                            s = 200
+                            if(speed > 0):
+                                s = speed
+                            
+                            try:
+                                self.servoController.move(servoID, int(coords[0]), s)
+                            except:
+                                print("Error on line: " + str(lineNr))
+                            #hier de servocontroller aanroepen met de variabelen wanneer not validate
 
