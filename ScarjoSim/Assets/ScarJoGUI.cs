@@ -56,8 +56,8 @@ public class ScarJoGUI : MonoBehaviour {
     {
         editMode = !editMode;
         spider.setEditMode(editMode);
-        if (!editMode) editButtontext.text = "AnimateMode";
-        else editButtontext.text = "EditMode";
+        if (!editMode) editButtontext.text = "EditMode";
+        else editButtontext.text = "AnimateMode";
 
         Camera.main.GetComponent<EditorCamera>().enabled = editMode;
     }

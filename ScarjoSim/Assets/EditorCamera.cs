@@ -285,17 +285,17 @@ public class EditorCamera : MonoBehaviour
 		p1 = SelectedTransform.InverseTransformPoint( ray.origin );
 		p2 = SelectedTransform.InverseTransformPoint( ray.GetPoint(5000) );
 
-		if( LineAABBIntersect( p1 , p2, xHandleBoxMin, xHandleBoxMax) )
+		/*if( LineAABBIntersect( p1 , p2, xHandleBoxMin, xHandleBoxMax) )
 		{
 			dragDirection = Vector3.right;
 			HandleColorX = Color.yellow;
 			HandleColorY = Color.green;
 			HandleColorZ = Color.blue;
 			return true;
-		}
+		}*/
 		
 		// check the handle for the Y direction
-		if( LineAABBIntersect( p1 , p2, yHandleBoxMin, yHandleBoxMax) )
+		if( SelectedObject != null && SelectedObject.gameObject.GetComponent<SpiderLeg>() != null && LineAABBIntersect( p1 , p2, yHandleBoxMin, yHandleBoxMax) )
 		{
 			dragDirection = Vector3.up;
 			HandleColorX = Color.red;
@@ -305,7 +305,7 @@ public class EditorCamera : MonoBehaviour
 		}
 		
 		// check the handle for the Z direction
-		if( LineAABBIntersect( p1 , p2, zHandleBoxMin, zHandleBoxMax) )
+		if(SelectedObject != null && SelectedObject.gameObject.GetComponent<SpiderLeg>() == null && LineAABBIntersect( p1 , p2, zHandleBoxMin, zHandleBoxMax) )
 		{
 			dragDirection = Vector3.forward;
 			HandleColorX = Color.red;

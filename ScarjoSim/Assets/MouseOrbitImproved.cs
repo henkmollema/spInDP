@@ -16,6 +16,8 @@ public class MouseOrbitImproved : MonoBehaviour
     public float distanceMin = .5f;
     public float distanceMax = 15f;
 
+    public Vector3 offset;
+
     private Rigidbody rigidbody;
 
     float x = 0.0f;
@@ -60,6 +62,7 @@ public class MouseOrbitImproved : MonoBehaviour
 
             transform.rotation = rotation;
             transform.position = position;
+            transform.localPosition += offset;
         }
     }
 
