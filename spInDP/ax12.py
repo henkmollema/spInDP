@@ -539,7 +539,7 @@ class Ax12:
         outData += chr(Ax12.AX_WRITE_DATA)
         outData += chr(Ax12.AX_CW_COMPLIANCE_MARGIN)
         outData += chr(cwMargin)
-        outData += chr(ccwMArgin)
+        outData += chr(ccwMargin)
         outData += chr(cwSlope)
         outData += chr(ccwSlope)
         outData += chr(checksum)
@@ -699,7 +699,7 @@ class Ax12:
                 temp = self.ping(i)
                 servoList.append(i)
                 if verbose: print "Found servo #" + str(i)
-                time.sleep(0.1)
+                sleep(0.1)
 
             except Exception, detail:
                 if verbose : print "Error pinging servo #" + str(i) + ': ' + str(detail)
