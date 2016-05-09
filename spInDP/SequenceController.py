@@ -10,7 +10,7 @@ class SequenceController(object):
     c = 15.0 #Tibia (cm)
     e = 6.85 #height (cm)
     d = 12.24 #Horz. afstand van c tot a (cm)
-    lc = 7.0 #Lengte coxa (cm)
+    lc = 6.645 #Lengte coxa (cm)
     b = math.sqrt(e**2 + d**2) #diagonal (cm)
 
     def __init__(self, spider):
