@@ -1,7 +1,6 @@
 import time
+import math
 from spInDP.LegVector import LegVector
-
-
 
 class SequenceController(object):
     """Executes sequences using servos."""
@@ -82,7 +81,7 @@ class SequenceController(object):
                             speed = int(words[2])
 
                         if(not validate):
-                            print("Will control servo {0}, coords: {1}, speed: {2}".format(servoID, coords, speed) )
+                            print("Will control leg {0}, coords: {1}, speed: {2}".format(legID, coords, speed) )
                             s = 200
                             if(speed > 0):
                                 s = speed
@@ -125,20 +124,20 @@ class SequenceController(object):
     def getServoPos(self, x,y,z):
         lIK = math.sqrt((self.d+self.lc+x)**2+y**2)
         dIK = lIK - self.lc
-        bIK = sqrt((self.e+z)**2 + dIK**2)
+        bIK = math.sqrt((self.e+z)**2 + dIK**2)
     
-        alphaIK = acos(bIK**2 + self.c**2 - self.a**2) / (2*bIK*self.c)
-        betaIK  = acos(self.a**2 + self.c**2 -bIK**2) / (2*self.a*self.c)
-        gammaIK = acos(self.a**2 + bIK**2 - self.c**2) / (2 * self.a * bIK)
-        thetaIK = asin(y/lIK)
-        tauIK   = atab(self.e/dIK)
+        alphaIK = math.acos(bIK**2 + self.c**2 - self.a**2) / (2*bIK*self.c)
+        betaIK  = math.acos(self.a**2 + self.c**2 -bIK**2) / (2*self.a*self.c)
+        gammaIK = math.acos(self.a**2 + bIK**2 - self.c**2) / (2 * self.a * bIK)
+        thetaIK = math.asin(y/lIK)
+        tauIK   = math.atan(self.e/dIK)
     
         angleCoxa = thetaIK * (180/math.pi)
         angleFemur = (alphaIK - tauIK) * (180/math.pi)
         angleTibia = (betaIK) * (180/math.pi)
 
         retVal = LegVector()
-        retval.coxa = 180 - angleCoxa
+        retVal.coxa = 180 - angleCoxa
         retVal.femur = 180 - angleFemur
         retVal.tibia = 180 - angleTibia
         return retVal
