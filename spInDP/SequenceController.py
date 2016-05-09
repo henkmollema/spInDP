@@ -51,6 +51,7 @@ class SequenceController(object):
             with open(filePath, 'r') as f:
                 for line in f:
                     lineNr += 1
+                    if(line.lstrip().startswith("#")) continue
                     words = line.split(' ')
                     if (lineNr == 0 and words[0].lower() != "sequence"):
                         raise("Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")

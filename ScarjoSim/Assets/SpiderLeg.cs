@@ -11,7 +11,7 @@ public class SpiderLeg : MonoBehaviour {
     float cFinish, fFinish, tFinish;
     float cStart, fStart, tStart;
 
-    public float anglePerSecond = 33f;
+    public float anglePerSecond = (180 * 360) / 60; //114rpm at max speed in specification
     public float angleOffsetY = 0f;
 
     bool cChanged, fChanged, tChanged;
