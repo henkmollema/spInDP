@@ -7,9 +7,16 @@ class ServoController(object):
 
     def __init__(self):
         self.ax12 = Ax12()
+        
+    def getPosition(self, servo):
+        pos = self.ax12.readPosition(servo)
+        return dxl_angle_to_degrees(pos)
 
     def move(self, servo, angle, speed=200):
         pos = int(degrees_to_dxl_angle(angle))
+        
+        print("moving: " + str(servo) + " to: " + str(angle) + ", pos: " + str(pos) + ", speed: " + str(speed))
+        
         self.ax12.moveSpeed(servo, pos, speed)
 
     def getTemp(self, servo):

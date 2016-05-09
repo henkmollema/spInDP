@@ -6,11 +6,11 @@ class SequenceController(object):
     """Executes sequences using servos."""
     
     ## Based on physical dimensions of scarJo
-    a = 11 #Femur length (cm)
-    c = 15 #Tibia (cm)
+    a = 11.0 #Femur length (cm)
+    c = 15.0 #Tibia (cm)
     e = 6.85 #height (cm)
     d = 12.24 #Horz. afstand van c tot a (cm)
-    lc = 4.107 #Lengte coxa (cm)
+    lc = 7.0 #Lengte coxa (cm)
     b = math.sqrt(e**2 + d**2) #diagonal (cm)
 
     def __init__(self, spider):
@@ -21,10 +21,10 @@ class SequenceController(object):
         print("Executing sequence: " + sequenceName)
         
         if sequenceName == "startup":
-            self.executeServosTest()
+            #self.executeServosTest()
+            #self.executeCrawl()
+            #self.executeStartup()
             self.executeWalk()
-            self.executeCrawl()
-            self.executeStartup()
             
     def executeServosTest(self):
         print("Execute servos test")
@@ -32,7 +32,7 @@ class SequenceController(object):
         
     def executeWalk(self):
         print("Execute walk")
-        self.parseSequence("sequences/walk.txt", repeat=4)
+        self.parseSequence("sequences/walk.txt", repeat=3)
         
     def executeCrawl(self):
         print("Execute crawl")
@@ -72,7 +72,7 @@ class SequenceController(object):
                             raise NameError("Wrong amount of arguments for servo control: " + str(len(words)) + " at line: " + str(lineNr))
                             
                         legID = int(words[0].split(':')[1]);
-                        coords = words[1].split(',')[0];
+                        coords = words[1].split(',');
                         if(len(coords) != 3):
                             raise NameError("Wrong amount of coords: "+str(len(coords))+" (expected 3) at line: " + str(lineNr))
                         
@@ -86,13 +86,13 @@ class SequenceController(object):
                             if(speed > 0):
                                 s = speed
                             
-                            try:
-                                vLeg = self.getServoPos(float(coords[0]), float(coords[1]), float(coords[2]))
-                                self.servoController.move((legID - 1) * 3 + 1, vLeg.coxa, s)
-                                self.servoController.move((legID - 1) * 3 + 2, vLeg.femur, s)
-                                self.servoController.move((legID - 1) * 3 + 3, vLeg.tibia, s)
-                            except:
-                                print("Error on line: " + str(lineNr))    
+                            #try:
+                                vLeg = self.getServoPos(float(coords[0]), float(coords[1]), float(coords[2]), legID, s)
+                                self.servoController.move((legID - 1) * 3 + 1, vLeg.coxa, vLeg.coxaSpeed)
+                                self.servoController.move((legID - 1) * 3 + 2, vLeg.femur, vLeg.femurSpeed)
+                                self.servoController.move((legID - 1) * 3 + 3, vLeg.tibia, vLeg.tibiaSpeed)
+                            #except:
+                                #print("Error on line: " + str(lineNr))    
                         
                     
                     #Control individual servo
@@ -101,7 +101,7 @@ class SequenceController(object):
                             raise NameError("Wrong amount of arguments for servo control: " + str(len(words)) + " at line: " + str(lineNr))
                             
                         servoID = int(words[0].split(':')[1]);
-                        coords = words[1].split(',')[0];
+                        coords = words[1].split(',');
                         if(len(coords) != 1):
                             raise NameError("Wrong amount of coords: "+str(len(coords))+" (expected 1) at line: " + str(lineNr))
                         
@@ -121,23 +121,60 @@ class SequenceController(object):
                                 print("Error on line: " + str(lineNr))
                             
 
-    def getServoPos(self, x,y,z):
+    def getServoPos(self, x, y, z, legID, speed):
         lIK = math.sqrt((self.d+self.lc+x)**2+y**2)
         dIK = lIK - self.lc
         bIK = math.sqrt((self.e+z)**2 + dIK**2)
-    
-        alphaIK = math.acos(bIK**2 + self.c**2 - self.a**2) / (2*bIK*self.c)
-        betaIK  = math.acos(self.a**2 + self.c**2 -bIK**2) / (2*self.a*self.c)
-        gammaIK = math.acos(self.a**2 + bIK**2 - self.c**2) / (2 * self.a * bIK)
-        thetaIK = math.asin(y/lIK)
-        tauIK   = math.atan(self.e/dIK)
+        
+        coxaServoId = (legID - 1) * 3 + 1
+        femurServoId = (legID - 1) * 3 + 2
+        tibiaServoId = (legID - 1) * 3 + 3
+        
+        # determine current position of servos
+        coxaCurr = self.servoController.getPosition(coxaServoId)
+        femurCurr = self.servoController.getPosition(femurServoId)
+        tibiaCurr = self.servoController.getPosition(tibiaServoId)
+        print ("current positions: " + str(coxaCurr) + ", " + str(femurCurr) + ", " + str(tibiaCurr))
+                
+        alphaIK = math.acos((bIK**2 + self.c**2 - self.a**2) / (2*bIK*self.c))
+        betaIK  = math.acos((self.a**2 + self.c**2 -bIK**2) / (2*self.a*self.c))
+        gammaIK = math.acos((self.a**2 + bIK**2 - self.c**2) / (2 * self.a * bIK))
+        thetaIK = math.asin(y / lIK)
+        tauIK   = math.atan(self.e / dIK)
     
         angleCoxa = thetaIK * (180/math.pi)
-        angleFemur = (alphaIK - tauIK) * (180/math.pi)
-        angleTibia = (betaIK) * (180/math.pi)
-
+        angleFemur = -((gammaIK - tauIK) * (180/math.pi))
+        angleTibia = 180 - ((betaIK) * (180/math.pi))
+        
+        deltaCoxa = abs(angleCoxa - coxaCurr)
+        deltaFemur = abs(angleFemur - femurCurr)
+        deltaTibia = abs(angleTibia - tibiaCurr)
+        print ("deltas " + str(deltaCoxa) + ", " + str(deltaFemur) + ", " + str(deltaTibia))
+                
         retVal = LegVector()
-        retVal.coxa = 180 - angleCoxa
-        retVal.femur = 180 - angleFemur
-        retVal.tibia = 180 - angleTibia
+        
+        maxDelta = max(deltaCoxa, deltaFemur, deltaTibia)
+        if (maxDelta == deltaCoxa): 
+            print("max delta is coxa")
+            retVal.coxaSpeed = speed
+            retVal.femurSpeed = int(round(speed * (deltaFemur / maxDelta), 0))
+            retVal.tibiaSpeed = int(round(speed * (deltaTibia / maxDelta), 0))
+        elif (maxDelta == deltaFemur): 
+            print("max delta is femur")
+            retVal.coxaSpeed = int(round(speed * (deltaCoxa / maxDelta), 0))
+            retVal.femurSpeed = speed
+            retVal.tibiaSpeed = int(round(speed * (deltaTibia / maxDelta), 0))
+        elif (maxDelta == deltaTibia): 
+            print("max delta is tibia")
+            retVal.coxaSpeed = int(round(speed * (deltaCoxa / maxDelta), 0))
+            retVal.femurSpeed = int(round(speed * (deltaFemur / maxDelta), 0))
+            retVal.tibiaSpeed = speed      
+                
+        print("angleCoxa: " + str(angleCoxa))
+        print ("angleFemur: " + str(angleFemur))
+        print ("angleTibia: " + str(angleTibia))
+        
+        retVal.coxa = angleCoxa
+        retVal.femur = angleFemur
+        retVal.tibia = angleTibia
         return retVal
