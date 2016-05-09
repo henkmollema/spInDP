@@ -11,17 +11,22 @@ class SequenceController(object):
         print("Executing sequence: " + sequenceName)
         
         if sequenceName == "startup":
-            #self.executeServosTest()
+            self.executeServosTest()
             self.executeWalk()
+            self.executeCrawl()
             self.executeStartup()
             
     def executeServosTest(self):
         print("Execute servos test")
-        self.parseSequence("sequences/test-all-servo.txt")
+        self.parseSequence("sequences/test-all-servo2.txt")
         
     def executeWalk(self):
         print("Execute walk")
-        self.parseSequence("sequences/walk.txt", repeat=6)        
+        self.parseSequence("sequences/walk.txt", repeat=4)
+        
+    def executeCrawl(self):
+        print("Execute crawl")
+        self.parseSequence("sequences/crawl.txt", repeat=4)    
 
     def executeStartup(self):
         print("Executing startup sequence")
@@ -30,8 +35,7 @@ class SequenceController(object):
     def parseSequence(self, filePath, validate=False, repeat=1):
         print("Parsing sequence at: " + filePath)
                 
-        for x in range(0, repeat):        
-            hasHeader = False
+        for x in range(0, repeat):
             lineNr = 0
             
             with open(filePath, 'r') as f:
