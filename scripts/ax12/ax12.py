@@ -168,12 +168,11 @@ class Ax12:
         sleep(Ax12.RPI_DIRECTION_SWITCH_DELAY)
 
     def readData(self,id):
-        print ()
         self.direction(Ax12.RPI_DIRECTION_RX)
         reply = Ax12.port.read(5) # [0xff, 0xff, origin, length, error]
         
-        print ("reply bytes len: " + str(len(reply)))
-        print ("first byte: " + str(ord(reply[0])))
+        #print ("reply bytes len: " + str(len(reply)))
+        #print ("first byte: " + str(ord(reply[0])))
         
         try:
             assert ord(reply[0]) == 0xFF
@@ -181,7 +180,7 @@ class Ax12:
             e = "Timeout on servo (first byte != 0xFF) " + str(id)
             raise Ax12.timeoutError(e)
 
-        #try :
+        try :
             length = ord(reply[3]) - 2
             error = ord(reply[4])
 
@@ -199,8 +198,8 @@ class Ax12:
                     reply = Ax12.port.read(1)
                     returnValue = ord(reply[0])
                 return returnValue
-        #except Exception, detail:
-            #raise Ax12.axError(detail)
+        except Exception, detail:
+            raise Ax12.axError(detail)
 
     def ping(self,id):
         self.direction(Ax12.RPI_DIRECTION_TX)
