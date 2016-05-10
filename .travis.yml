@@ -1,6 +1,6 @@
 language: python
 python:
   - "2.7"
-install: "pip install pyserial pylint"
+install: "pip install pyserial flask pylint"
 script:
   - pylint spInDP --errors-only
