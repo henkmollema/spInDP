@@ -6,6 +6,7 @@ from spInDP.SequenceController import SequenceController
 from spInDP.ManualBehavior import ManualBehavior
 from spInDP.AutonomeBehavior import AutonomeBehavior
 from spInDP.BehaviorType import BehaviorType
+from spInDP.WebServer import WebServer
 
 class Spider(object):
     """Encapsulates the interaction with the spider."""
@@ -16,11 +17,16 @@ class Spider(object):
         self.remoteController = RemoteController(self)
         self.servoController = ServoController()
         self.sequenceController = SequenceController(self)
+        self.webserver = WebServer(self)
 
         self.behavior = ManualBehavior(self.remoteController.Context)
-        self.thread = None
+        self.updatethread = None
+        self.webserverthread = None
 
     def start(self):
+        print("Starting the webserver")
+        #self.startWebserverThread()
+        self.webserver.start()
         print("Starting the spider")
         self.sequenceController.execute("startup")
 
@@ -31,8 +37,13 @@ class Spider(object):
             time.sleep(0.0166667)
 
     def startUpdateLoopThread(self):
-        self.thread = Thread(target=self.updateLoop)
-        self.thread.start()
+        self.updatethread = Thread(target=self.updateLoop)
+        self.updatethread.start()
+    
+    def startWebserverThread(self):
+        self.webserverthread = Thread(target=self.webserver.start)
+        self.webserverthread.daemon = True
+        self.webserverthread.start()
 
     def initBevahiorLoop(self):
         print("Initialize the default behavior loop")
@@ -43,7 +54,7 @@ class Spider(object):
 
         # Stop the update loop
         self.stopLoop = True
-        self.thread.join()
+        self.updatethread.join()
         print("Update loop stopped")
 
         # Switch to the desired behavior
@@ -60,5 +71,5 @@ class Spider(object):
 
     def stop(self):
         self.stopLoop = True
-        self.thread.join()
+        self.updatethread.join()
         print("Stopped the spider")
