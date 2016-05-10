@@ -20,14 +20,17 @@ class WebServer:
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return resp
 
+    @staticmethod
     @app.route("/")
     def api_root():
         return webserverinstance.format_response("Hello World!")
 
+    @staticmethod
     @app.route("/app")
     def api_app():
         return webserverinstance.format_response("{\"spiderstatus\": \"Hoi\"}")
         
+    @staticmethod
     @app.route("/control/<animation>")
     @app.route("/control/<animation>/<repeat>")
     def api_control_animation(animation, repeat = 1):
