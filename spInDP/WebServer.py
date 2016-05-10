@@ -29,8 +29,10 @@ class WebServer:
         return webserverinstance.format_response("{\"spiderstatus\": \"Hoi\"}")
         
     @app.route("/control/<animation>")
-    def api_control_animation(animation):
-        #webserverinstance.spider.sequenceController.executeSequence("sequences/" + animation)
+    @app.route("/control/<animation>/<repeat>")
+    def api_control_animation(animation, repeat = 1):
+        print ("exec animation: " + animation)
+        webserverinstance.spider.sequenceController.parseSequence("sequences/" + animation, repeat = int(repeat))
         return webserverinstance.format_response("animation executed: sequences/" + animation)
 
     #def gen(self, camera):

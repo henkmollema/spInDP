@@ -31,7 +31,7 @@ class SequenceController(object):
 
         if sequenceName == "startup":
             # self.executeServosTest()
-            self.executeWalk()
+            #self.executeWalk()
             self.executeStartup()
 
     def executeServosTest(self):
@@ -122,6 +122,10 @@ class SequenceController(object):
                             # try:
                                 vLeg = self.getServoPos(float(coords[0]), float(
                                     coords[1]), float(coords[2]), legID, s)
+                                    
+                                if (vLeg is None):
+                                    return
+                                    
                                 self.servoController.move(
                                     (legID - 1) * 3 + 1, vLeg.coxa, vLeg.coxaSpeed)
                                 self.servoController.move(
@@ -228,6 +232,10 @@ class SequenceController(object):
         retVal = LegVector()   
 
         maxDelta = max(deltaCoxa, deltaFemur, deltaTibia)
+        
+        if (maxDelta == 0):
+            return None
+        
         if (maxDelta == deltaCoxa):
             #print("max delta is coxa")            
             retVal.coxaSpeed = speed

@@ -5,7 +5,8 @@ from spInDP.BehaviorType import BehaviorType
 def main():
     spider = Spider()
     spider.start()
-    #spider.initBevahiorLoop()
+    #spider.initBehaviorLoop()
+    spider.webserver.start()
 
     #spider.stop()
     print("program ended")

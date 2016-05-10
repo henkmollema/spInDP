@@ -8,4 +8,5 @@ class ManualBehavior(Behavior):
         self.remoteContext = remoteContext
 
     def update(self):
-        print("Update from ManualBehavior with context" + str(self.remoteContext))
+        return
+        #print("Update from ManualBehavior with context" + str(self.remoteContext))

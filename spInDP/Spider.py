@@ -24,9 +24,6 @@ class Spider(object):
         self.webserverthread = None
 
     def start(self):
-        print("Starting the webserver")
-        #self.startWebserverThread()
-        self.webserver.start()
         print("Starting the spider")
         self.sequenceController.execute("startup")
 
@@ -38,6 +35,7 @@ class Spider(object):
 
     def startUpdateLoopThread(self):
         self.updatethread = Thread(target=self.updateLoop)
+        self.updatethread.deamon = True
         self.updatethread.start()
     
     def startWebserverThread(self):
@@ -45,7 +43,7 @@ class Spider(object):
         self.webserverthread.daemon = True
         self.webserverthread.start()
 
-    def initBevahiorLoop(self):
+    def initBehaviorLoop(self):
         print("Initialize the default behavior loop")
         self.startUpdateLoopThread()
 
