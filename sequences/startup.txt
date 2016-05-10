@@ -2,5 +2,5 @@ Sequence startup
 
 print Moving the legs of the spider into the starting position
 
-l:6 0,0,0 100
+l:5 0,0,0 100
 #waitleg 6
