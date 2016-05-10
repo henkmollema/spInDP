@@ -1,4 +1,6 @@
 Sequence startup
 
-l:6 0,0,3 100
-delay 1000
+print Moving the legs of the spider into the starting position
+
+l:6 0,0,0 100
+#waitleg 6

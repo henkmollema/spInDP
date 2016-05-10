@@ -11,11 +11,14 @@ class ServoController(object):
     def getPosition(self, servo):
         pos = self.ax12.readPosition(servo)
         return dxl_angle_to_degrees(pos)
+        
+    def isMoving(self, servo):
+        return self.ax12.readMovingStatus(servo) == 1
 
     def move(self, servo, angle, speed=200):
         pos = int(degrees_to_dxl_angle(angle))
         
-        print("moving: " + str(servo) + " to: " + str(angle) + ", pos: " + str(pos) + ", speed: " + str(speed))
+        #print("moving: " + str(servo) + " to: " + str(angle) + ", pos: " + str(pos) + ", speed: " + str(speed))
         
         self.ax12.moveSpeed(servo, pos, speed)
 

@@ -6,3 +6,4 @@ class LegVector(object):
     self.coxaSpeed = 0.0
     self.tibiaSpeed = 0.0
     self.femurSpeed = 0.0
+    self.maxExecTime = 0.0

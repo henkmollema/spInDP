@@ -7,12 +7,6 @@ def main():
     spider.start()
     #spider.initBevahiorLoop()
 
-    #time.sleep(1)
-
-    #spider.switchBehavior(BehaviorType.Autonome)
-
-    #time.sleep(1)
-
     #spider.stop()
     print("program ended")
 

@@ -137,7 +137,7 @@ class Ax12:
 
     def __init__(self):
         if(Ax12.port == None):
-            Ax12.port = Serial("/dev/ttyAMA0", baudrate=1000000, timeout=0.1)
+            Ax12.port = Serial("/dev/ttyAMA0", baudrate=1000000, timeout=0.001)
         if(not Ax12.gpioSet):
             GPIO.setwarnings(False)
             GPIO.setmode(GPIO.BCM)
@@ -350,8 +350,11 @@ class Ax12:
         outData += chr(s[1])
         outData += chr(checksum)
         Ax12.port.write(outData)
-        sleep(Ax12.TX_DELAY_TIME)        
-        return self.readData(id)
+        sleep(Ax12.TX_DELAY_TIME)
+        #try:
+            #return self.readData(id)
+        #except:
+        return None
 
     def moveRW(self, id, position):
         self.direction(Ax12.RPI_DIRECTION_TX)
