@@ -31,12 +31,41 @@ class WebServer:
         return webserverinstance.format_response("{\"spiderstatus\": \"Hoi\"}")
         
     @staticmethod
-    @app.route("/control/<animation>")
-    @app.route("/control/<animation>/<repeat>")
+    @app.route("/sequence/<animation>")
+    @app.route("/sequence/<animation>/<repeat>")
     def api_control_animation(animation, repeat = 1):
         print ("exec animation: " + animation)
         webserverinstance.spider.sequenceController.parseSequence("sequences/" + animation, repeat = int(repeat))
         return webserverinstance.format_response("animation executed: sequences/" + animation)
+    
+    @staticmethod
+    @app.route("/behavior/<behaviortype>")
+    def api_control_animation(behaviortype):
+        print ("got behavior command: " + behaviortype)
+        webserverinstance.spider.switchBehavior(behaviortype)
+        return webserverinstance.format_response("switch behavior: " + behaviortype)
+    
+    @staticmethod
+    @app.route("/control/walk/<x>/<y>")
+    def api_control_animation(x, y):
+        print ("Got control walk command: " + x + ", " + y)
+        
+        return webserverinstance.format_response("Walk xy: " + x + ", " + y)
+        
+    @staticmethod
+    @app.route("/control/reset")
+    def api_control_animation():
+        print ("Got control reset command")
+        webserverinstance.spider.sequenceController.parseSequence("sequences/startup.txt", repeat = 1)
+        return webserverinstance.format_response("reset")
+        
+        
+    @staticmethod
+    @app.route("/control/stop/")
+    def api_control_animation():
+        print ("Got control stop command")
+        
+        return webserverinstance.format_response("stop")
 
     #def gen(self, camera):
     #    """Video streaming generator function."""
