@@ -34,14 +34,17 @@ class ServoController(object):
     def getServoDataJSON(self):
         retVal = {}
         for x in range(1, 19):
-            tmp = {}
-            tmp.position = self.getPosition(x)
-            tmp.temp     = self.getTemperature(x)
-            tmp.load = self.getLoad(x)
-            tmp.voltage = self.getVoltage(x)
-            tmp.speed = self.getSpeed(x)
+            try:
+                tmp = { }
+                retVal[x] = tmp
+                tmp['position'] = self.getPosition(x)
+                tmp['temp'] = self.getTemperature(x)
+                tmp['load'] = self.getLoad(x)
+                tmp['voltage'] = str(float(float(self.getVoltage(x)) / float(10)))
 
-            retVal[x] = tmp
+            except:
+                # Ignore errors with servos
+                continue
 
         return json.dumps(retVal, separators=(',', ':'))
 

@@ -39,7 +39,7 @@ class SequenceController(object):
         print("Executing sequence: " + sequenceName)
 
         if sequenceName == "startup":
-            self.executeWalk()
+            #self.executeWalk()
             self.executeStartup()
 
     def executeWalk(self):
