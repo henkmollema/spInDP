@@ -12,6 +12,40 @@ class ServoController(object):
         pos = self.ax12.readPosition(servo)
         return dxl_angle_to_degrees(pos)
         
+    def getSpeed(self, servo):
+        speed = self.ax12.readSpeed(servo)
+        return speed
+        
+    def getTemp(self, servo):
+        temp = self.ax12.readTemperature(servo)
+        return temp
+        
+    def getLoad(self, servo):
+        load = self.ax12.readLoad(servo)
+        return load
+   
+    def getVoltage(self, servo):
+        volt = self.ax12.readVoltage(servo)
+        return volt
+        
+     
+        
+    #Generates a JSON string with data from all servos. 
+    def getServoDataJSON(self)
+        retVal = {};
+        for x in range(1, 19):
+            tmp = {}
+            tmp.position = getPosition(x)
+            tmp.load     = getLoad(x)
+            tmp.voltage  = getVoltage(x)
+            tmp.speed    = getSpeed(x)
+            
+            retval[x] = tmp
+        
+        return json.dumps(retVal, separators=(',',':'))
+         
+    
+        
     def isMoving(self, servo):
         return self.ax12.readMovingStatus(servo) == 1
 
