@@ -5,6 +5,7 @@ import Queue
 from spInDP.LegMovement import LegMovement
 from spInDP.LegThread import LegThread
 
+
 class SequenceController(object):
     """Parses and executes sequences using servos."""
 
@@ -31,7 +32,7 @@ class SequenceController(object):
 
     def stop(self):
         self.stopped = True
-    
+
         for key in self.threadMap:
             self.threadMap[key].join()
 
@@ -39,9 +40,9 @@ class SequenceController(object):
         print("Executing sequence: " + sequenceName)
 
         if sequenceName == "startup":
-            #self.executeWalk()
+            # self.executeWalk()
             self.executeStartup()
-            
+
         if sequenceName == "walk":
             self.executeWalk()
 
@@ -84,7 +85,7 @@ class SequenceController(object):
 
                     # Wait for all lengs to complete their queued movements
                     elif (command == "waitlegs"):
-                        print ("Waiting for all legs to finish")
+                        print("Waiting for all legs to finish")
                         for key in self.legQueue:
                             self.legQueue[key].join()
 
@@ -95,7 +96,8 @@ class SequenceController(object):
                                 "Wrong amount of arguments for 'waitleg' command. Expected: 1.")
 
                         legId = int(words[1])
-                        print("waiting for movement of leg " + str(legId) + " to finish")
+                        print("waiting for movement of leg " +
+                              str(legId) + " to finish")
 
                         # Join will block the calling thread until all items in
                         # the queue are processed
@@ -110,14 +112,15 @@ class SequenceController(object):
                     elif (command == "include"):
                         if (len(words) < 2):
                             raise NameError("No sequence file given")
-                            
-                        seq = words[1]                        
-                        print ("including sequence: " + seq)                        
+
+                        seq = words[1]
+                        print("including sequence: " + seq)
                         repeat = 1
                         if (len(words) > 2):
                             repeat = int(words[2])
 
-                        self.parseSequence("sequences/" + seq.rstrip() + ".txt", repeat=repeat)
+                        self.parseSequence(
+                            "sequences/" + seq.rstrip() + ".txt", repeat=repeat)
 
                     # Control legs
                     elif(words[0].lower().startswith('l:')):
@@ -139,7 +142,8 @@ class SequenceController(object):
                             s = 200
                             if(speed > 0):
                                 s = speed
-                                vLeg = self.getServoPos(float(coords[0]), float(coords[1]), float(coords[2]), legID, s)
+                                vLeg = self.getServoPos(float(coords[0]), float(
+                                    coords[1]), float(coords[2]), legID, s)
 
                                 if (vLeg is None):
                                     return
@@ -166,7 +170,8 @@ class SequenceController(object):
                             s = 200
                             if(speed > 0):
                                 s = speed
-                                self.servoController.move(servoID, int(coords[0]), s)
+                                self.servoController.move(
+                                    servoID, int(coords[0]), s)
 
     servoAngleMap = {
         1: 0.0,
@@ -222,7 +227,7 @@ class SequenceController(object):
         angleCoxa = thetaIK * (180 / math.pi)
         angleFemur = -90 + ((gammaIK - tauIK) * (180 / math.pi))
         angleTibia = 180 - ((betaIK) * (180 / math.pi))
-        
+
         if (legID > 1 and legID < 5):
             angleCoxa = -angleCoxa
             angleFemur = -angleFemur

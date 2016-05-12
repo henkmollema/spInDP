@@ -17,7 +17,7 @@ class ServoController(object):
     def getSpeed(self, servo):
         speed = self.ax12.readSpeed(servo)
         return speed
-        
+
     def getTemperature(self, servo):
         temp = self.ax12.readTemperature(servo)
         return temp
@@ -35,12 +35,13 @@ class ServoController(object):
         retVal = {}
         for x in range(1, 19):
             try:
-                tmp = { }
+                tmp = {}
                 retVal[x] = tmp
                 tmp['position'] = self.getPosition(x)
                 tmp['temp'] = self.getTemperature(x)
                 tmp['load'] = self.getLoad(x)
-                tmp['voltage'] = str(float(float(self.getVoltage(x)) / float(10)))
+                tmp['voltage'] = str(
+                    float(float(self.getVoltage(x)) / float(10)))
 
             except:
                 # Ignore errors with servos
@@ -83,6 +84,7 @@ def dxl_angle_to_degrees(dxl_angle):
     angle_degrees = round(dxl_angle / 1023. * 300. - 150.0, 1)
     return angle_degrees
 
+
 def degrees_to_dxl_angle(angle_degrees):
     """Normalize the given angle.
 
@@ -107,4 +109,3 @@ def degrees_to_dxl_angle(angle_degrees):
     """
     dxl_angle = math.floor((angle_degrees + 150.0) / 300. * 1023.)
     return dxl_angle
-    

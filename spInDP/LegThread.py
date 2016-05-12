@@ -1,6 +1,7 @@
 import time
 import threading
 
+
 class LegThread(threading.Thread):
     """Provides a thread for handling leg movements."""
 
@@ -18,9 +19,12 @@ class LegThread(threading.Thread):
         while not self.sequenceController.stopped:
             vLeg = q.get()
 
-            self.sequenceController.servoController.move((self.legId - 1) * 3 + 1, vLeg.coxa, vLeg.coxaSpeed)
-            self.sequenceController.servoController.move((self.legId - 1) * 3 + 2, vLeg.femur, vLeg.femurSpeed)
-            self.sequenceController.servoController.move((self.legId - 1) * 3 + 3, vLeg.tibia, vLeg.tibiaSpeed)
+            self.sequenceController.servoController.move(
+                (self.legId - 1) * 3 + 1, vLeg.coxa, vLeg.coxaSpeed)
+            self.sequenceController.servoController.move(
+                (self.legId - 1) * 3 + 2, vLeg.femur, vLeg.femurSpeed)
+            self.sequenceController.servoController.move(
+                (self.legId - 1) * 3 + 3, vLeg.tibia, vLeg.tibiaSpeed)
 
             time.sleep(vLeg.maxExecTime if vLeg.maxExecTime > 0 else 0.005)
             q.task_done()

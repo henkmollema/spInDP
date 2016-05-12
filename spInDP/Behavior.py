@@ -1,5 +1,6 @@
 import abc
 
+
 class Behavior(object):
     """Base class of behavior of a spider."""
 

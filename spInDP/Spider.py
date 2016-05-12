@@ -8,6 +8,7 @@ from spInDP.AutonomeBehavior import AutonomeBehavior
 from spInDP.BehaviorType import BehaviorType
 from spInDP.WebServer import WebServer
 
+
 class Spider(object):
     """Encapsulates the interaction with the spider."""
 
@@ -37,7 +38,7 @@ class Spider(object):
         self.updatethread = Thread(target=self.updateLoop)
         self.updatethread.deamon = True
         self.updatethread.start()
-    
+
     def startWebserverThread(self):
         self.webserverthread = Thread(target=self.webserver.start)
         self.webserverthread.daemon = True
@@ -71,6 +72,6 @@ class Spider(object):
         self.stopLoop = True
         if (self.updatethread is not None):
             self.updatethread.join()
-            
+
         self.sequenceController.stop()
         print("Stopped the spider")

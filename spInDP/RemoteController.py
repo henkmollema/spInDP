@@ -1,5 +1,6 @@
 from spInDP.RemoteContext import RemoteContext
 
+
 class RemoteController(object):
     """Provides interaction with the physical remote controller."""
 
@@ -7,4 +8,3 @@ class RemoteController(object):
 
     def __init__(self, spider):
         self.spider = spider
-
