@@ -27,17 +27,17 @@ class WebServer:
 
     @staticmethod
     @app.route("/app/servodata")
-    def api_app():
+    def api_servodata():
         return webserverinstance.format_response(webserverinstance.spider.servoController.getServoDataJSON())
         
     @staticmethod
     @app.route("/app/graphdata")
-    def api_app():
+    def api_graphdata():
         return webserverinstance.format_response("Not implemented")
         
     @staticmethod
     @app.route("/app/debugdata")
-    def api_app():
+    def api_deubgdata():
         return webserverinstance.format_response("Not implemented")
         
     @staticmethod

@@ -1,17 +1,19 @@
 ﻿import time
 import math
+import json
 from spInDP.ax12 import Ax12
+
 
 class ServoController(object):
     """Provides interaction with the physical servos."""
 
     def __init__(self):
         self.ax12 = Ax12()
-        
+
     def getPosition(self, servo):
         pos = self.ax12.readPosition(servo)
         return dxl_angle_to_degrees(pos)
-        
+
     def getSpeed(self, servo):
         speed = self.ax12.readSpeed(servo)
         return speed
@@ -19,47 +21,41 @@ class ServoController(object):
     def getTemperature(self, servo):
         temp = self.ax12.readTemperature(servo)
         return temp
-        
+
     def getLoad(self, servo):
         load = self.ax12.readLoad(servo)
         return load
-   
+
     def getVoltage(self, servo):
         volt = self.ax12.readVoltage(servo)
         return volt
-        
-     
-        
-    #Generates a JSON string with data from all servos. 
-    def getServoDataJSON(self)
-        retVal = {};
+
+    # Generates a JSON string with data from all servos.
+    def getServoDataJSON(self):
+        retVal = {}
         for x in range(1, 19):
             tmp = {}
-            tmp.position = getPosition(x)
-            tmp.temp     = getTemperature(x)
-            tmp.load     = getLoad(x)
-            tmp.voltage  = getVoltage(x)
-            tmp.speed    = getSpeed(x)
-            
-            retval[x] = tmp
-        
-        return json.dumps(retVal, separators=(',',':'))
-         
-    
-        
+            tmp.position = self.getPosition(x)
+            tmp.temp     = self.getTemperature(x)
+            tmp.load = self.getLoad(x)
+            tmp.voltage = self.getVoltage(x)
+            tmp.speed = self.getSpeed(x)
+
+            retVal[x] = tmp
+
+        return json.dumps(retVal, separators=(',', ':'))
+
     def isMoving(self, servo):
         return self.ax12.readMovingStatus(servo) == 1
 
     def move(self, servo, angle, speed=200):
         pos = int(degrees_to_dxl_angle(angle))
-        
+
         #print("moving: " + str(servo) + " to: " + str(angle) + ", pos: " + str(pos) + ", speed: " + str(speed))
-        
+
         self.ax12.moveSpeed(servo, pos, speed)
 
-    def getTemp(self, servo):
-        return self.ax12.readTemperature(servo)
-        
+
 def dxl_angle_to_degrees(dxl_angle):
     """Normalize the given angle.
 
@@ -108,3 +104,4 @@ def degrees_to_dxl_angle(angle_degrees):
     """
     dxl_angle = math.floor((angle_degrees + 150.0) / 300. * 1023.)
     return dxl_angle
+    
