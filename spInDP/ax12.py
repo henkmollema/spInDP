@@ -365,6 +365,7 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
+        self.mutex.release()
         #try:
             #return self.readData(id)
         #except:
