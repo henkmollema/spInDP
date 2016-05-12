@@ -1,6 +1,39 @@
 import time
 import math
-from spInDP.LegVector import LegVector
+import threading
+import Queue
+from spInDP.LegMovement import LegMovement
+
+
+class LegThread(threading.Thread):
+
+    def __init__(self, legId, sequenceController, group=None, target=None, name=None, args=(), kwargs=None, verbose=None):
+        super(LegThread, self).__init__()
+        self.target = target
+        self.name = name
+        self.deamon = True
+        self.legId = legId
+        self.sequenceController = sequenceController
+        return
+
+    def run(self):
+        q = self.sequenceController.legQueue[self.legId]
+        while not self.sequenceController.stopped:
+            if not q.empty():
+                vLeg = q.get()
+                # print("got instr: " + str(vLeg)+ str(q.qsize()) + ", items in
+                # queue")
+
+                self.sequenceController.servoController.move(
+                    (self.legId - 1) * 3 + 1, vLeg.coxa, vLeg.coxaSpeed)
+                self.sequenceController.servoController.move(
+                    (self.legId - 1) * 3 + 2, vLeg.femur, vLeg.femurSpeed)
+                self.sequenceController.servoController.move(
+                    (self.legId - 1) * 3 + 3, vLeg.tibia, vLeg.tibiaSpeed)
+
+                time.sleep(vLeg.maxExecTime if vLeg.maxExecTime > 0 else 0.005)
+                q.task_done()
+        return
 
 
 class SequenceController(object):
@@ -9,42 +42,40 @@ class SequenceController(object):
     # Based on physical dimensions of scarJo
     a = 11.0  # Femur length (cm)
     c = 15.0  # Tibia (cm)
-    e = 6.85  # height (cm)
+    e = 5.60  # height (cm)
     d = 12.24  # Horz. afstand van c tot a (cm)
-    lc = 6.645  # Lengte coxa (cm)
+    lc = 4.107  # Lengte coxa (cm)
     b = math.sqrt(e**2 + d**2)  # diagonal (cm)
 
     def __init__(self, spider):
         self.spider = spider
         self.servoController = spider.servoController
-        self.threadMap = {
-            1: None,
-            2: None,
-            3: None,
-            4: None,
-            5: None,
-            6: None
-        }
+        self.legQueue = {}
+        self.threadMap = {}
+        self.stopped = False
+
+        # Initialize a thread and queue per leg
+        for x in range(1, 6):
+            self.legQueue[x] = Queue.Queue()
+            self.threadMap[x] = LegThread(x, self, name='legthread' + str(x))
+            self.threadMap[x].start()
+
+    def stop(self):
+        self.stopped = True
+    
+        for key in self.threadMap:
+            self.threadMap[key].join()
 
     def execute(self, sequenceName):
         print("Executing sequence: " + sequenceName)
 
         if sequenceName == "startup":
-            # self.executeServosTest()
-            #self.executeWalk()
+            self.executeWalk()
             self.executeStartup()
-
-    def executeServosTest(self):
-        print("Execute servos test")
-        self.parseSequence("sequences/test-all-servo2.txt")
 
     def executeWalk(self):
         print("Execute walk")
-        self.parseSequence("sequences/walk.txt", repeat=10)
-
-    def executeCrawl(self):
-        print("Execute crawl")
-        self.parseSequence("sequences/crawl.txt", repeat=4)
+        self.parseSequence("sequences/walk.txt", repeat=2)
 
     def executeStartup(self):
         print("Executing startup sequence")
@@ -65,6 +96,7 @@ class SequenceController(object):
 
                     words = line.split(' ')
                     command = words[0].lower()
+                    print("command: " + command)
                     if (lineNr == 0 and words[0].lower() != "sequence"):
                         raise(
                             "Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
@@ -79,26 +111,49 @@ class SequenceController(object):
                         seconds = float(words[1]) / 1000
 
                         if(not validate):
-                            #print("Will delay " + str(seconds) + " seconds")
+                            # print("Will delay " + str(seconds) + " seconds")
                             time.sleep(seconds)
 
-                    if (command == "waitleg"):
+                    # Wait for all lengs to complete their queued movements
+                    elif (command == "waitlegs"):
+                        print ("command wait legs")
+                        for key in self.legQueue:
+                            print ("waiting for leg " + str(key) + " to finish moving")
+                            self.legQueue[key].join()
+
+                    # Wait for a single leg to complete its queued movement
+                    elif (command == "waitleg"):
                         if (len(words) != 2):
                             raise NameError(
                                 "Wrong amount of arguments for 'waitleg' command. Expected: 1.")
 
                         legId = int(words[1])
-                        #print("waiting for movement of leg " + str(legId) + " to finish")
-                        self.waitForLeg(legId)
+                        print("waiting for movement of leg " +
+                              str(legId) + " to finish")
 
-                    if (command == "print"):
+                        # Join will block the calling thread until all items in
+                        # the queue are processed
+                        self.legQueue[legId].join()
+
+                    elif (command == "print"):
                         if (len(words) < 2):
                             raise NameError("Nothing to print")
 
                         print(' '.join(words[1:])[:-1])
 
+                    elif (command == "include"):
+                        if (len(words) < 2):
+                            raise NameError("No sequence file given")
+
+                        seq = words[1]
+                        repeat = 1
+                        if (len(words) > 2):
+                            repeat = int(words[2])
+
+                        self.parseSequence(seq, repeat=repeat)
+
                     # Control legs
-                    if(words[0].lower().startswith('l:')):
+                    elif(words[0].lower().startswith('l:')):
                         if(len(words) < 2 or len(words) > 3):
                             raise NameError("Wrong amount of arguments for servo control: " + str(
                                 len(words)) + " at line: " + str(lineNr))
@@ -114,7 +169,8 @@ class SequenceController(object):
                             speed = int(words[2])
 
                         if(not validate):
-                            #print("Will control leg {0}, coords: {1}, speed: {2}".format(legID, coords, speed))
+                            # print("Will control leg {0}, coords: {1}, speed:
+                            # {2}".format(legID, coords, speed))
                             s = 200
                             if(speed > 0):
                                 s = speed
@@ -122,23 +178,24 @@ class SequenceController(object):
                             # try:
                                 vLeg = self.getServoPos(float(coords[0]), float(
                                     coords[1]), float(coords[2]), legID, s)
-                                    
+
                                 if (vLeg is None):
                                     return
-                                    
-                                self.servoController.move(
-                                    (legID - 1) * 3 + 1, vLeg.coxa, vLeg.coxaSpeed)
-                                self.servoController.move(
-                                    (legID - 1) * 3 + 2, vLeg.femur, vLeg.femurSpeed)
-                                self.servoController.move(
-                                    (legID - 1) * 3 + 3, vLeg.tibia, vLeg.tibiaSpeed)
-                                    
-                                time.sleep(vLeg.maxExecTime)
+
+                                self.legQueue[legID].put(vLeg)
+
+                                # self.servoController.move((legID - 1) * 3 + 1, vLeg.coxa, vLeg.coxaSpeed)
+                                # self.servoController.move((legID - 1) * 3 + 2, vLeg.femur, vLeg.femurSpeed)
+                                # self.servoController.move((legID - 1) * 3 +
+                                # 3, vLeg.tibia, vLeg.tibiaSpeed)
+
+                                # print("sleeping for: " + str(vLeg.maxExecTime))
+                                # time.sleep(vLeg.maxExecTime)
                             # except:
-                                #print("Error on line: " + str(lineNr))
+                                # print("Error on line: " + str(lineNr))
 
                     # Control individual servo
-                    if(words[0].lower().startswith('s:')):
+                    elif(words[0].lower().startswith('s:')):
                         if(len(words) < 2 or len(words) > 3):
                             raise NameError("Wrong amount of arguments for servo control: " + str(
                                 len(words)) + " at line: " + str(lineNr))
@@ -154,7 +211,8 @@ class SequenceController(object):
                             speed = int(words[2])
 
                         if(not validate):
-                            #print("Will control servo {0}, coords: {1}, speed: {2}".format(servoID, coords, speed))
+                            # print("Will control servo {0}, coords: {1},
+                            # speed: {2}".format(servoID, coords, speed))
                             s = 200
                             if(speed > 0):
                                 s = speed
@@ -163,7 +221,7 @@ class SequenceController(object):
                                 self.servoController.move(
                                     servoID, int(coords[0]), s)
                             # except:
-                                #print("Error on line: " + str(lineNr))
+                                # print("Error on line: " + str(lineNr))
 
     servoAngleMap = {
         1: 0.0,
@@ -184,7 +242,10 @@ class SequenceController(object):
         16: 0.0,
         17: 0.0,
         18: 0.0
-     }
+    }
+
+    # True if we need to get initial positions from servo
+    first = True
 
     def getServoPos(self, x, y, z, legID, speed):
         lIK = math.sqrt((self.d + self.lc + x)**2 + y**2)
@@ -195,20 +256,20 @@ class SequenceController(object):
         femurServoId = (legID - 1) * 3 + 2
         tibiaServoId = (legID - 1) * 3 + 3
 
-        # determine current position of servos
-        #coxaCurr = self.servoController.getPosition(coxaServoId)
-        #femurCurr = self.servoController.getPosition(femurServoId)
-        #tibiaCurr = self.servoController.getPosition(tibiaServoId)
-
         # get previous servo angles
         coxaCurr = self.servoAngleMap[coxaServoId]
         femurCurr = self.servoAngleMap[femurServoId]
         tibiaCurr = self.servoAngleMap[tibiaServoId]
-        
-        #print("current positions: " + str(coxaCurr) + ", " + str(femurCurr) + ", " + str(tibiaCurr))
 
-        alphaIK = math.acos(
-            (bIK**2 + self.c**2 - self.a**2) / (2 * bIK * self.c))
+        if (self.first is True):
+            self.first = False
+            coxaCurr = self.servoController.getPosition(coxaServoId)
+            femurCurr = self.servoController.getPosition(femurServoId)
+            tibiaCurr = self.servoController.getPosition(tibiaServoId)
+
+        # print("current positions: " + str(coxaCurr) + ", " + str(femurCurr) +
+        # ", " + str(tibiaCurr))
+
         betaIK = math.acos(
             (self.a**2 + self.c**2 - bIK**2) / (2 * self.a * self.c))
         gammaIK = math.acos(
@@ -217,9 +278,10 @@ class SequenceController(object):
         tauIK = math.atan((self.e + z) / dIK)
 
         angleCoxa = thetaIK * (180 / math.pi)
-        angleFemur = -((gammaIK - tauIK) * (180 / math.pi))
+        angleFemur = -90 + ((gammaIK - tauIK) * (180 / math.pi))
         angleTibia = 180 - ((betaIK) * (180 / math.pi))
-        
+        # print ("angle tibia :" +str(angleTibia) +", tauIK: " + str(tauIK))
+
         self.servoAngleMap[coxaServoId] = angleCoxa
         self.servoAngleMap[femurServoId] = angleFemur
         self.servoAngleMap[tibiaServoId] = angleTibia
@@ -227,41 +289,39 @@ class SequenceController(object):
         deltaCoxa = abs(angleCoxa - coxaCurr)
         deltaFemur = abs(angleFemur - femurCurr)
         deltaTibia = abs(angleTibia - tibiaCurr)
-        #print("deltas " + str(deltaCoxa) + ", " + str(deltaFemur) + ", " + str(deltaTibia))
+        # print("deltas " + str(deltaCoxa) + ", " + str(deltaFemur) + ", " +
+        # str(deltaTibia))
 
-        retVal = LegVector()   
-
+        retVal = LegMovement()
         maxDelta = max(deltaCoxa, deltaFemur, deltaTibia)
-        
+
         if (maxDelta == 0):
             return None
-        
+
         if (maxDelta == deltaCoxa):
-            #print("max delta is coxa")            
+            # print("max delta is coxa")
             retVal.coxaSpeed = speed
             retVal.femurSpeed = int(round(speed * (deltaFemur / maxDelta), 0))
             retVal.tibiaSpeed = int(round(speed * (deltaTibia / maxDelta), 0))
         elif (maxDelta == deltaFemur):
-            #print("max delta is femur")
+            # print("max delta is femur")
             retVal.coxaSpeed = int(round(speed * (deltaCoxa / maxDelta), 0))
             retVal.femurSpeed = speed
             retVal.tibiaSpeed = int(round(speed * (deltaTibia / maxDelta), 0))
         elif (maxDelta == deltaTibia):
-            #print("max delta is tibia")
+            # print("max delta is tibia")
             retVal.coxaSpeed = int(round(speed * (deltaCoxa / maxDelta), 0))
             retVal.femurSpeed = int(round(speed * (deltaFemur / maxDelta), 0))
             retVal.tibiaSpeed = speed
 
         # optimal rpm is 114 without load
         timePerAngle = (114.0 * 360.0 / 60.0) * (speed / 1023.0)
-        #print("time per angle: " + str(timePerAngle))
-        maxExecTime = maxDelta / timePerAngle  
+        maxExecTime = maxDelta / timePerAngle
         retVal.maxExecTime = maxExecTime
 
-
-        #print("angleCoxa: " + str(angleCoxa))
-        #print("angleFemur: " + str(angleFemur))
-        #print("angleTibia: " + str(angleTibia))
+        # print("angleCoxa: " + str(angleCoxa))
+        # print("angleFemur: " + str(angleFemur))
+        # print("angleTibia: " + str(angleTibia))
 
         retVal.coxa = angleCoxa
         retVal.femur = angleFemur

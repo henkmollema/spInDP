@@ -69,5 +69,8 @@ class Spider(object):
 
     def stop(self):
         self.stopLoop = True
-        self.updatethread.join()
+        if (self.updatethread is not None):
+            self.updatethread.join()
+            
+        self.sequenceController.stop()
         print("Stopped the spider")

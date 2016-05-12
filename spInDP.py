@@ -6,7 +6,7 @@ def main():
     spider = Spider()
     spider.start()
     #spider.initBehaviorLoop()
-    spider.webserver.start()
+    #spider.webserver.start()
 
     #spider.stop()
     print("program ended")

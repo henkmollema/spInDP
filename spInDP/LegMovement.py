@@ -1,4 +1,4 @@
-class LegVector(object):   
+class LegMovement(object):   
    def __init__(self):
     self.coxa = 0.0
     self.tibia = 0.0
