@@ -16,7 +16,7 @@ class ServoController(object):
         speed = self.ax12.readSpeed(servo)
         return speed
         
-    def getTemp(self, servo):
+    def getTemperature(self, servo):
         temp = self.ax12.readTemperature(servo)
         return temp
         
@@ -36,6 +36,7 @@ class ServoController(object):
         for x in range(1, 19):
             tmp = {}
             tmp.position = getPosition(x)
+            tmp.temp     = getTemperature(x)
             tmp.load     = getLoad(x)
             tmp.voltage  = getVoltage(x)
             tmp.speed    = getSpeed(x)

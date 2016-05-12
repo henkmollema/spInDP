@@ -5,15 +5,15 @@
 		<img class="fullwidthImage" src="img/spider_render.png"/>
 		<div class='' ng-repeat="servo in servodata">
 			<div class='servoBlock servo{{$index + 1}}' >
-				<b>Position:</b> {{servo.PresentPosition}}
+				<b>Position:</b> {{servo.position}}
 				<br>
-				<b>Speed:</b> {{servo.PresentSpeed}}
+				<b>Speed:</b> {{servo.speed}}
 				<br>
-				<b>Load:</b> {{servo.PresentLoad}}
+				<b>Load:</b> {{servo.load}}
 				<br>
-				<b>Voltage:</b> {{servo.PresentVoltage}}
+				<b>Voltage:</b> {{servo.voltage}}
 				<br>
-				<b>Temp:</b> {{servo.PresentTemp}}
+				<b>Temp:</b> {{servo.temp}}
 				<br>
 			</div>
 		</div>
