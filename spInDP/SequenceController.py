@@ -26,7 +26,7 @@ class SequenceController(object):
         # Initialize a thread and queue per leg
         for x in range(1, 7):
             self.legQueue[x] = Queue.Queue()
-            self.threadMap[x] = LegThread(x, self, name='legthread' + str(x))
+            self.threadMap[x] = LegThread(x, self)
             self.threadMap[x].start()
 
     def stop(self):

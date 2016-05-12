@@ -5,7 +5,7 @@ import threading
 class LegThread(threading.Thread):
     """Provides a thread for handling leg movements."""
 
-        def __init__(self, legId, sequenceController, group=None, target=None, name=None, args=(), kwargs=None, verbose=None):
+        def __init__(self, legId, sequenceController, group=None, target=None, args=(), kwargs=None, verbose=None):
             super(LegThread, self).__init__()
             self.target = target
             self.name = 'LegThread' + str(legId)
