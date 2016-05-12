@@ -8,6 +8,7 @@ http://savageelectronics.blogspot.it/2011/01/arduino-y-dynamixel-ax-12.html
 
 from time import sleep
 from serial import Serial
+import threading
 import RPi.GPIO as GPIO
 
 class Ax12:
@@ -144,6 +145,7 @@ class Ax12:
             GPIO.setup(Ax12.RPI_DIRECTION_PIN, GPIO.OUT)
             Ax12.gpioSet = True
         self.direction(Ax12.RPI_DIRECTION_RX)
+        self.mutex = threading.Lock()
 
     connectedServos = []
 
@@ -197,11 +199,15 @@ class Ax12:
                 else:
                     reply = Ax12.port.read(1)
                     returnValue = ord(reply[0])
+                 
+                self.mutex.release()
                 return returnValue
-        except Exception as detail:
+        except Exception as detail:            
+            self.mutex.release()
             raise Ax12.axError(detail)
 
     def ping(self,id):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_READ_DATA + Ax12.AX_PING))&0xff
@@ -217,6 +223,7 @@ class Ax12:
 
     def factoryReset(self,id, confirm = False):
         if(confirm):
+            self.mutex.acquire()
             self.direction(Ax12.RPI_DIRECTION_TX)
             Ax12.port.flushInput()
             checksum = (~(id + Ax12.AX_RESET_LENGTH + Ax12.AX_RESET))&0xff
@@ -234,6 +241,7 @@ class Ax12:
             return
 
     def setID(self, id, newId):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_ID_LENGTH + Ax12.AX_WRITE_DATA + Ax12.AX_ID + newId))&0xff
@@ -250,6 +258,7 @@ class Ax12:
         return self.readData(id)
 
     def setBaudRate(self, id, baudRate):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         br = ((2000000/long(baudRate))-1)
@@ -267,6 +276,7 @@ class Ax12:
         return self.readData(id)
 
     def setStatusReturnLevel(self, id, level):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_SRL_LENGTH + Ax12.AX_WRITE_DATA + Ax12.AX_RETURN_LEVEL + level))&0xff
@@ -283,6 +293,7 @@ class Ax12:
         return self.readData(id)
 
     def setReturnDelayTime(self, id, delay):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_RDT_LENGTH + Ax12.AX_WRITE_DATA + Ax12.AX_RETURN_DELAY_TIME + (int(delay)/2)&0xff))&0xff
@@ -299,6 +310,7 @@ class Ax12:
         return self.readData(id)
 
     def lockRegister(self, id):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_LR_LENGTH + Ax12.AX_WRITE_DATA + Ax12.AX_LOCK + Ax12.AX_LOCK_VALUE))&0xff
@@ -315,6 +327,7 @@ class Ax12:
         return self.readData(id)
 
     def move(self, id, position):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         p = [position&0xff, position>>8]
@@ -333,6 +346,7 @@ class Ax12:
         return self.readData(id)
 
     def moveSpeed(self, id, position, speed):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)        
         Ax12.port.flushInput()
         p = [position&0xff, position>>8]
@@ -357,6 +371,7 @@ class Ax12:
         return None
 
     def moveRW(self, id, position):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         p = [position&0xff, position>>8]
@@ -375,6 +390,7 @@ class Ax12:
         return self.readData(id)
 
     def moveSpeedRW(self, id, position, speed):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         p = [position&0xff, position>>8]
@@ -396,6 +412,7 @@ class Ax12:
         return self.readData(id)
 
     def action(self):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         outData = chr(Ax12.AX_START)
@@ -408,6 +425,7 @@ class Ax12:
         #sleep(Ax12.TX_DELAY_TIME)
 
     def setTorqueStatus(self, id, status):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         ts = 1 if ((status == True) or (status == 1)) else 0
@@ -425,6 +443,7 @@ class Ax12:
         return self.readData(id)
 
     def setLedStatus(self, id, status):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         ls = 1 if ((status == True) or (status == 1)) else 0
@@ -442,6 +461,7 @@ class Ax12:
         return self.readData(id)
 
     def setTemperatureLimit(self, id, temp):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_TL_LENGTH + Ax12.AX_WRITE_DATA + Ax12.AX_LIMIT_TEMPERATURE + temp))&0xff
@@ -458,6 +478,7 @@ class Ax12:
         return self.readData(id)
 
     def setVoltageLimit(self, id, lowVolt, highVolt):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_VL_LENGTH + Ax12.AX_WRITE_DATA + Ax12.AX_DOWN_LIMIT_VOLTAGE + lowVolt + highVolt))&0xff
@@ -475,6 +496,7 @@ class Ax12:
         return self.readData(id)
 
     def setAngleLimit(self, id, cwLimit, ccwLimit):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         cw = [cwLimit&0xff, cwLimit>>8]
@@ -496,6 +518,7 @@ class Ax12:
         return self.readData(id)
 
     def setTorqueLimit(self, id, torque):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         mt = [torque&0xff, torque>>8]
@@ -514,6 +537,7 @@ class Ax12:
         return self.readData(id)
 
     def setPunchLimit(self, id, punch):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         p = [punch&0xff, punch>>8]
@@ -532,6 +556,7 @@ class Ax12:
         return self.readData(id)
 
     def setCompliance(self, id, cwMargin, ccwMargin, cwSlope, ccwSlope):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_COMPLIANCE_LENGTH + Ax12.AX_WRITE_DATA + Ax12.AX_CW_COMPLIANCE_MARGIN + cwMargin + ccwMargin + cwSlope + ccwSlope))&0xff
@@ -551,6 +576,7 @@ class Ax12:
         return self.readData(id)
 
     def setLedAlarm(self, id, alarm):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_LEDALARM_LENGTH + Ax12.AX_WRITE_DATA + Ax12.AX_ALARM_LED + alarm))&0xff
@@ -567,6 +593,7 @@ class Ax12:
         return self.readData(id)
 
     def setShutdownAlarm(self, id, alarm):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_SHUTDOWNALARM_LENGTH + Ax12.AX_WRITE_DATA + Ax12.AX_ALARM_SHUTDOWN + alarm))&0xff
@@ -583,6 +610,7 @@ class Ax12:
         return self.readData(id)
 
     def readTemperature(self, id):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_TEM_LENGTH + Ax12.AX_READ_DATA + Ax12.AX_PRESENT_TEMPERATURE + Ax12.AX_BYTE_READ))&0xff
@@ -599,6 +627,7 @@ class Ax12:
         return self.readData(id)
 
     def readPosition(self, id):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_POS_LENGTH + Ax12.AX_READ_DATA + Ax12.AX_PRESENT_POSITION_L + Ax12.AX_INT_READ))&0xff
@@ -610,11 +639,12 @@ class Ax12:
         outData += chr(Ax12.AX_PRESENT_POSITION_L)
         outData += chr(Ax12.AX_INT_READ)
         outData += chr(checksum)
-        Ax12.port.write(outData)        
+        Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
         return self.readData(id)
 
     def readVoltage(self, id):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_VOLT_LENGTH + Ax12.AX_READ_DATA + Ax12.AX_PRESENT_VOLTAGE + Ax12.AX_BYTE_READ))&0xff
@@ -631,6 +661,7 @@ class Ax12:
         return self.readData(id)
 
     def readSpeed(self, id):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_SPEED_LENGTH + Ax12.AX_READ_DATA + Ax12.AX_PRESENT_SPEED_L + Ax12.AX_INT_READ))&0xff
@@ -647,6 +678,7 @@ class Ax12:
         return self.readData(id)
 
     def readLoad(self, id):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_LOAD_LENGTH + Ax12.AX_READ_DATA + Ax12.AX_PRESENT_LOAD_L + Ax12.AX_INT_READ))&0xff
@@ -663,6 +695,7 @@ class Ax12:
         return self.readData(id)
 
     def readMovingStatus(self, id):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_MOVING_LENGTH + Ax12.AX_READ_DATA + Ax12.AX_MOVING + Ax12.AX_BYTE_READ))&0xff
@@ -679,6 +712,7 @@ class Ax12:
         return self.readData(id)
 
     def readRWStatus(self, id):
+        self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         checksum = (~(id + Ax12.AX_RWS_LENGTH + Ax12.AX_READ_DATA + Ax12.AX_REGISTERED_INSTRUCTION + Ax12.AX_BYTE_READ))&0xff
