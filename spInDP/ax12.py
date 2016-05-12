@@ -7,8 +7,8 @@ http://savageelectronics.blogspot.it/2011/01/arduino-y-dynamixel-ax-12.html
 '''
 
 from time import sleep
-from serial import Serial
 import threading
+from serial import Serial
 import RPi.GPIO as GPIO
 
 class Ax12:
@@ -174,10 +174,10 @@ class Ax12:
     def readData(self,id):
         self.direction(Ax12.RPI_DIRECTION_RX)
         reply = Ax12.port.read(5) # [0xff, 0xff, origin, length, error]
-        
+
         #print ("reply bytes len: " + str(len(reply)))
         #print ("first byte: " + str(ord(reply[0])))
-        
+
         try:
             assert ord(reply[0]) == 0xFF
         except:
@@ -201,10 +201,10 @@ class Ax12:
                 else:
                     reply = Ax12.port.read(1)
                     returnValue = ord(reply[0])
-                 
+
                 self.mutex.release()
                 return returnValue
-        except Exception as detail:            
+        except Exception as detail:
             self.mutex.release()
             raise Ax12.axError(detail)
 
@@ -343,13 +343,13 @@ class Ax12:
         outData += chr(p[0])
         outData += chr(p[1])
         outData += chr(checksum)
-        Ax12.port.write(outData)        
+        Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
         return self.readData(id)
 
     def moveSpeed(self, id, position, speed):
         self.mutex.acquire()
-        self.direction(Ax12.RPI_DIRECTION_TX)        
+        self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
         p = [position&0xff, position>>8]
         s = [speed&0xff, speed>>8]
