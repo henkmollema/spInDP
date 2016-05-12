@@ -2,9 +2,36 @@ Sequence startup
 
 print Moving the legs of the spider into the starting position
 
+#l:1 0,0,0 100
+#l:2 0,0,0 100
+#l:3 0,0,0 100
+#l:4 0,0,0 100
+#l:5 0,0,0 100
+#l:6 0,0,0 100
+
+l:1 0,0,3 100
+#waitleg 1
+#delay 1
+l:2 0,0,3 100
+#waitleg 2
+#delay 1
+l:3 0,0,3 100
+#waitleg 3
+#delay 1
+l:4 0,0,3 100
+#waitleg 4
+#delay 1
+l:5 0,0,3 100
+#waitleg 5
+#delay 1
+l:6 0,0,3 100
+#waitleg 6
+
 l:1 0,0,0 100
 l:2 0,0,0 100
 l:3 0,0,0 100
 l:4 0,0,0 100
 l:5 0,0,0 100
 l:6 0,0,0 100
+
+waitlegs
