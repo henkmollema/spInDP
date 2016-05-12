@@ -41,6 +41,9 @@ class SequenceController(object):
         if sequenceName == "startup":
             #self.executeWalk()
             self.executeStartup()
+            
+        if sequenceName == "walk":
+            self.executeWalk()
 
     def executeWalk(self):
         self.parseSequence("sequences/walk.txt", repeat=5)
