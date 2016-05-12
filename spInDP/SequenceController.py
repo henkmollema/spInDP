@@ -222,6 +222,11 @@ class SequenceController(object):
         angleCoxa = thetaIK * (180 / math.pi)
         angleFemur = -90 + ((gammaIK - tauIK) * (180 / math.pi))
         angleTibia = 180 - ((betaIK) * (180 / math.pi))
+        
+        if (legID > 1 and legID < 5):
+            angleCoxa = -angleCoxa
+            angleFemur = -angleFemur
+            angleTibia = -angleTibia
 
         self.servoAngleMap[coxaServoId] = angleCoxa
         self.servoAngleMap[femurServoId] = angleFemur
