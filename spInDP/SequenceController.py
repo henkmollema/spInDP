@@ -90,7 +90,6 @@ class SequenceController(object):
 
                     # Wait for all lengs to complete their queued movements
                     elif (command == "waitlegs"):
-                        print("Waiting for all legs to finish")
                         for key in self.legQueue:
                             self.legQueue[key].join()
 
