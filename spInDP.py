@@ -5,7 +5,9 @@ from spInDP.BehaviorType import BehaviorType
 def main():
     spider = Spider()
     spider.start()
-    #spider.initBehaviorLoop()
+    spider.initBehaviorLoop()
+    
+    # Call to webserver.start() blocks the main thread
     spider.webserver.start()
 
     #spider.stop()
