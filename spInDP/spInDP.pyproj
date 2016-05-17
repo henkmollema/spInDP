@@ -5,7 +5,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>ada7b2b0-020e-4eda-8216-55803918c517</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>spInDP.py</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -14,7 +15,7 @@
     <RootNamespace>spInDP</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
     <InterpreterId>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</InterpreterId>
-    <InterpreterVersion>3.4</InterpreterVersion>
+    <InterpreterVersion>2.7</InterpreterVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,8 +30,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="AutonomeBehavior.py" />
+    <Compile Include="ax12.py" />
     <Compile Include="Behavior.py" />
     <Compile Include="BehaviorType.py" />
+    <Compile Include="LegMovement.py" />
+    <Compile Include="LegThread.py" />
     <Compile Include="ManualBehavior.py" />
     <Compile Include="RemoteContext.py">
       <SubType>Code</SubType>
@@ -50,15 +54,12 @@
     <Compile Include="Spider.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="spInDP.py" />
+    <Compile Include="WebServer.py" />
     <Compile Include="__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\2.7" />
     <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\3.4" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="sequence_walk.json" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

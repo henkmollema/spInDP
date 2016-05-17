@@ -9,6 +9,7 @@ from spInDP.BehaviorType import BehaviorType
 from spInDP.WebServer import WebServer
 from spInDP.VisionController import VisionController
 
+
 class Spider(object):
     """Encapsulates the interaction with the spider."""
 
@@ -28,8 +29,6 @@ class Spider(object):
     def start(self):
         print("Starting the spider")
         self.sequenceController.execute("startup")
-        print("Starting the webserver")
-        self.webserver.start()
 
     def updateLoop(self):
         # Simulate 60fps update.
@@ -41,7 +40,7 @@ class Spider(object):
         self.updatethread = Thread(target=self.updateLoop)
         self.updatethread.deamon = True
         self.updatethread.start()
-    
+
     def startWebserverThread(self):
         self.webserverthread = Thread(target=self.webserver.start)
         self.webserverthread.daemon = True
@@ -73,5 +72,8 @@ class Spider(object):
 
     def stop(self):
         self.stopLoop = True
-        self.updatethread.join()
+        if (self.updatethread is not None):
+            self.updatethread.join()
+
+        self.sequenceController.stop()
         print("Stopped the spider")

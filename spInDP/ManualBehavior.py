@@ -1,5 +1,6 @@
 from spInDP.Behavior import Behavior
 
+
 class ManualBehavior(Behavior):
     """Provides manual behavior of a spider."""
 
@@ -9,4 +10,3 @@ class ManualBehavior(Behavior):
 
     def update(self):
         return
-        #print("Update from ManualBehavior with context" + str(self.remoteContext))

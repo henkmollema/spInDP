@@ -1,29 +1,36 @@
 angular.module('starter.controllers', [])
 
-.controller('SpiderCtrl', function($scope, SpiderService) {
+.controller('SpiderCtrl', function($scope, SpiderService, ServoDataService) {
 	$scope.testConnection = function()
 	{
-		SpiderService.getFromSpider();
+		ServoDataService.get(function (data) {
+			$scope.servodata = data;
+		});
 	}
+
+	
+	
+	
+	
 	$scope.servodata = [
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"}, //Dummy servo 'data'
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
-	{PresentPosition: "100", PresentSpeed: "42", PresentLoad: "2", PresentVoltage: "5", PresentTemp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"}, //Dummy servo 'data'
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
+	{position: "100", speed: "42", load: "2", voltage: "5", temp: "30"},					
 	]; 
 	
 })
