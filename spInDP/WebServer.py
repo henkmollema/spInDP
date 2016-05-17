@@ -1,4 +1,6 @@
 import subprocess
+import time
+import os
 from flask import Flask, render_template, Response
 
 webserverinstance = None
@@ -13,12 +15,19 @@ class WebServer:
         self.spider = spider
     
     def start(self):
-        self.app.run(host='0.0.0.0', port=80, debug=True, threaded=True)
+        self.app.run(host='0.0.0.0', port=80, debug=False, threaded=True)
     
     def format_response(self, message, mimetype='application/json'):
         resp = Response(message, status=200, mimetype=mimetype)
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return resp
+ 
+    def gen_cam(self):
+        while True:
+            frame = self.spider.visioncontroller.GetImage()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            time.sleep(0.01)
 
     @staticmethod
     @app.route("/")
@@ -29,7 +38,7 @@ class WebServer:
     @app.route("/app")
     def api_app():
         return webserverinstance.format_response("{\"spiderstatus\": \"Hoi\"}")
-        
+
     @staticmethod
     @app.route("/control/<animation>")
     @app.route("/control/<animation>/<repeat>")
@@ -37,15 +46,8 @@ class WebServer:
         print ("exec animation: " + animation)
         webserverinstance.spider.sequenceController.parseSequence("sequences/" + animation, repeat = int(repeat))
         return webserverinstance.format_response("animation executed: sequences/" + animation)
-
-    #def gen(self, camera):
-    #    """Video streaming generator function."""
-    #    while True:
-    #        frame = camera.get_frame()
-    #        yield (b'--frame\r\n'
-    #               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-            #time.sleep(0.05)
-
-    #@app.route("/app/camera")
-    #def api_app_camera(self):
-    #    return format_response(gen(Camera()), mimetype='multipart/x-mixed-replace; boundary=frame')
+    
+    @staticmethod
+    @app.route("/camera")
+    def api_camera():
+        return webserverinstance.format_response(webserverinstance.gen_cam(), mimetype='multipart/x-mixed-replace; boundary=frame')

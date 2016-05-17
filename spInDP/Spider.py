@@ -7,6 +7,7 @@ from spInDP.ManualBehavior import ManualBehavior
 from spInDP.AutonomeBehavior import AutonomeBehavior
 from spInDP.BehaviorType import BehaviorType
 from spInDP.WebServer import WebServer
+from spInDP.VisionController import VisionController
 
 class Spider(object):
     """Encapsulates the interaction with the spider."""
@@ -17,6 +18,7 @@ class Spider(object):
         self.remoteController = RemoteController(self)
         self.servoController = ServoController()
         self.sequenceController = SequenceController(self)
+        self.visioncontroller = VisionController()
         self.webserver = WebServer(self)
 
         self.behavior = ManualBehavior(self.remoteController.Context)
@@ -26,6 +28,8 @@ class Spider(object):
     def start(self):
         print("Starting the spider")
         self.sequenceController.execute("startup")
+        print("Starting the webserver")
+        self.webserver.start()
 
     def updateLoop(self):
         # Simulate 60fps update.
