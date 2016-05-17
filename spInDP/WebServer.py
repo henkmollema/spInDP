@@ -62,7 +62,7 @@ class WebServer:
         print("exec animation: " + animation)
         webserverinstance.spider.sequenceController.parseSequence(
             "sequences/" + animation, repeat=int(repeat))
-        return webserverinstance.format_response("animation executed: sequences/" + animation)
+        #return webserverinstance.format_response("animation executed: sequences/" + animation)
 
     @staticmethod
     @app.route("/behavior/<behaviortype>")
@@ -84,11 +84,27 @@ class WebServer:
         print("Got control reset command")
         webserverinstance.spider.sequenceController.parseSequence(
             "sequences/startup.txt", repeat=1)
-        return webserverinstance.format_response("reset")
+        #return webserverinstance.format_response("reset")
 
     @staticmethod
     @app.route("/control/stop/")
     def api_control_stop():
         print("Got control stop command")
         webserverinstance.spider.stop()
-        return webserverinstance.format_response("stop")
+        #return webserverinstance.format_response("stop")
+        
+    @staticmethod
+    @app.route("/remote/", methods=['GET','POST'])
+    def remote():
+        if request.method == 'POST':
+            animation = request.form['motion']
+            value = request.form['value']
+            if value == "stop":
+                webserverinstance.api_control_stop()
+            elif value == "reset":
+                webserverinstance.api_control_reset()
+            else:
+                webserverinstance.api_control_animation(animation,1)
+            return render_template('temp.html')
+        else:
+            return render_template('test.html')

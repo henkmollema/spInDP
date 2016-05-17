@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Scarjo - remote</title>
+    <script>
+    /*
+      $(function () {
+        $('form').bind('button', function () {
+          $.ajax({
+            type: 'post',
+            url: '/controller/<' + data: $(),
+            data: $('form').serialize()
+            data: $(this).attr("value"));
+          });
+          return false;
+        });
+      });
+      */
+      
+      
+      $('.move').click(function() {
+            var animations = walk.txt
+            $.get(window.location.host + '/control/<' + animations + '>/');
+        });
+    </script>
+</head>
+<body>
+    <form>
+        <input type="button" id="move" value="Forward">
+        <input type="button" id="move" value="Left">
+        <input type="button" id="move" value="Right">
+        <input type="button" id="move" value="Back">
+        <input type="button" id="move" value="Stop">
+    </form>
+</body>
+</html>
