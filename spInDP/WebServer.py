@@ -1,7 +1,7 @@
 import subprocess
 import time
 import os
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, request
 
 webserverinstance = None
 
@@ -16,7 +16,7 @@ class WebServer:
         self.spider = spider
 
     def start(self):
-        self.app.run(host='0.0.0.0', port=80, debug=False, threaded=True)
+        self.app.run(host='0.0.0.0', port=80, debug=True, threaded=True)
 
     def format_response(self, message, mimetype='application/json'):
         resp = Response(message, status=200, mimetype=mimetype)
@@ -62,7 +62,7 @@ class WebServer:
         print("exec animation: " + animation)
         webserverinstance.spider.sequenceController.parseSequence(
             "sequences/" + animation, repeat=int(repeat))
-        #return webserverinstance.format_response("animation executed: sequences/" + animation)
+        return webserverinstance.format_response("animation executed: sequences/" + animation)
 
     @staticmethod
     @app.route("/behavior/<behaviortype>")
@@ -84,14 +84,14 @@ class WebServer:
         print("Got control reset command")
         webserverinstance.spider.sequenceController.parseSequence(
             "sequences/startup.txt", repeat=1)
-        #return webserverinstance.format_response("reset")
+        return webserverinstance.format_response("reset")
 
     @staticmethod
     @app.route("/control/stop/")
     def api_control_stop():
         print("Got control stop command")
         webserverinstance.spider.stop()
-        #return webserverinstance.format_response("stop")
+        return webserverinstance.format_response("stop")
         
     @staticmethod
     @app.route("/remote/", methods=['GET','POST'])
