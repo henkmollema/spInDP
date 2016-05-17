@@ -16,6 +16,8 @@ class SequenceController(object):
     d = 12.24  # Horz. afstand van c tot a (cm)
     lc = 4.107  # Lengte coxa (cm)
     b = math.sqrt(e**2 + d**2)  # diagonal (cm)
+    
+    offset = 0
 
     def __init__(self, spider):
         self.spider = spider
@@ -67,10 +69,13 @@ class SequenceController(object):
 
                     words = line.split(' ')
                     command = words[0].lower().rstrip()
-                    if (lineNr == 0 and words[0].lower() != "sequence"):
-                        raise(
-                            "Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
-                    elif (lineNr == 0):
+                    if (lineNr == 1 and words[0].lower() != "sequence"):
+                        raise("Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
+                    elif (lineNr == 1):
+                        if(len(words) > 3):
+                            self.offset = int(words[3])
+                        else:
+                            self.offset = 0
                         continue
 
                     if(command == "delay"):
@@ -268,7 +273,10 @@ class SequenceController(object):
         maxExecTime = maxDelta / timePerAngle
         retVal.maxExecTime = maxExecTime
 
+
         retVal.coxa = angleCoxa
+        if(legID == 1 or legID == 4): retVal.coxa += self.offset
+        if(legID == 2 or legID == 5): retVal.coxa -= self.offset
         retVal.femur = angleFemur
         retVal.tibia = angleTibia
         return retVal
