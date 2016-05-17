@@ -16,7 +16,7 @@ class WebServer:
         self.spider = spider
 
     def start(self):
-        self.app.run(host='0.0.0.0', port=80, debug=True, threaded=True)
+        self.app.run(host='0.0.0.0', port=80, debug=False, threaded=True)
 
     def format_response(self, message, mimetype='application/json'):
         resp = Response(message, status=200, mimetype=mimetype)
@@ -64,7 +64,7 @@ class WebServer:
             "sequences/" + animation, repeat=int(repeat))
         return webserverinstance.format_response("animation executed: sequences/" + animation)
 
-    @staticmethod
+    @staticmethod 
     @app.route("/behavior/<behaviortype>")
     def api_control_behavior(behaviortype):
         print("got behavior command: " + behaviortype)
