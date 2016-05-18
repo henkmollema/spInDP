@@ -1,7 +1,7 @@
 import subprocess
 import time
 import os
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, request
 
 webserverinstance = None
 
@@ -74,7 +74,7 @@ class WebServer:
             "sequences/" + animation, repeat=int(repeat))
         return webserverinstance.format_response("animation executed: sequences/" + animation)
 
-    @staticmethod
+    @staticmethod 
     @app.route("/behavior/<behaviortype>")
     def api_control_behavior(behaviortype):
         print("got behavior command: " + behaviortype)
@@ -102,3 +102,19 @@ class WebServer:
         print("Got control stop command")
         webserverinstance.spider.stop()
         return webserverinstance.format_response("stop")
+        
+    @staticmethod
+    @app.route("/remote/", methods=['GET','POST'])
+    def remote():
+        if request.method == 'POST':
+            animation = request.form['motion']
+            value = request.form['value']
+            if value == "stop":
+                webserverinstance.api_control_stop()
+            elif value == "reset":
+                webserverinstance.api_control_reset()
+            else:
+                webserverinstance.api_control_animation(animation,1)
+            return render_template('temp.html')
+        else:
+            return render_template('test.html')

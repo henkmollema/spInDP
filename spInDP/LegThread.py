@@ -17,15 +17,22 @@ class LegThread(threading.Thread):
     def run(self):
         q = self.sequenceController.legQueue[self.legId]
         while not self.sequenceController.stopped:
-            vLeg = q.get()
-
-            self.sequenceController.servoController.move(
-                (self.legId - 1) * 3 + 1, vLeg.coxa, vLeg.coxaSpeed)
-            self.sequenceController.servoController.move(
-                (self.legId - 1) * 3 + 2, vLeg.femur, vLeg.femurSpeed)
-            self.sequenceController.servoController.move(
-                (self.legId - 1) * 3 + 3, vLeg.tibia, vLeg.tibiaSpeed)
-
-            time.sleep(vLeg.maxExecTime if vLeg.maxExecTime > 0 else 0.005)
-            q.task_done()
+            try:
+                vLeg = q.get()
+                
+                self.sequenceController.servoController.move(
+                    (self.legId - 1) * 3 + 1, vLeg.coxa, vLeg.coxaSpeed)
+                self.sequenceController.servoController.move(
+                    (self.legId - 1) * 3 + 2, vLeg.femur, vLeg.femurSpeed)
+                self.sequenceController.servoController.move(
+                    (self.legId - 1) * 3 + 3, vLeg.tibia, vLeg.tibiaSpeed)
+                
+                time.sleep(vLeg.maxExecTime if vLeg.maxExecTime > 0 else 0.005)
+            #except:
+                #print ("error on leg " + str(self.legId))
+            finally:
+                # Mark the task as done in the queue.
+                q.task_done()
+              
+        print ("while loop quited")
         return

@@ -1,0 +1,39 @@
+Sequence startup
+
+
+# x positief -> poot naar buiten
+# y positief -> poot naar achter
+# z positief -> poot omlaag
+
+
+l:1 0,0,0 100
+l:2 0,0,0 100
+l:3 0,0,0 100
+l:4 0,0,0 100
+l:5 0,0,0 100
+l:6 0,0,0 100
+
+waitlegs
+
+l:1 -2,0,3 100
+l:2 -2,0,3 100
+l:3 -3,0,3 100
+l:4 -2,0,3 100
+l:5 -2,0,3 100
+l:6 -3,0,3 100
+
+waitlegs
+
+# Links
+l:1 3,-10,0 100
+l:5 -7,-5,0 100
+l:6 -7,10,0 100
+
+#waitlegs
+
+# Rechts
+l:2 -7,7,0 100
+l:3 -7,-10,0 100
+l:4 3,5,0 100
+
+waitlegs
