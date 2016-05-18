@@ -29,6 +29,12 @@ class WebServer:
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             time.sleep(0.01)
+    def gen_cam_vision(self):
+        while True:
+            frame = self.spider.visioncontroller.GetImageVision()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            time.sleep(0.01)
 
     @staticmethod
     @app.route("/")
@@ -39,6 +45,10 @@ class WebServer:
     @app.route("/camera")
     def api_camera():
         return webserverinstance.format_response(webserverinstance.gen_cam(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    @staticmethod
+    @app.route("/vision")
+    def api_vision():
+        return webserverinstance.format_response(webserverinstance.gen_cam_vision(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
     @staticmethod
     @app.route("/app/servodata")
