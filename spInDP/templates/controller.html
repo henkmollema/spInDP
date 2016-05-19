@@ -1,24 +1,54 @@
 ﻿<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>ScarJo control panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+        crossorigin="anonymous">
+</head>
+
 <body>
-    <body> 
+    <div class="container" style="margin-top: 20px">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <input type="number" class="form-control" name="repeat" id="repeat" />
+                <button name="walk" type="button" id="walk" class="btn btn-primary" style="margin-top: 5px">Walk x times</button>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="btn-group">
+                    <button onclick="walkLeft()" name="left" type="button" id="left_btn" class="btn btn-default">&#8592;</button>
+                    <button onclick="walkForward()" name="up" type="button" id="up_btn" class="btn btn-default">&#8593;</button>
+                    <button onclick="walkBackward()" name="down" type="button" id="down_btn" class="btn btn-default">&#8595;</button>
+                    <button onclick="walkRight()" name="right" type="button" id="right_btn" class="btn btn-default">&#8594;</button>
+                </div>
 
-    <button onclick="walkLeft()" name="left"  type="button" id="left_btn">&#8592;</button>
-    <button onclick="walkForward()"name="up" type="button" id="up_btn">&#8593;</button>
-    <button onclick="walkBackward()" name="down" type="button" id="down_btn" >&#8595;</button>    
-    <button onclick="walkRight()" name="right" type="button" id="right_btn">&#8594;</button>
-   
+                <select id="behaviours" class="form-control">
+                    <option value="manual" selected="selected" >Manual</option>
+                    <option value="autonome">Autonome</option>
+                </select>
+                <select id="animations" class="form-control">
+                    <option value="walk" selected="selected">Walk</option>
+                    <option value="crab">Crab</option>
+                </select>
+            </div>
+        </div>
+    </div>
 
-    <select id="behaviours">
-        <option value="manual" selected="selected" >Manual</option>
-        <option value="autonome">Autonome</option>
-    </select>
-    <select id="animations">
-        <option value="walk" selected="selected" >Walk</option>
-        <option value="crab">Crab</option>
-    </select>
-
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
     <script>
+        $(function(){
+            $('#walk').click(function(){
+                var repeat = $('#repeat').val();
+                if (repeat <= 0){
+                    repeat = 1;
+                }
+                
+                $.get(window.location.host + '/sequence/walk.txt/' + repeat);
+            });
+        });
         ////Browser Support Code
         //function ajaxFunction() {
         //    var ajaxRequest;  // The variable that makes Ajax possible!
@@ -115,8 +145,8 @@
                     break;
             }
         }
-    
     </script>
 
 </body>
+
 </html>

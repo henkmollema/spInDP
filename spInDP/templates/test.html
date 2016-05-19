@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="eng">
+
 <head>
-<title>remote</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-<script>
-  $(document).ready(function(){
+  <title>remote</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+  <script>
+    $(document).ready(function(){
     $('button').click(function(){
         $val = $(this).val()
         $seq = $('select').val()
@@ -12,24 +13,28 @@
         //$.post('/remote/', {motion: 'walk.txt', value: $val});
     });
   });
-    
-</script>
-<style>
-button {display: block;}
-</style>
+
+  </script>
+  <style>
+    button {
+      display: block;
+    }
+  </style>
 </head>
+
 <body>
-<button type="button" value="forward">Forward</button>
-<button type="button" value="back">Back</button>
-<button type="button" value="left">Left</button>
-<button type="button" value="right">Right</button>
-<button type="button" value="stop">Stop</button>
-<button type="button" value="reset">Reset</button>
-<form>
-<select name="seq">
+  <button type="button" value="forward">Forward</button>
+  <button type="button" value="back">Back</button>
+  <button type="button" value="left">Left</button>
+  <button type="button" value="right">Right</button>
+  <button type="button" value="stop">Stop</button>
+  <button type="button" value="reset">Reset</button>
+  <form>
+    <select name="seq">
   <option value="walk.txt" selected>walk</option>
   <option value="crab-walk.txt">crab-walk</option>
 </select>
-</form>
+  </form>
 </body>
+
 </html>
