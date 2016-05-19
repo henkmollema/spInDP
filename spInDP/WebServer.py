@@ -63,32 +63,3 @@ class WebServer:
         webserverinstance.spider.sequenceController.parseSequence(
             "sequences/" + animation, repeat=int(repeat))
         return webserverinstance.format_response("animation executed: sequences/" + animation)
-
-    @staticmethod
-    @app.route("/behavior/<behaviortype>")
-    def api_control_behavior(behaviortype):
-        print("got behavior command: " + behaviortype)
-        webserverinstance.spider.switchBehavior(behaviortype)
-        return webserverinstance.format_response("switch behavior: " + behaviortype)
-
-    @staticmethod
-    @app.route("/control/walk/<x>/<y>")
-    def api_control_walk(x, y):
-        print("Got control walk command: " + x + ", " + y)
-
-        return webserverinstance.format_response("Walk xy: " + x + ", " + y)
-
-    @staticmethod
-    @app.route("/control/reset")
-    def api_control_reset():
-        print("Got control reset command")
-        webserverinstance.spider.sequenceController.parseSequence(
-            "sequences/startup.txt", repeat=1)
-        return webserverinstance.format_response("reset")
-
-    @staticmethod
-    @app.route("/control/stop/")
-    def api_control_stop():
-        print("Got control stop command")
-        webserverinstance.spider.stop()
-        return webserverinstance.format_response("stop")
