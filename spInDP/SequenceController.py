@@ -16,7 +16,7 @@ class SequenceController(object):
     d = 12.24  # Horz. afstand van c tot a (cm)
     lc = 4.107  # Lengte coxa (cm)
     b = math.sqrt(e**2 + d**2)  # diagonal (cm)
-    
+
     offset = 0
 
     def __init__(self, spider):
@@ -56,18 +56,19 @@ class SequenceController(object):
 
     def parseSequence(self, filePath, validate=False, direction=1, repeat=1):
         print("Parsing sequence at: " + filePath)
-        
+
         with open(filePath, 'r') as f:
             lines = f.readLines()
-        
+
         reversed = False
-        if(direction < 0): reversed = True
+        if(direction < 0):
+            reversed = True
 
         for x in range(0, repeat):
             lineNr = 0
-            
+
             if(reversed):
-                lineNr = len(lines);
+                lineNr = len(lines)
                 for line in reversed(lines):
                     interpretLine(line, lineNr, direction, validate)
                     lineNr -= 1
@@ -77,122 +78,122 @@ class SequenceController(object):
                     interpretLine(line, lineNr, direction, validate)
                     lineNr += 1
 
-def interpretLine(self, line, lineNr, direction=1, validate=False):
-    if(line.lstrip().startswith("#") or len(line) == 0):
-        return
+    def interpretLine(self, line, lineNr, direction=1, validate=False):
+        if(line.lstrip().startswith("#") or len(line) == 0):
+            return
 
-    words = line.split(' ')
-    command = words[0].lower().rstrip()
-    if (lineNr == 1 and words[0].lower() != "sequence"):
-        raise("Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
-    elif (lineNr == 1):
-        if(len(words) > 3):
-            self.offset = int(words[3])
+        words = line.split(' ')
+        command = words[0].lower().rstrip()
+        if (lineNr == 1 and words[0].lower() != "sequence"):
+            raise(
+                "Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
+        elif (lineNr == 1):
+            if(len(words) > 3):
+                self.offset = int(words[3])
+            else:
+                self.offset = 0
+            return
+
+        if(command == "delay"):
+            if(len(words) != 2):
+                raise NameError(
+                    "No argument given for delay at line: " + str(lineNr))
+
+            seconds = float(words[1]) / 1000
+
+            if(not validate):
+                time.sleep(seconds)
+
+        # Wait for all lengs to complete their queued movements
+        elif (command == "waitlegs"):
+            for key in self.legQueue:
+                self.legQueue[key].join()
+
+        # Wait for a single leg to complete its queued movement
+        elif (command == "waitleg"):
+            if (len(words) != 2):
+                raise NameError(
+                    "Wrong amount of arguments for 'waitleg' command. Expected: 1.")
+
+            legId = int(words[1])
+            print("waiting for movement of leg " +
+                  str(legId) + " to finish")
+
+            # Join will block the calling thread until all items in
+            # the queue are processed
+            self.legQueue[legId].join()
+
+        elif (command == "print"):
+            if (len(words) < 2):
+                raise NameError("Nothing to print")
+
+            print(' '.join(words[1:])[:-1])
+
+        elif (command == "include"):
+            if (len(words) < 2):
+                raise NameError("No sequence file given")
+
+            seq = words[1]
+            print("including sequence: " + seq)
+            repeat = 1
+            if (len(words) > 2):
+                repeat = int(words[2])
+
+            self.parseSequence(
+                "sequences/" + seq.rstrip() + ".txt", repeat=repeat)
+
+        # Control legs
+        elif(words[0].lower().startswith('l:')):
+            if(len(words) < 2 or len(words) > 3):
+                raise NameError("Wrong amount of arguments for servo control: " + str(
+                    len(words)) + " at line: " + str(lineNr))
+
+            legID = int(words[0].split(':')[1])
+            coords = words[1].split(',')
+            if(len(coords) != 3):
+                raise NameError(
+                    "Wrong amount of coords: " + str(len(coords)) + " (expected 3) at line: " + str(lineNr))
+
+            speed = -1
+            if(len(words) == 3):
+                speed = int(words[2])
+
+            if(not validate):
+                s = 200
+                if(speed > 0):
+                    s = speed
+                    vLeg = self.getServoPos(float(coords[0]), float(
+                        coords[1]), float(coords[2]), legID, s * abs(direction))
+
+                    if (vLeg is None):
+                        return
+
+                    self.legQueue[legID].put(vLeg)
+
+        # Control individual servo
+        elif(words[0].lower().startswith('s:')):
+            if(len(words) < 2 or len(words) > 3):
+                raise NameError("Wrong amount of arguments for servo control: " + str(
+                    len(words)) + " at line: " + str(lineNr))
+
+            servoID = int(words[0].split(':')[1])
+            coords = words[1].split(',')
+            if(len(coords) != 1):
+                raise NameError(
+                    "Wrong amount of coords: " + str(len(coords)) + " (expected 1) at line: " + str(lineNr))
+
+            speed = -1
+            if(len(words) == 3):
+                speed = int(words[2])
+
+            if(not validate):
+                s = 200
+                if(speed > 0):
+                    s = speed
+                    self.servoController.move(
+                        servoID, int(coords[0]), s * abs(direction))
         else:
-            self.offset = 0
-        return
-
-    if(command == "delay"):
-        if(len(words) != 2):
-            raise NameError(
-                "No argument given for delay at line: " + str(lineNr))
-
-        seconds = float(words[1]) / 1000
-
-        if(not validate):
-            time.sleep(seconds)
-
-    # Wait for all lengs to complete their queued movements
-    elif (command == "waitlegs"):
-        for key in self.legQueue:
-            self.legQueue[key].join()
-
-    # Wait for a single leg to complete its queued movement
-    elif (command == "waitleg"):
-        if (len(words) != 2):
-            raise NameError(
-                "Wrong amount of arguments for 'waitleg' command. Expected: 1.")
-
-        legId = int(words[1])
-        print("waiting for movement of leg " +
-                str(legId) + " to finish")
-
-        # Join will block the calling thread until all items in
-        # the queue are processed
-        self.legQueue[legId].join()
-
-    elif (command == "print"):
-        if (len(words) < 2):
-            raise NameError("Nothing to print")
-
-        print(' '.join(words[1:])[:-1])
-
-    elif (command == "include"):
-        if (len(words) < 2):
-            raise NameError("No sequence file given")
-
-        seq = words[1]
-        print("including sequence: " + seq)
-        repeat = 1
-        if (len(words) > 2):
-            repeat = int(words[2])
-
-        self.parseSequence(
-            "sequences/" + seq.rstrip() + ".txt", repeat=repeat)
-
-    # Control legs
-    elif(words[0].lower().startswith('l:')):
-        if(len(words) < 2 or len(words) > 3):
-            raise NameError("Wrong amount of arguments for servo control: " + str(
-                len(words)) + " at line: " + str(lineNr))
-
-        legID = int(words[0].split(':')[1])
-        coords = words[1].split(',')
-        if(len(coords) != 3):
-            raise NameError(
-                "Wrong amount of coords: " + str(len(coords)) + " (expected 3) at line: " + str(lineNr))
-
-        speed = -1
-        if(len(words) == 3):
-            speed = int(words[2])
-
-        if(not validate):
-            s = 200
-            if(speed > 0):
-                s = speed
-                vLeg = self.getServoPos(float(coords[0]), float(
-                    coords[1]), float(coords[2]), legID, s * abs(direction))
-
-                if (vLeg is None):
-                    return
-
-                self.legQueue[legID].put(vLeg)
-
-    # Control individual servo
-    elif(words[0].lower().startswith('s:')):
-        if(len(words) < 2 or len(words) > 3):
-            raise NameError("Wrong amount of arguments for servo control: " + str(
-                len(words)) + " at line: " + str(lineNr))
-
-        servoID = int(words[0].split(':')[1])
-        coords = words[1].split(',')
-        if(len(coords) != 1):
-            raise NameError(
-                "Wrong amount of coords: " + str(len(coords)) + " (expected 1) at line: " + str(lineNr))
-
-        speed = -1
-        if(len(words) == 3):
-            speed = int(words[2])
-
-        if(not validate):
-            s = 200
-            if(speed > 0):
-                s = speed
-                self.servoController.move(
-                    servoID, int(coords[0]), s * abs(direction))
-    else:
-        raise NameError("No valid command found on line: "+str(lineNr))            
-
+            raise NameError("No valid command found on line: " + str(lineNr))
 
     servoAngleMap = {
         1: 0.0,
@@ -289,10 +290,11 @@ def interpretLine(self, line, lineNr, direction=1, validate=False):
         maxExecTime = maxDelta / timePerAngle
         retVal.maxExecTime = maxExecTime
 
-
         retVal.coxa = angleCoxa
-        if(legID == 1 or legID == 4): retVal.coxa += self.offset
-        if(legID == 2 or legID == 5): retVal.coxa -= self.offset
+        if(legID == 1 or legID == 4):
+            retVal.coxa += self.offset
+        if(legID == 2 or legID == 5):
+            retVal.coxa -= self.offset
         retVal.femur = angleFemur
         retVal.tibia = angleTibia
         return retVal
