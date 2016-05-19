@@ -31,7 +31,7 @@ class VisionController:
         frame = np.fromstring(originalImage, dtype=np.uint8)
         frame = cv2.imdecode(frame, 1)
         foundBlob, frame, coords, size = self.__vision.detect(frame)
-        print "coords: " + str(coords)
+        print "coords: " + str(coords) + " size: " + str(size)
         return cv2.imencode('.jpeg', frame)[1].tostring()
 
 class Camera(object):
@@ -68,6 +68,7 @@ class Camera(object):
             camera.exposure_compensation = 0
             camera.awb_mode = 'off'
             camera.awb_gains = (1.19, 1.43)
+            camera.shutter_speed = 20000
 
             #camera.start_preview()
             #time.sleep(1)
@@ -112,9 +113,9 @@ class Vision:
     def detect(self, image):
         imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         h,s,v = cv2.split(imagehsv)
-        h = self.thresholdRange(h, 160, 9)
-        v = self.thresholdRange(v, 130, 255)
-        s = self.thresholdRange(s, 120, 255)
+        h = self.thresholdRange(h, 175, 4)
+        s = self.thresholdRange(s, 110, 250)
+        v = self.thresholdRange(v, 160, 255)
         imageBin = h * s * v
 
         imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7,7)))
@@ -153,6 +154,6 @@ class Vision:
             size = -1
 
         if foundBlob:
-            image = cv2.drawKeypoints(image, keypoints, np.array([]), (255,0,0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+            image = cv2.drawKeypoints(imageBin, keypoints, np.array([]), (255,0,0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 		
         return foundBlob, image, coords, size

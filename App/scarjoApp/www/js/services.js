@@ -1,4 +1,4 @@
-var API_HOST = "http://192.168.137.59/";
+var API_HOST = "http://192.168.137.82/";
 
 angular.module('starter.services', [])
 

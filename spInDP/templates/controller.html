@@ -1,0 +1,122 @@
+﻿<html>
+<body>
+    <body> 
+
+    <button onclick="walkLeft()" name="left"  type="button" id="left_btn">&#8592;</button>
+    <button onclick="walkForward()"name="up" type="button" id="up_btn">&#8593;</button>
+    <button onclick="walkBackward()" name="down" type="button" id="down_btn" >&#8595;</button>    
+    <button onclick="walkRight()" name="right" type="button" id="right_btn">&#8594;</button>
+   
+
+    <select id="behaviours">
+        <option value="manual" selected="selected" >Manual</option>
+        <option value="autonome">Autonome</option>
+    </select>
+    <select id="animations">
+        <option value="walk" selected="selected" >Walk</option>
+        <option value="crab">Crab</option>
+    </select>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+        ////Browser Support Code
+        //function ajaxFunction() {
+        //    var ajaxRequest;  // The variable that makes Ajax possible!
+
+        //    try {
+        //        // Opera 8.0+, Firefox, Safari 
+        //        ajaxRequest = new XMLHttpRequest();
+        //    } catch (e) {
+
+        //        // Internet Explorer Browsers
+        //        try {
+        //            ajaxRequest = new ActiveXObject("Msxml2.XMLHTTP");
+        //        } catch (e) {
+        //            try {
+        //                ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+        //            } catch (e) {
+
+        //                // Something went wrong
+        //                alert("Your browser broke!");
+        //                return false;
+        //            }
+        //        }
+        //    }
+        //}
+
+        // Get selected behaviour
+        var e = document.getElementById("behaviours");
+        var behaviours = e.options[e.selectedIndex].value;
+        // Get selected animation
+        var el = document.getElementById("animations");
+        var animation = el.options[el.selectedIndex].value;
+
+        function walkLeft() { 
+            //$(function () {
+            //    $('a#left_btn').bind('click', function () {
+            //        $.getJSON($SCRIPT_ROOT + '/control/' + animations);
+            //        
+            //    });
+            //});
+        }
+    
+        function walkForward() {
+           // ajaxFunction();
+           ////Here processRequest() is the callback function.
+           // ajaxRequest.onreadystatechange = processRequest;
+           // //var url = window.location.protocol + "//" + window.location.host + "/" + "control" + "/" + animation;
+           // var url = window.location.protocol + "//" + window.location.host + "/" + "contact";
+
+           // ajaxRequest.open("GET", url, true);
+            // ajaxRequest.send(null);
+
+            $(function () {
+                $("#up_btn").click(function (event) {                       //('a#up_btn').bind('click', function ()
+                    //$.getJSON($SCRIPT_ROOT + '/control/' + animations); 
+                    $.load($SCRIPT_ROOT + '/control/<' + animations + '>/');
+                });
+            });
+            
+        }        
+
+        function walkBackward() {
+            //$(function () {
+            //    $('a#down_btn').bind('click', function () {
+            //        $.getJSON($SCRIPT_ROOT + '/control/' + animations);
+            //        return false;
+            //    });
+            //});
+        }
+
+        function walkRight() {
+            //$(function () {
+            //    $('a#right_btn').bind('click', function () {
+            //        $.getJSON($SCRIPT_ROOT + '/control/' + animations);
+            //        return false;
+            //    });
+            //});
+        }
+
+        window.addEventListener("keydown", moveSpider, false);
+
+        function moveSpider(e) {
+            switch (e.keyCode) {
+                case 37:
+                    walkLeft();
+                    break;
+                case 38:
+                    walkForward();
+                    break;
+                case 39:
+                    walkRight();
+                    break;
+                case 40:
+                    walkBackwards();
+                    break;
+            }
+        }
+    
+    </script>
+
+</body>
+</html>
