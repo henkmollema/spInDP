@@ -31,7 +31,7 @@ class VisionController:
         frame = np.fromstring(originalImage, dtype=np.uint8)
         frame = cv2.imdecode(frame, 1)
         foundBlob, frame, coords, size = self.__vision.detect(frame)
-        print "coords: " + str(coords) + " size: " + str(size)
+        print("coords: " + str(coords) + " size: " + str(size))
         return cv2.imencode('.jpeg', frame)[1].tostring()
 
 class Camera(object):

@@ -1,7 +1,7 @@
 import time
 from threading import Thread
-from WebServer import WebServer
-from VisionController import VisionController
+from spInDP.WebServer import WebServer
+from spInDP.VisionController import VisionController
 
 class Spider:
     webserver = None

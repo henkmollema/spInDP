@@ -4,6 +4,7 @@ import threading
 import Queue
 from spInDP.LegMovement import LegMovement
 from spInDP.LegThread import LegThread
+from spInDP.SequenceFrame import SequenceFrame
 
 
 class SequenceController(object):
@@ -54,11 +55,13 @@ class SequenceController(object):
     def executeStartup(self):
         self.parseSequence("sequences/startup.txt")
 
+    sequenceFrame = None
+    
     def parseSequence(self, filePath, validate=False, direction=1, repeat=1):
         print("Parsing sequence at: " + filePath)
 
         with open(filePath, 'r') as f:
-            lines = f.readLines()
+            lines = f.readlines()
 
         reversed = False
         if(direction < 0):
@@ -70,12 +73,12 @@ class SequenceController(object):
             if(reversed):
                 lineNr = len(lines)
                 for line in reversed(lines):
-                    interpretLine(line, lineNr, direction, validate)
+                    self.interpretLine(line, lineNr, direction, validate)
                     lineNr -= 1
             else:
                 lineNr = 0
                 for line in lines:
-                    interpretLine(line, lineNr, direction, validate)
+                    self.interpretLine(line, lineNr, direction, validate)
                     lineNr += 1
 
     def interpretLine(self, line, lineNr, direction=1, validate=False):
@@ -85,8 +88,7 @@ class SequenceController(object):
         words = line.split(' ')
         command = words[0].lower().rstrip()
         if (lineNr == 1 and words[0].lower() != "sequence"):
-            raise(
-                "Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
+            raise("Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
         elif (lineNr == 1):
             if(len(words) > 3):
                 self.offset = int(words[3])
@@ -96,8 +98,7 @@ class SequenceController(object):
 
         if(command == "delay"):
             if(len(words) != 2):
-                raise NameError(
-                    "No argument given for delay at line: " + str(lineNr))
+                raise NameError("No argument given for delay at line: " + str(lineNr))
 
             seconds = float(words[1]) / 1000
 
@@ -142,6 +143,19 @@ class SequenceController(object):
             self.parseSequence(
                 "sequences/" + seq.rstrip() + ".txt", repeat=repeat)
 
+        elif (command == "framebegin"):
+            self.sequenceFrame = SequenceFrame()
+        
+        elif (command == "frameend"):
+            if (self.sequenceFrame is None):
+                return
+        
+            scaledMovements = self.sequenceFrame.getScaledMovements()
+            for k in scaledMovements:
+                self.sequenceFrame.movements[k] = scaledMovements[k]
+                
+            self.sequenceFrame = None
+        
         # Control legs
         elif(words[0].lower().startswith('l:')):
             if(len(words) < 2 or len(words) > 3):
@@ -167,8 +181,14 @@ class SequenceController(object):
 
                     if (vLeg is None):
                         return
+                        
+                    if (self.sequenceFrame is None):
+                        self.legQueue[legID].put(vLeg)
+                    else:
+                        if (self.sequenceFrame.movements[legID] is not None):
+                            raise NameError("Attempt to move leg " + str(legID) + " more than once in one frame")
 
-                    self.legQueue[legID].put(vLeg)
+                        self.sequenceFrame.movements[legID] = vLeg
 
         # Control individual servo
         elif(words[0].lower().startswith('s:')):
