@@ -1,6 +1,8 @@
 import subprocess
 import time
 import os
+import json
+import glob
 from flask import Flask, render_template, Response, request
 
 webserverinstance = None
@@ -73,3 +75,39 @@ class WebServer:
         webserverinstance.spider.sequenceController.parseSequence(
             "sequences/" + animation, repeat=int(repeat))
         return webserverinstance.format_response("animation executed: sequences/" + animation)
+
+   
+    @staticmethod
+    @app.route("/behavior/<behaviortype>")
+    def api_control_behavior(behaviortype):
+        print("got behavior command: " + behaviortype)
+        webserverinstance.spider.switchBehavior(behaviortype)
+        return webserverinstance.format_response("switch behavior: " + behaviortype)
+
+    @staticmethod
+    @app.route("/control/joystick/<x>/<y>")
+    def api_control_walk(jX, jY):
+        print("Got control joystick command: " + jX + ", " + jY)
+
+        return webserverinstance.format_response( jX + "," + jY)
+
+    @staticmethod
+    @app.route("/control/reset")
+    def api_control_reset():
+        print("Got control reset command")
+        webserverinstance.spider.sequenceController.parseSequence("sequences/startup.txt", repeat=1)
+        return webserverinstance.format_response("reset")
+
+    @staticmethod
+    @app.route("/control/stop/")
+    def api_control_stop():
+        print("Got control stop command")
+        webserverinstance.spider.stop()
+        return webserverinstance.format_response("stop")
+        
+    @staticmethod
+    @app.route("/control/sequencelist/")
+    def api_control_getSequences():
+        seqObj = {}
+        seqObj['sequenceFiles'] = glob.glob("../sequences/*.txt")
+        return json.dumps(seqObj, separators=(',', ':'))
