@@ -12,7 +12,7 @@ class SequenceController(object):
 
     # Based on physical dimensions of scarJo
     a = 11.0  # Femur length (cm)
-    c = 15.0  # Tibia (cm)
+    c = 16.4  # Tibia (cm)
     e = 5.60  # height (cm)
     d = 12.24  # Horz. afstand van c tot a (cm)
     lc = 4.107  # Lengte coxa (cm)
@@ -62,6 +62,16 @@ class SequenceController(object):
 
         with open(filePath, 'r') as f:
             lines = f.readlines()
+            
+        words = lines[0].split(' ')
+        if (lineNr == 1 and words[0].lower() != "sequence"):
+            raise("Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
+        elif (lineNr == 1):
+            if(len(words) > 3):
+                self.offset = int(words[3])
+            else:
+                self.offset = 0
+            return
 
         reversed = False
         if(direction < 0):
@@ -82,20 +92,12 @@ class SequenceController(object):
                     lineNr += 1
 
     def interpretLine(self, line, lineNr, direction=1, validate=False):
-        if(line.lstrip().startswith("#") or len(line) == 0):
+        if(line.lstrip().startswith("#") or len(line.strip()) == 0):
             return
-
+            
         words = line.split(' ')
         command = words[0].lower().rstrip()
-        if (lineNr == 1 and words[0].lower() != "sequence"):
-            raise("Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
-        elif (lineNr == 1):
-            if(len(words) > 3):
-                self.offset = int(words[3])
-            else:
-                self.offset = 0
-            return
-
+        
         if(command == "delay"):
             if(len(words) != 2):
                 raise NameError("No argument given for delay at line: " + str(lineNr))
