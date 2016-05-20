@@ -43,7 +43,6 @@ class SequenceController(object):
         print("Executing sequence: " + sequenceName)
 
         if sequenceName == "startup":
-            # self.executeWalk()
             self.executeStartup()
 
         if sequenceName == "walk":
@@ -56,25 +55,25 @@ class SequenceController(object):
         self.parseSequence("sequences/startup.txt")
 
     sequenceFrame = None
-    
-    def parseSequence(self, filePath, validate=False, direction=1, repeat=1):
+
+    def parseSequence(self, filePath, validate=False, speedModifier=1, repeat=1):
         print("Parsing sequence at: " + filePath)
 
         with open(filePath, 'r') as f:
             lines = f.readlines()
-            
+
         words = lines[0].split(' ')
         if (words[0].lower() != "sequence"):
-            raise("Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
+            raise(
+                "Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
         else:
             if(len(words) > 3):
                 self.offset = int(words[3])
             else:
                 self.offset = 0
-            return
 
         reversed = False
-        if(direction < 0):
+        if(speedModifier < 0):
             reversed = True
 
         for x in range(0, repeat):
@@ -83,21 +82,32 @@ class SequenceController(object):
             if(reversed):
                 lineNr = len(lines)
                 for line in reversed(lines):
-                    self.interpretLine(line, lineNr, direction, validate)
+                    self.interpretLine(line, lineNr, speedModifier, validate)
                     lineNr -= 1
             else:
-                lineNr = 0
+                lineNr = 1
                 for line in lines:
-                    self.interpretLine(line, lineNr, direction, validate)
+                    self.interpretLine(line, lineNr, speedModifier, validate)
                     lineNr += 1
 
-    def interpretLine(self, line, lineNr, direction=1, validate=False):
-        if(line.lstrip().startswith("#") or len(line.strip()) == 0):
+        if (filePath != "sequences/startup.txt"):
+            self.parseSequence("sequences/startup.txt")
+
+    def interpretLine(self, line, lineNr, speedModifier=1, validate=False):
+        if(lineNr == 1 or line.lstrip().startswith("#") or len(line.strip()) == 0):
             return
-            
+
         words = line.split(' ')
         command = words[0].lower().rstrip()
-        
+        #print("exec command: " + command)
+
+        # Reverse frames when in a backwards direction
+        if (speedModifier < 0):
+            if (command == "framebegin"):
+                command = "frameend"
+            elif (command == "frameend"):
+                command = "framebegin"
+
         if(command == "delay"):
             if(len(words) != 2):
                 raise NameError("No argument given for delay at line: " + str(lineNr))
@@ -147,17 +157,26 @@ class SequenceController(object):
 
         elif (command == "framebegin"):
             self.sequenceFrame = SequenceFrame()
-        
+
         elif (command == "frameend"):
             if (self.sequenceFrame is None):
                 return
-        
+
             scaledMovements = self.sequenceFrame.getScaledMovements()
-            for k in scaledMovements:
-                self.sequenceFrame.movements[k] = scaledMovements[k]
-                
+            for x in range(1, 7):
+                mov = scaledMovements.get(x, None)
+
+                # Create an 'empty movement
+                if (mov is None):
+                    mov = LegMovement()
+                    mov.empty = True
+                    mov.maxExecTime = self.sequenceFrame.maxMaxExecTime
+
+                self.legQueue[x].put(mov)
+
+            self.sequenceFrame.movements.clear()
             self.sequenceFrame = None
-        
+
         # Control legs
         elif(words[0].lower().startswith('l:')):
             if(len(words) < 2 or len(words) > 3):
@@ -179,16 +198,20 @@ class SequenceController(object):
                 if(speed > 0):
                     s = speed
                     vLeg = self.getServoPos(float(coords[0]), float(
-                        coords[1]), float(coords[2]), legID, s * abs(direction))
+                        coords[1]), float(coords[2]), legID, s * abs(speedModifier))
 
                     if (vLeg is None):
                         return
-                        
+
                     if (self.sequenceFrame is None):
                         self.legQueue[legID].put(vLeg)
                     else:
-                        if (self.sequenceFrame.movements[legID] is not None):
-                            raise NameError("Attempt to move leg " + str(legID) + " more than once in one frame")
+                        #print ("add leg move to frame")
+                        # for i in self.sequenceFrame.movements:
+                            # print i, self.sequenceFrame.movements[i].tibia
+                        if (self.sequenceFrame.movements.get(legID, None) is not None):
+                            raise NameError(
+                                "Attempt to move leg " + str(legID) + " more than once in one frame")
 
                         self.sequenceFrame.movements[legID] = vLeg
 
@@ -213,7 +236,7 @@ class SequenceController(object):
                 if(speed > 0):
                     s = speed
                     self.servoController.move(
-                        servoID, int(coords[0]), s * abs(direction))
+                        servoID, int(coords[0]), s * abs(speedModifier))
         else:
             raise NameError("No valid command found on line: " + str(lineNr))
 

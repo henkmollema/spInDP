@@ -1,6 +1,7 @@
 class LegMovement(object):
 
     def __init__(self):
+        self.empty = False
         self.coxa = 0.0
         self.tibia = 0.0
         self.femur = 0.0

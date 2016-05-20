@@ -2,17 +2,18 @@ from spInDP.LegMovement import LegMovement
 
 class SequenceFrame(object):
   movements = { }
+  maxMaxExecTime = 0.0
   
   def getScaledMovements(self):
     times = []
     for k in self.movements:
       times.append(self.movements[k].maxExecTime)
       
-    maxMaxExec = max(times)
+    self.maxMaxExecTime = max(times)
     scaledMoves = { }
     for k in self.movements:
       mov = self.movements[k]
-      scaleFactor = mov.maxExecTime / maxMaxExec
+      scaleFactor = mov.maxExecTime / self.maxMaxExecTime
       
       newMov = LegMovement()
       newMov.coxa = mov.coxa
