@@ -9,7 +9,7 @@ class SequenceFrame(object):
       times.append(self.movements[k].maxExecTime)
       
     maxMaxExec = max(times)
-  
+    scaledMoves = { }
     for k in self.movements:
       mov = self.movements[k]
       scaleFactor = mov.maxExecTime / maxMaxExec
@@ -25,4 +25,5 @@ class SequenceFrame(object):
       
       newMov.maxExecTime = mov.maxExecTime * scaleFactor
       
-      yield (k, newMov)
+      scaledMoves[k] = newMov
+    return scaledMoves
