@@ -7,6 +7,11 @@ from spInDP.ax12 import Ax12
 class ServoController(object):
     """Provides interaction with the physical servos."""
 
+    # Based on physical dimensions of scarJo
+    femurLength = 11.0  # Femur length (cm)
+    tibiaLength = 15.0  # Tibia (cm)
+    coxaLength = 4.107  # Lengte coxa (cm)
+    
     def __init__(self):
         self.ax12 = Ax12()
 
@@ -29,7 +34,46 @@ class ServoController(object):
     def getVoltage(self, servo):
         volt = self.ax12.readVoltage(servo)
         return volt
-
+        
+    # Kinematics (non inverse) for leg positioning
+    def setServoTorque(self, servo, status):
+        try:
+            self.ax12.setTorqueStatus(servo, status)
+        except:
+            #ignore error, but tell the user
+            print "Error setting servo torque for servo " + str(servo)
+    def setServoTorqueAll(self, status):
+        for x in range(1, 19):
+            try:
+                self.ax12.setTorqueStatus(x, status)
+            except:
+                #ignore error and continue, but tell the user
+                print "Error setting servo torque for servo " + str(x)
+                continue
+    def computeKinematics(self, leg):
+        coxa = leg[1]
+        femur = leg[2]
+        tibia = leg[3]
+        x = math.cos(coxa)*(coxaLength+(math.cos(femur)*femurLength)+(math.sin(math.pi-tibia-((math.pi/2)-femur))*tibiaLength))
+        y = math.sin(coxa)*(coxaLength+math.cos(femur)*femurLength+math.sin(math.pi-tibia-((math.pi/2)-femur))*tibiaLength)
+        z = (math.sin(femur)*femurLength)-(math.cos((math.pi-tibia-((math.pi/2)-femur)))*tibiaLength)
+        legCoords = x,y,z
+        return legCoords
+    def getAllLegsXYZ(self):
+        legs = {}
+        for legId in range(1, 7):
+            legServos = {}
+            for x in range(1, 4):
+                servoId = (legId-1)*3+x
+                try:
+                    legServos[x] = (self.getPosition(servoId)/180)*math.pi
+                except:
+                    # Ignore error
+                    print "Error reading position from leg " + str(servoId)
+                    continue
+            legs[legId] = computeKinematics(legServos)
+        return legs
+        
     # Generates a JSON string with data from all servos.
     def getServoDataJSON(self):
         retVal = {}
