@@ -64,9 +64,9 @@ class SequenceController(object):
             lines = f.readlines()
             
         words = lines[0].split(' ')
-        if (lineNr == 1 and words[0].lower() != "sequence"):
+        if (words[0].lower() != "sequence"):
             raise("Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
-        elif (lineNr == 1):
+        else:
             if(len(words) > 3):
                 self.offset = int(words[3])
             else:
