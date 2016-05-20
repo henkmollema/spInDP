@@ -185,6 +185,7 @@ class Ax12:
         try:
             assert ord(reply[0]) == 0xFF
         except:
+            self.mutex.release()
             e = "Timeout on servo (first byte != 0xFF) " + str(id)
             raise Ax12.timeoutError(e)
 
@@ -195,9 +196,11 @@ class Ax12:
             if(error != 0):
                 print("Error from servo: " +
                       str(Ax12.dictErrors[error]) + " (code  " + str(hex(error)) + ")")
+                self.mutex.release()
                 return -error
             # just reading error bit
             elif(length == 0):
+                self.mutex.release()
                 return error
             else:
                 if(length > 1):

@@ -18,7 +18,7 @@ class WebServer:
         self.spider = spider
 
     def start(self):
-        self.app.run(host='0.0.0.0', port=80, debug=False, threaded=True)
+        self.app.run(host='0.0.0.0', port=80, debug=True, threaded=True)
 
     def format_response(self, message, mimetype='application/json'):
         resp = Response(message, status=200, mimetype=mimetype)
@@ -112,3 +112,29 @@ class WebServer:
         seqObj = {}
         seqObj['sequenceFiles'] = glob.glob("../sequences/*.txt")
         return json.dumps(seqObj, separators=(',', ':'))
+
+    @staticmethod
+    @app.route("/kinematics")
+    def api_kinematics():
+        webserverinstance.spider.servoController.getAllLegsXYZ()
+        return webserverinstance.format_response("getalllegs")
+    @staticmethod
+    @app.route("/kinematics/disablelegs")
+    def api_kinematics_disable():
+        webserverinstance.spider.servoController.setServoTorque(2, 0)
+        return webserverinstance.format_response("disabled")
+    @staticmethod
+    @app.route("/kinematics/enablelegs")
+    def api_kinematics_enable():
+        webserverinstance.spider.servoController.setServoTorque(2, 1)
+        return webserverinstance.format_response("enabled")
+    @staticmethod
+    @app.route("/kinematics/disablealllegs")
+    def api_kinematics_disableAll():
+        webserverinstance.spider.servoController.setServoTorqueAll(0)
+        return webserverinstance.format_response("disabled")
+    @staticmethod
+    @app.route("/kinematics/enablealllegs")
+    def api_kinematics_enableAll():
+        webserverinstance.spider.servoController.setServoTorqueAll(1)
+        return webserverinstance.format_response("enabled")

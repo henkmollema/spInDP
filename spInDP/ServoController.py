@@ -9,7 +9,7 @@ class ServoController(object):
 
     # Based on physical dimensions of scarJo
     femurLength = 11.0  # Femur length (cm)
-    tibiaLength = 15.0  # Tibia (cm)
+    tibiaLength = 16.4  # Tibia (cm)
     coxaLength = 4.107  # Lengte coxa (cm)
     
     def __init__(self):
@@ -36,14 +36,18 @@ class ServoController(object):
         return volt
         
     # Kinematics (non inverse) for leg positioning
-    def setServoTorque(self, servo, status):
-        try:
-            self.ax12.setTorqueStatus(servo, status)
-        except:
-            #ignore error, but tell the user
-            print "Error setting servo torque for servo " + str(servo)
-    def setServoTorqueAll(self, status):
+    def setLegTorque(self, leg, status):
+        for x in range ((leg-1)*3+1, (leg-1)*3+4):
+            print "Setting torque for servo " + str(x) + " from leg " + str(leg) + " to " + str(status)
+            try:
+                self.ax12.setTorqueStatus(x, status)
+            except:
+                #ignore error, but tell the user
+                print "Error setting servo + " + str(x) + " torque for leg " + str(leg)
+                continue
+    def setLegTorqueAll(self, status):
         for x in range(1, 19):
+            print "Setting torque for servo " + str(x) + " from leg " + str(leg) + " to " + str(status)
             try:
                 self.ax12.setTorqueStatus(x, status)
             except:
