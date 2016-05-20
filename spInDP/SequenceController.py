@@ -72,14 +72,10 @@ class SequenceController(object):
             else:
                 self.offset = 0
 
-        reversed = False
-        if(speedModifier < 0):
-            reversed = True
-
         for x in range(0, repeat):
             lineNr = 0
 
-            if(reversed):
+            if(speedModifier < 0):
                 lineNr = len(lines)
                 for line in reversed(lines):
                     self.interpretLine(line, lineNr, speedModifier, validate)
