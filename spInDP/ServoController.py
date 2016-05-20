@@ -101,7 +101,7 @@ class ServoController(object):
 
         #print("moving: " + str(servo) + " to: " + str(angle) + ", pos: " + str(pos) + ", speed: " + str(speed))
 
-        self.ax12.moveSpeed(servo, pos, speed)
+        self.ax12.moveSpeed(servo, pos, int(speed))
 
 
 def dxl_angle_to_degrees(dxl_angle):

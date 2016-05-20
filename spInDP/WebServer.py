@@ -70,10 +70,11 @@ class WebServer:
     @staticmethod
     @app.route("/sequence/<animation>")
     @app.route("/sequence/<animation>/<repeat>")
-    def api_control_animation(animation, repeat=1):
+    @app.route("/sequence/<animation>/<repeat>/<speedModifier>")
+    def api_control_animation(animation, repeat=1, speedModifier=1):
         print("exec animation: " + animation)
         webserverinstance.spider.sequenceController.parseSequence(
-            "sequences/" + animation, repeat=int(repeat))
+            "sequences/" + animation, repeat=int(repeat), speedModifier=float(speedModifier))
         return webserverinstance.format_response("animation executed: sequences/" + animation)
 
    
