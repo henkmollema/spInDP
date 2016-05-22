@@ -105,6 +105,14 @@ public class SpiderController : MonoBehaviour
                 else if (lineNr == 1)
                 {
                     hasHeader = true;
+                    if(words.Length > 3)
+                    {
+                        this.offset = int.Parse(words[3]);
+                    }
+                    else
+                    {
+                        this.offset = 0;
+                    }
                     continue;
                 }
 
@@ -136,10 +144,8 @@ public class SpiderController : MonoBehaviour
                         {
                             mov = new SpiderLeg.LegMovement();
                             mov.empty = true;
-                            mov.maxExecTime = sf.maxMaxExecTime;
-                            
                         }
-                        
+                        mov.maxExecTime = sf.maxMaxExecTime;
                         legs[x - 1].addMove(mov);
                     }
 
@@ -209,7 +215,7 @@ public class SpiderController : MonoBehaviour
                     if (!validate)
                     {
                         float newAngle = float.Parse(coords[0]);
-                        Debug.Log("Will control servo " + servoID + ", coords: " + newAngle + ", speed: " + speed);
+                        //Debug.Log("Will control servo " + servoID + ", coords: " + newAngle + ", speed: " + speed);
                         foreach (SpiderLeg leg in legs)
                         {
 
@@ -248,7 +254,7 @@ public class SpiderController : MonoBehaviour
                     if (!validate)
                     {
 
-                        Debug.Log("Will control leg " + legID + ", coords: " + words[1] + ", speed: " + speed);
+                        //Debug.Log("Will control leg " + legID + ", coords: " + words[1] + ", speed: " + speed);
 
                         SpiderLeg.LegMovement lm = setServoPos(float.Parse(coords[0]), float.Parse(coords[1]), float.Parse(coords[2]), legID, speed);
                         if(tmpFrame == null)
@@ -268,6 +274,7 @@ public class SpiderController : MonoBehaviour
 
     }
     float[] servoAngleMap = new float[18];
+    float offset = 0f;
     private SpiderLeg.LegMovement setServoPos(float x, float y, float z, int legID, float speed)
     {
         float lIK = (float)Math.Sqrt(Math.Pow((d + lc + x), 2) + (Math.Pow(y, 2)));
@@ -289,19 +296,30 @@ public class SpiderController : MonoBehaviour
 
 
         float angleCoxa = thetaIK * (180 / Mathf.PI);
-        float angleFemur = -90 + ((gammaIK - tauIK) * (180 / Mathf.PI));
+        float angleFemur = -30f - ((gammaIK - tauIK) * (180 / Mathf.PI));
         float angleTibia = 180f - ((betaIK) * (180 / Mathf.PI));
 
+        if (legID == 1 || legID == 2)
+        {
+            angleCoxa -= offset;
+        }
+        else if (legID == 4 || legID == 5)
+        {
+            angleCoxa += offset;
+        }
+        
         if (legID == 2 || legID == 3 || legID == 4)
         {
             angleCoxa *= -1;
         }
 
+        
+
 
         float deltaCoxa = Quaternion.Angle(Quaternion.Euler(0, angleCoxa, 0), Quaternion.Euler(0, coxaCurr, 0));
         float deltaFemur = Math.Abs(angleFemur - femurCurr);
         float deltaTibia = Math.Abs(angleTibia - tibiaCurr);
-        Debug.Log(("deltas " + deltaCoxa + ", " + deltaFemur + ", " + deltaTibia));
+        //Debug.Log(("deltas " + deltaCoxa + ", " + deltaFemur + ", " + deltaTibia));
 
         servoAngleMap[(legID - 1) * 3] = angleCoxa;
         servoAngleMap[(legID - 1) * 3 + 1] = angleFemur;
@@ -313,7 +331,7 @@ public class SpiderController : MonoBehaviour
 
         if(maxDelta == 0)
         {
-            Debug.LogError("0 Delta moving to: " + x + "," + y + "," + z + " LEG: " + legID);
+            //Debug.LogError("0 Delta moving to: " + x + "," + y + "," + z + " LEG: " + legID);
         }
         float coxaSpeed = 0, femurSpeed = 0, tibiaSpeed = 0;
 
