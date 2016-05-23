@@ -118,7 +118,7 @@ public class ScarJoGUI : MonoBehaviour {
 
     public void playSelectedSequence()
     {
-        spider.executeSequence(selectedSequence, false, repeatCount, false);
+        spider.executeSequence(selectedSequence, false, repeatCount, delayval * 10f);
     }
 
     public void loopCountChanged(float val)

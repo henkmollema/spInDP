@@ -47,7 +47,7 @@ class ServoController(object):
                 continue
     def setLegTorqueAll(self, status):
         for x in range(1, 19):
-            print "Setting torque for servo " + str(x) + " from leg " + str(leg) + " to " + str(status)
+            print "Setting torque for servo " + str(x) + " to " + str(status)
             try:
                 self.ax12.setTorqueStatus(x, status)
             except:
@@ -58,9 +58,9 @@ class ServoController(object):
         coxa = leg[1]
         femur = leg[2]
         tibia = leg[3]
-        x = math.cos(coxa)*(coxaLength+(math.cos(femur)*femurLength)+(math.sin(math.pi-tibia-((math.pi/2)-femur))*tibiaLength))
-        y = math.sin(coxa)*(coxaLength+math.cos(femur)*femurLength+math.sin(math.pi-tibia-((math.pi/2)-femur))*tibiaLength)
-        z = (math.sin(femur)*femurLength)-(math.cos((math.pi-tibia-((math.pi/2)-femur)))*tibiaLength)
+        x = math.cos(coxa)*(self.coxaLength+(math.cos(femur)*self.femurLength)+(math.sin(math.pi-tibia-((math.pi/2)-femur))*self.tibiaLength))
+        y = math.sin(coxa)*(self.coxaLength+math.cos(femur)*self.femurLength+math.sin(math.pi-tibia-((math.pi/2)-femur))*self.tibiaLength)
+        z = (math.sin(femur)*self.femurLength)-(math.cos((math.pi-tibia-((math.pi/2)-femur)))*self.tibiaLength)
         legCoords = x,y,z
         return legCoords
     def getAllLegsXYZ(self):
@@ -75,7 +75,7 @@ class ServoController(object):
                     # Ignore error
                     print "Error reading position from leg " + str(servoId)
                     continue
-            legs[legId] = computeKinematics(legServos)
+            legs[legId] = self.computeKinematics(legServos)
         return legs
         
     # Generates a JSON string with data from all servos.
