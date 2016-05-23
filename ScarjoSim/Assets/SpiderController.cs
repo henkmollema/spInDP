@@ -9,11 +9,11 @@ public class SpiderController : MonoBehaviour
 
 
     // Based on physical dimensions of scarJo
-    const float a = 11.0f; //Femur length (cm)
-    const float c = 15.0f; //Tibia (cm)
-    const float e = 5.60f; //height (cm)
-    const float d = 12.24f;//Horz. afstand van c tot a (cm)
-    const float lc = 4.107f; //Lengte coxa (cm)
+    public static float a = 11.0f; //Femur length (cm)
+	public static float c = 15.0f; //Tibia (cm)
+	public static float e = 5.60f; //height (cm)
+	public static float d = 12.24f;//Horz. afstand van c tot a (cm)
+	public static float lc = 4.107f; //Lengte coxa (cm)
     float b = (float)Math.Sqrt(Math.Pow(e, 2) + Math.Pow(d, 2)); //diagonal (cm)
 
     public SpiderLeg[] legs;
@@ -296,7 +296,7 @@ public class SpiderController : MonoBehaviour
 
 
         float angleCoxa = thetaIK * (180 / Mathf.PI);
-        float angleFemur = -30f - ((gammaIK - tauIK) * (180 / Mathf.PI));
+        float angleFemur = -((gammaIK - tauIK) * (180 / Mathf.PI));
         float angleTibia = 180f - ((betaIK) * (180 / Mathf.PI));
 
         if (legID == 1 || legID == 2)

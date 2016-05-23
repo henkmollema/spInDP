@@ -171,14 +171,25 @@ public class SpiderLeg : MonoBehaviour
         return retVal;
     }
 
+	public Vector3 getCoordinates()
+	{
+		float cCoxa = this.getCoxa ();
+		float cFemur = this.getFemur ();
+		float cTibia = this.getTibia() - 180f;
+
+		float x = Mathf.Cos (cCoxa) * (SpiderController.lc + (Mathf.Cos (cFemur) * SpiderController.a) + (Mathf.Sin (Mathf.PI - cTibia  - ((Mathf.PI / 2f) - cFemur)) * SpiderController.c));
+		float y = Mathf.Sin(cCoxa)*(SpiderController.lc+Mathf.Cos(cFemur)*SpiderController.a+Mathf.Sin(Mathf.PI-cTibia-((Mathf.PI/2)-cFemur))*SpiderController.c);
+     	float z = (Mathf.Sin(cFemur)*SpiderController.a)-(Mathf.Cos((Mathf.PI-cTibia-((Mathf.PI/2)-cFemur)))*SpiderController.c);
+		Vector3 retVal = new Vector3(x,y,z);
+		return retVal;
+	}
+
     public string getSequenceString(float speed)
     {
         string retVal = "" + Environment.NewLine;
-        int firstServo = ((legID - 1) * 3) + 1;
+		Vector3 cCoords = getCoordinates();
 
-        retVal += "s:" + firstServo + " " + (int)getCoxa() + ",0,0 " + speed + Environment.NewLine;
-        retVal += "s:" + (firstServo + 1) + " " + (int)getFemur() + ",0,0 " + speed + Environment.NewLine;
-        retVal += "s:" + (firstServo + 2) + " " + (int)getTibia() + ",0,0 " + speed + Environment.NewLine;
+		retVal += "l:" + legID + " " + cCoords.x + ","+cCoords.y+","+cCoords.y +" " + speed + Environment.NewLine;
 
         return retVal;
     }
