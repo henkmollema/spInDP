@@ -7,7 +7,6 @@ from flask import Flask, render_template, Response, request
 
 webserverinstance = None
 
-
 class WebServer:
     app = Flask(__name__)
     spider = None
@@ -116,25 +115,25 @@ class WebServer:
     @staticmethod
     @app.route("/kinematics")
     def api_kinematics():
-        webserverinstance.spider.servoController.getAllLegsXYZ()
-        return webserverinstance.format_response("getalllegs")
+        legs = webserverinstance.spider.servoController.getAllLegsXYZ()
+        return webserverinstance.format_response("Not implemented")
     @staticmethod
-    @app.route("/kinematics/disablelegs")
-    def api_kinematics_disable():
-        webserverinstance.spider.servoController.setServoTorque(2, 0)
+    @app.route("/kinematics/disableleg/<leg>")
+    def api_kinematics_disable_leg(leg):
+        webserverinstance.spider.servoController.setLegTorque(leg, 0)
         return webserverinstance.format_response("disabled")
     @staticmethod
-    @app.route("/kinematics/enablelegs")
-    def api_kinematics_enable():
-        webserverinstance.spider.servoController.setServoTorque(2, 1)
+    @app.route("/kinematics/enableleg/<leg>")
+    def api_kinematics_enable_leg(leg):
+        webserverinstance.spider.servoController.setLegTorque(leg, 1)
         return webserverinstance.format_response("enabled")
     @staticmethod
     @app.route("/kinematics/disablealllegs")
     def api_kinematics_disableAll():
-        webserverinstance.spider.servoController.setServoTorqueAll(0)
+        webserverinstance.spider.servoController.setLegTorqueAll(0)
         return webserverinstance.format_response("disabled")
     @staticmethod
     @app.route("/kinematics/enablealllegs")
     def api_kinematics_enableAll():
-        webserverinstance.spider.servoController.setServoTorqueAll(1)
+        webserverinstance.spider.servoController.setLegTorqueAll(1)
         return webserverinstance.format_response("enabled")
