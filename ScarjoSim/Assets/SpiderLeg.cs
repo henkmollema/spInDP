@@ -139,6 +139,10 @@ public class SpiderLeg : MonoBehaviour
                 startTime = Time.time;
                 if(!nextMove.empty)
                 {
+					this.Coxa.localRotation = cTarget;
+					this.Femur.localRotation = fTarget;
+					this.Tibia.localRotation = tTarget;
+
                     //Debug.Log("New Move: " + nextMove.coxa + ", " + fixAngle(nextMove.femur) + ", " + nextMove.tibia + " EXECTIME: " + nextMove.maxExecTime);
                     setCoxa(nextMove.coxa, nextMove.coxaSpeed);
                     setFemur(nextMove.femur, nextMove.femurSpeed);
