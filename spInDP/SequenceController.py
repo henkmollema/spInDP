@@ -188,10 +188,11 @@ class SequenceController(object):
 
                 self.legQueue[x].put(mov)
 
+            ret = self.sequenceFrame.maxMaxExecTime
             self.sequenceFrame.movements.clear()
             self.sequenceFrame = None
             
-            return self.sequenceFrame.maxMaxExecTime
+            return ret
 
         # Control legs
         elif(words[0].lower().startswith('l:')):
