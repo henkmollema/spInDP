@@ -12,7 +12,7 @@ class SequenceController(object):
 
     # Based on physical dimensions of scarJo
     a = 11.0  # Femur length (cm)
-    c = 16.4  # Tibia (cm)
+    c = 16.8  # Tibia (cm)
     e = 5.60  # height (cm)
     d = 12.24  # Horz. afstand van c tot a (cm)
     lc = 4.107  # Lengte coxa (cm)
@@ -46,22 +46,38 @@ class SequenceController(object):
             self.executeStartup()
 
         if sequenceName == "walk":
-            self.executeWalk()
+            self.executeWalk(1)
 
-    def executeWalk(self):
-        self.parseSequence("sequences/walk.txt", repeat=5)
+    
+    def executeWalk(self, speedModifier):
+        return self.parseSequence("sequences/walk-frame.txt", repeat=1, speedModifier=speedModifier)
+        
+    def executeStepForward(self):
+        return self.parseSequence("sequences/walk-frame.txt", repeat=1, speedModifier=1)
+        
+    def executeStepBackwards(self):
+        return self.parseSequence("sequences/walk-frame.txt", repeat=1, speedModifier=-1)
+        
+    def executeStepLeft(self):
+        return self.parseSequence("sequences/crab-walk.txt", repeat=1, speedModifier=-1)
+        
+    def executeStepRight(self):
+        return self.parseSequence("sequences/crab-walk.txt", repeat=1, speedModifier=1)
 
     def executeStartup(self):
         self.parseSequence("sequences/startup.txt")
 
     sequenceFrame = None
 
+    #Returns the time it takes to execute this sequence in seconds
     def parseSequence(self, filePath, validate=False, speedModifier=1, repeat=1):
         print("Parsing sequence at: " + filePath)
 
         with open(filePath, 'r') as f:
             lines = f.readlines()
 
+        totalTime = 0
+        
         words = lines[0].split(' ')
         if (words[0].lower() != "sequence"):
             raise(
@@ -78,20 +94,22 @@ class SequenceController(object):
             if(speedModifier < 0):
                 lineNr = len(lines)
                 for line in reversed(lines):
-                    self.interpretLine(line, lineNr, speedModifier, validate)
+                    totalTime += self.interpretLine(line, lineNr, speedModifier, validate)
                     lineNr -= 1
             else:
                 lineNr = 1
                 for line in lines:
-                    self.interpretLine(line, lineNr, speedModifier, validate)
+                    totalTime += self.interpretLine(line, lineNr, speedModifier, validate)
                     lineNr += 1
 
-        if (filePath != "sequences/startup.txt"):
-            self.parseSequence("sequences/startup.txt")
-
+        #if (filePath != "sequences/startup.txt"):
+            #self.parseSequence("sequences/startup.txt")
+        
+        return totalTime
+        
     def interpretLine(self, line, lineNr, speedModifier=1, validate=False):
         if(lineNr == 1 or line.lstrip().startswith("#") or len(line.strip()) == 0):
-            return
+            return 0
 
         words = line.split(' ')
         command = words[0].lower().rstrip()
@@ -156,7 +174,7 @@ class SequenceController(object):
 
         elif (command == "frameend"):
             if (self.sequenceFrame is None):
-                return
+                return 0
 
             scaledMovements = self.sequenceFrame.getScaledMovements()
             for x in range(1, 7):
@@ -172,6 +190,8 @@ class SequenceController(object):
 
             self.sequenceFrame.movements.clear()
             self.sequenceFrame = None
+            
+            return self.sequenceFrame.maxMaxExecTime
 
         # Control legs
         elif(words[0].lower().startswith('l:')):
@@ -197,7 +217,7 @@ class SequenceController(object):
                         coords[1]), float(coords[2]), legID, s * abs(speedModifier))
 
                     if (vLeg is None):
-                        return
+                        return 0
 
                     if (self.sequenceFrame is None):
                         self.legQueue[legID].put(vLeg)
@@ -235,6 +255,8 @@ class SequenceController(object):
                         servoID, int(coords[0]), s * abs(speedModifier))
         else:
             raise NameError("No valid command found on line: " + str(lineNr))
+            
+        return 0
 
     servoAngleMap = {
         1: 0.0,
