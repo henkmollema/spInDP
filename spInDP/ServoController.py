@@ -38,21 +38,21 @@ class ServoController(object):
     # Kinematics (non inverse) for leg positioning
     def setLegTorque(self, leg, status):
         for x in range ((leg-1)*3+1, (leg-1)*3+4):
-            print "Setting torque for servo " + str(x) + " from leg " + str(leg) + " to " + str(status)
+            print ("Setting torque for servo " + str(x) + " from leg " + str(leg) + " to " + str(status))
             try:
                 self.ax12.setTorqueStatus(x, status)
             except:
                 #ignore error, but tell the user
-                print "Error setting servo + " + str(x) + " torque for leg " + str(leg)
+                print ("Error setting servo + " + str(x) + " torque for leg " + str(leg))
                 continue
     def setLegTorqueAll(self, status):
         for x in range(1, 19):
-            print "Setting torque for servo " + str(x) + " to " + str(status)
+            print ("Setting torque for servo " + str(x) + " to " + str(status))
             try:
                 self.ax12.setTorqueStatus(x, status)
             except:
                 #ignore error and continue, but tell the user
-                print "Error setting servo torque for servo " + str(x)
+                print ("Error setting servo torque for servo " + str(x))
                 continue
     def computeKinematics(self, leg):
         coxa = leg[1]
@@ -73,7 +73,7 @@ class ServoController(object):
                     legServos[x] = (self.getPosition(servoId)/180)*math.pi
                 except:
                     # Ignore error
-                    print "Error reading position from leg " + str(servoId)
+                    print ("Error reading position from leg " + str(servoId))
                     continue
             legs[legId] = self.computeKinematics(legServos)
         return legs
