@@ -37,10 +37,11 @@ class ServoController(object):
         
     # Kinematics (non inverse) for leg positioning
     def setLegTorque(self, leg, status):
-        for x in range ((leg-1)*3+1, (leg-1)*3+4):
+        for x in range ((int(leg)-1)*3+1, (int(leg)-1)*3+4):
             print "Setting torque for servo " + str(x) + " from leg " + str(leg) + " to " + str(status)
             try:
-                self.ax12.setTorqueStatus(x, status)
+                time.sleep(0.01)
+                self.ax12.setTorqueStatus(x, int(status))
             except:
                 #ignore error, but tell the user
                 print "Error setting servo + " + str(x) + " torque for leg " + str(leg)
@@ -61,21 +62,32 @@ class ServoController(object):
         x = math.cos(coxa)*(self.coxaLength+(math.cos(femur)*self.femurLength)+(math.sin(math.pi-tibia-((math.pi/2)-femur))*self.tibiaLength))
         y = math.sin(coxa)*(self.coxaLength+math.cos(femur)*self.femurLength+math.sin(math.pi-tibia-((math.pi/2)-femur))*self.tibiaLength)
         z = (math.sin(femur)*self.femurLength)-(math.cos((math.pi-tibia-((math.pi/2)-femur)))*self.tibiaLength)
-        legCoords = x,y,z
-        return legCoords
+        return x,y,z
     def getAllLegsXYZ(self):
         legs = {}
         for legId in range(1, 7):
             legServos = {}
             for x in range(1, 4):
                 servoId = (legId-1)*3+x
-                try:
-                    legServos[x] = (self.getPosition(servoId)/180)*math.pi
-                except:
-                    # Ignore error
-                    print "Error reading position from leg " + str(servoId)
-                    continue
-            legs[legId] = self.computeKinematics(legServos)
+                legServos[x] = None
+                tryCount = 0
+                maxTryCount = 10
+                while legServos[x] == None and tryCount < maxTryCount:
+                    try:
+                        tmp = self.getPosition(servoId)
+                        print "servonr: " + str(servoId) + " in pos: " + str(tmp)
+                        legServos[x] = (tmp/180)*math.pi
+                    except:
+                        # Ignore error
+                        print "Error reading position from servo " + str(servoId) + ". Retrying.."
+                        tryCount += 1
+                        continue
+                    time.sleep(0.01)
+            try:
+                legs[legId] = self.computeKinematics(legServos)
+            except:
+                print "Something went wrong in \"computeKinematics\"..."
+                continue
         return legs
         
     # Generates a JSON string with data from all servos.

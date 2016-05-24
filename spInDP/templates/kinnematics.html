@@ -1,0 +1,105 @@
+<html>
+<head>
+<title>test</title>
+<style>
+.pressed{
+    font-size: 1.1em;
+    background-color: #efefef;
+}
+table, tr, td{
+    border: 2px solid grey;
+    border-collapse: collapse;
+}
+table{
+    width: 300px;
+}
+tr{
+    width: 300px;
+}
+td{
+    padding: 10px
+}
+.td-btn{
+    width: 150px;
+}
+button, input{
+    width: 100px;
+    
+    background-color: white;
+    font-size: 1em;
+    border: 2px solid gray;
+    border-radius: 5px;
+    width: 150px;
+    height: 30px;
+}
+</style>
+
+<script type="text/javascript" src="../jquery.min.js"></script>
+
+<script>
+$(document).ready(function(){    
+    var msg = "";
+    $('#all').click(function(){
+        $(this).toggleClass('pressed');
+        $('button').each(function(){
+            if($('#all').hasClass('pressed')){
+                $(this).addClass('pressed');
+            } else {
+                $(this).removeClass('pressed');
+            }
+        });
+    });
+    $('.leg').click(function(){
+        $(this).toggleClass('pressed');
+        if($(this).hasClass('pressed'))
+        {   
+            if(!$(".leg").not('.pressed').length){
+                $('#all').addClass('pressed');
+            }
+        } else {
+            $('#all').removeClass('pressed');
+        }
+    });
+    $('#sub-leg').click(function(){
+        msg = "";
+        $('.leg').each(function(){
+            if($(this).hasClass('pressed')){
+                if(msg.length > 0)
+                    {msg += '_'}
+                    msg += 1;
+            } else {
+                if(msg.length > 0)
+                    {msg += '_'}
+                msg += 0;
+            }
+        });
+        $.get('/kinematics/' + msg + '/');
+    });
+    $('#sub-val').click(function(){
+        $.get('/kinematics/', function(){
+            $('#leg1').html("{{legs[1]}}")
+            $('#leg2').html("{{legs[2]}}")
+            $('#leg3').html("{{legs[3]}}")
+            $('#leg4').html("{{legs[4]}}")
+            $('#leg5').html("{{legs[5]}}")
+            $('#leg6').html("{{legs[6]}}")
+        });
+    });
+});
+</script>
+</head>
+<body>
+<h1>Kinematics</h1>
+
+<table class="tbl">
+<tr><td><input type="submit" id="sub-leg" value="Legs On/Off"></td><td><input type="submit" id="sub-val" value="Get cordinates"></td></tr>
+<tr><td class="td-btn"><button id="all" value="100">All Legs</button></td><td></td></tr>
+<tr><td class="td-btn"><button class="leg" value="1">Leg 1</button></td><td id="leg1"></td></tr>
+<tr><td class="td-btn"><button class="leg" value="2">Leg 2</button></td><td id="leg2"></td></tr>
+<tr><td class="td-btn"><button class="leg" value="3">Leg 3</button></td><td id="leg3"></td></tr>
+<tr><td class="td-btn"><button class="leg" value="4">Leg 4</button></td><td id="leg4"></td></tr>
+<tr><td class="td-btn"><button class="leg" value="5">Leg 5</button></td><td id="leg5"></td></tr>
+<tr><td class="td-btn"><button class="leg" value="6">Leg 6</button></td><td id="leg6"></td></tr>
+</table>
+</body>
+</html>

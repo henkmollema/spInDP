@@ -10,6 +10,7 @@ webserverinstance = None
 class WebServer:
     app = Flask(__name__)
     spider = None
+    spiderLegs = [0,0,0,0,0,0]
 
     def __init__(self, spider):
         global webserverinstance
@@ -112,15 +113,54 @@ class WebServer:
         seqObj['sequenceFiles'] = glob.glob("../sequences/*.txt")
         return json.dumps(seqObj, separators=(',', ':'))
 
+        
     @staticmethod
-    @app.route("/kinematics")
+    @app.route("/kinematics/")
     def api_kinematics():
+        #legs = [1,2,3,4,5,6]
         legs = webserverinstance.spider.servoController.getAllLegsXYZ()
-        retVal = "Kinematics output\r\n"
-        for legId in range(1, 7):
-            leg = legs[legId]
-            retVal += "leg #" + str(legId) + ": " + str(leg[0]) + "," + str(leg[1]) + "," + str(leg[2]) + "\r\n"
-        return webserverinstance.format_response(retVal)
+        #return webserverinstance.format_response("Not implemented")
+        return render_template('kinnematics.html', legs = legs)
+    @staticmethod
+    @app.route("/kinematics/<leg>/")   
+    def api_kinematics_legsOnOff(leg):
+        index = 1;
+        for x in leg.split('_'):
+            webserverinstance.spider.servoController.setLegTorque(index, x)
+            print(x)
+            index += 1
+        return render_template('kinnematics.html')
+        
+
+    @staticmethod
+    @app.route("/jquery.min.js")
+    def api_kinematics_jquery():
+        with open ("spInDP/templates/jquery.min.js") as jquery:
+            data = jquery.readlines()
+            return webserverinstance.format_response(data)
+    
+'''    
+    @staticmethod
+    @app.route("/kinematics/<leg>/")
+    def api_kinematics_legsOnOff(leg):
+        for x in leg.split('_'):
+            if x in webserverinstance.spiderLegs:
+                #webserverinstance.spider.servoController.setTorque(x, )
+                i = int(x) - 1
+                webserverinstance.spiderLegs[i] = x
+                print(webserverinstance.spiderLegs[i])
+                print("if")
+            else:
+                #webserverinstance.spider.servoController.setTorque(x,1)
+                i = int(x) - 1
+                print(i)
+                print(x)
+                print("------")
+                webserverinstance.spiderLegs[i] = x
+                print(webserverinstance.spiderLegs[i])
+                print("else")
+        return render_template('kinnematics.html')
+       
     @staticmethod
     @app.route("/kinematics/disableleg/<leg>")
     def api_kinematics_disable_leg(leg):
@@ -141,3 +181,4 @@ class WebServer:
     def api_kinematics_enableAll():
         webserverinstance.spider.servoController.setLegTorqueAll(1)
         return webserverinstance.format_response("enabled")
+'''
