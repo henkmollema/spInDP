@@ -62,7 +62,7 @@ class Spider(object):
         # Switch to the desired behavior
         if behaviorType == BehaviorType.Manual:
             print("Switched to manual behavior")
-            self.behavior = ManualBehavior(self.remoteController.Context)
+            self.behavior = ManualBehavior(self)
         elif behaviorType == BehaviorType.AutonomeDestroyBalloon:
             print("Autonome behavior not implemented")
             self.behavior = FindBalloonBehavior(self)
