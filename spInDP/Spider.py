@@ -8,6 +8,7 @@ from spInDP.AutonomeBehavior import AutonomeBehavior
 from spInDP.BehaviorType import BehaviorType
 from spInDP.WebServer import WebServer
 from spInDP.VisionController import VisionController
+from spInDP.FindBalloonBehavior import FindBalloonBehavior
 
 
 class Spider(object):
@@ -61,10 +62,10 @@ class Spider(object):
         # Switch to the desired behavior
         if behaviorType == BehaviorType.Manual:
             print("Switched to manual behavior")
-            self.behavior = ManualBehavior(self.remoteController.Context)
-        elif behaviorType == BehaviorType.Autonome:
+            self.behavior = ManualBehavior(self)
+        elif behaviorType == BehaviorType.AutonomeDestroyBalloon:
             print("Autonome behavior not implemented")
-            self.behavior = AutonomeBehavior()
+            self.behavior = FindBalloonBehavior(self)
 
         # Start the loop again
         self.stopLoop = False
