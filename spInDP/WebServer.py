@@ -116,7 +116,11 @@ class WebServer:
     @app.route("/kinematics")
     def api_kinematics():
         legs = webserverinstance.spider.servoController.getAllLegsXYZ()
-        return webserverinstance.format_response("Not implemented")
+        retVal = "Kinematics output\r\n"
+        for legId in range(1, 7):
+            leg = legs[legId]
+            retVal += "leg #" + str(legId) + ": " + str(leg[0]) + "," + str(leg[1]) + "," + str(leg[2]) + "\r\n"
+        return webserverinstance.format_response(retVal)
     @staticmethod
     @app.route("/kinematics/disableleg/<leg>")
     def api_kinematics_disable_leg(leg):
