@@ -1,0 +1,11 @@
+Sequence pre-stab-right
+
+s:4 0 100
+s:5 10 100
+s:6 -10 100
+
+delay 1500
+
+s:4 60 100
+
+delay 1500

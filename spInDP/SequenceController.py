@@ -64,11 +64,17 @@ class SequenceController(object):
     def executeStepRight(self):
         return self.parseSequence("sequences/crab-walk.txt", repeat=1, speedModifier=1)
         
+    def executePreStabLeft(self):
+        self.parseSequence("sequences/pre-stab-left.txt", repeat=1, speedModifier=1)
+        
     def executeStabLeft(self):
-        return self.parseSequence("sequences/stab-left.txt", repeat=3, speedModifier=1)
+        self.parseSequence("sequences/stab-left.txt", repeat=1, speedModifier=1)
+        
+    def executePreStabRight(self):
+        self.parseSequence("sequences/pre-stab-right.txt", repeat=1, speedModifier=1)
         
     def executeStabRight(self):
-        return self.parseSequence("sequences/stab-right.txt", repeat=3, speedModifier=1)
+        self.parseSequence("sequences/stab-right.txt", repeat=1, speedModifier=1)
 
     def executeStartup(self):
         return self.parseSequence("sequences/startup.txt")
@@ -77,7 +83,7 @@ class SequenceController(object):
 
     #Returns the time it takes to execute this sequence in seconds
     def parseSequence(self, filePath, validate=False, speedModifier=1, repeat=1):
-        print("Parsing sequence at: " + filePath)
+        print("Parsing sequence at: " + filePath + " repeating for "  + str(repeat))
 
         with open(filePath, 'r') as f:
             lines = f.readlines()
@@ -95,6 +101,7 @@ class SequenceController(object):
                 self.offset = 0
 
         for x in range(0, repeat):
+            print("repeat count: " + str(x))
             lineNr = 0
 
             if(speedModifier < 0):

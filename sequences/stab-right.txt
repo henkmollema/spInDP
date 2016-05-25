@@ -1,18 +1,9 @@
-Sequence startup
-
-
-s:4 0 100
-s:5 10 100
-s:6 -10 100
-
-delay 1500
-
-s:4 60 100
-
-delay 1000
+Sequence stab-right
 
 s:5 55 400
 s:6 -55 400
+
 delay 200
+
 s:5 10 400
 s:6 -10 400
