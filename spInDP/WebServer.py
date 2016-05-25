@@ -125,11 +125,12 @@ class WebServer:
     @app.route("/kinematics/<leg>/")   
     def api_kinematics_legsOnOff(leg):
         index = 1;
+        legs = [0,0,0,0,0,0,0]
         for x in leg.split('_'):
             webserverinstance.spider.servoController.setLegTorque(index, x)
             print(x)
             index += 1
-        return render_template('kinnematics.html')
+        return render_template('kinnematics.html', legs = legs)
         
 
     @staticmethod
