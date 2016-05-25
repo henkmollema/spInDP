@@ -113,9 +113,9 @@ class Vision:
     def detect(self, image):
         imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         h,s,v = cv2.split(imagehsv)
-        h = self.thresholdRange(h, 175, 4)
+        h = self.thresholdRange(h, 170, 10)
         s = self.thresholdRange(s, 110, 250)
-        v = self.thresholdRange(v, 160, 255)
+        v = self.thresholdRange(v, 140, 255)
         imageBin = h * s * v
 
         imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7,7)))

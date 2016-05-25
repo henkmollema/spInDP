@@ -11,7 +11,7 @@ class ServoController(object):
     femurLength = 11.0  # Femur length (cm)
     tibiaLength = 16.4  # Tibia (cm)
     coxaLength = 4.107  # Lengte coxa (cm)
-    
+
     def __init__(self):
         self.ax12 = Ax12()
 
