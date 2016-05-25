@@ -117,9 +117,7 @@ class WebServer:
     @staticmethod
     @app.route("/kinematics/")
     def api_kinematics():
-        #legs = [1,2,3,4,5,6]
         legs = webserverinstance.spider.servoController.getAllLegsXYZ()
-        #return webserverinstance.format_response("Not implemented")
         return render_template('kinnematics.html', legs = legs)
     @staticmethod
     @app.route("/kinematics/<leg>/")   
@@ -139,47 +137,3 @@ class WebServer:
         with open ("spInDP/templates/jquery.min.js") as jquery:
             data = jquery.readlines()
             return webserverinstance.format_response(data)
-    
-'''    
-    @staticmethod
-    @app.route("/kinematics/<leg>/")
-    def api_kinematics_legsOnOff(leg):
-        for x in leg.split('_'):
-            if x in webserverinstance.spiderLegs:
-                #webserverinstance.spider.servoController.setTorque(x, )
-                i = int(x) - 1
-                webserverinstance.spiderLegs[i] = x
-                print(webserverinstance.spiderLegs[i])
-                print("if")
-            else:
-                #webserverinstance.spider.servoController.setTorque(x,1)
-                i = int(x) - 1
-                print(i)
-                print(x)
-                print("------")
-                webserverinstance.spiderLegs[i] = x
-                print(webserverinstance.spiderLegs[i])
-                print("else")
-        return render_template('kinnematics.html')
-       
-    @staticmethod
-    @app.route("/kinematics/disableleg/<leg>")
-    def api_kinematics_disable_leg(leg):
-        webserverinstance.spider.servoController.setLegTorque(leg, 0)
-        return webserverinstance.format_response("disabled")
-    @staticmethod
-    @app.route("/kinematics/enableleg/<leg>")
-    def api_kinematics_enable_leg(leg):
-        webserverinstance.spider.servoController.setLegTorque(leg, 1)
-        return webserverinstance.format_response("enabled")
-    @staticmethod
-    @app.route("/kinematics/disablealllegs")
-    def api_kinematics_disableAll():
-        webserverinstance.spider.servoController.setLegTorqueAll(0)
-        return webserverinstance.format_response("disabled")
-    @staticmethod
-    @app.route("/kinematics/enablealllegs")
-    def api_kinematics_enableAll():
-        webserverinstance.spider.servoController.setLegTorqueAll(1)
-        return webserverinstance.format_response("enabled")
-'''
