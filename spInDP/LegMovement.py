@@ -9,3 +9,4 @@ class LegMovement(object):
         self.tibiaSpeed = 0.0
         self.femurSpeed = 0.0
         self.maxExecTime = 0.0
+        self.IKCoordinates = {0,0,0}

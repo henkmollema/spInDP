@@ -19,6 +19,18 @@ class SequenceController(object):
     b = math.sqrt(e**2 + d**2)  # diagonal (cm)
 
     offset = 0
+    
+    LegOffsets = {
+        1: {0,0,0},
+        2: {0,0,0},
+        3: {0,0,0},
+        4: {0,0,0},
+        5: {0,0,0},
+        6: {0,0,0}
+    }
+    
+    def offsetLeg(self, legID, x,y,z):
+        self.LegOffsets[legID] = {x,y,z}
 
     def __init__(self, spider):
         self.spider = spider
@@ -292,11 +304,24 @@ class SequenceController(object):
         17: 0.0,
         18: 0.0
     }
+    
+    legCoordinateMap = {
+        1: {0,0,0},
+        2: {0,0,0},
+        3: {0,0,0},
+        4: {0,0,0},
+        5: {0,0,0},
+        6: {0,0,0}
+    }
 
     # True if we need to get initial positions from servo
     first = True
 
     def getServoPos(self, x, y, z, legID, speed):
+        x += self.LegOffsets[legID][0]
+        y += self.LegOffsets[legID][1]
+        z += self.LegOffsets[legID][2]
+    
         lIK = math.sqrt((self.d + self.lc + x)**2 + y**2)
         dIK = lIK - self.lc
         bIK = math.sqrt((self.e + z)**2 + dIK**2)
@@ -342,6 +367,7 @@ class SequenceController(object):
 
         retVal = LegMovement()
         maxDelta = max(deltaCoxa, deltaFemur, deltaTibia)
+        retVal.IKCoordinates = {x,y,z}
 
         if (maxDelta == 0):
             return None
