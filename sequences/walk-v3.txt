@@ -4,39 +4,43 @@ Sequence walk offset 45
 
 # Midpoot voor
 # Achterpoot achter
+# Voorpoot midden
 framebegin
-l:3 -5,8,5 200
-l:6 -5,8,5 200
-l:2 -7,-16,5 100
-l:5 -7,0,5 100
+l:3 -5,8,5 100
+l:6 -5,8,5 100
+l:2 -7,-16,5 200
+l:5 -7,0,5 200
 l:1 -7,-8,5 100
 l:4 -7,8,5 100
 frameend
 
-# Midpoot op weg naar midden
-# Achterpoot in de lucht
+# Midpoot in de lucht
+# Achterpoot op weg naar achter
+# Voorpoot op weg naar midden
 framebegin
-l:3 -5,4,5 100
-l:6 -5,4,5 100
-l:2 -7,-8,2 200
-l:5 -7,8,2 200
-l:1 -7,-12,5 100
-l:4 -7,4,5 100
+l:3 -5,0,2 200
+l:6 -5,0,2 200
+l:2 -7,-12,5 100
+l:5 -7,4,5 100
+l:1 -7,-4,5 100
+l:4 -7,12,5 100
 frameend
 
-# Midpoot midden
-# Achterpoot voor
+# Midpoot achter
+# Achterpoot midden
+# Voorpoot voor
 framebegin
-l:3 -5,0,5 100
-l:6 -5,0,5 100
-l:2 -7,0,5 200
-l:5 -7,16,5 200
-l:1 -7,-16,5 100
-l:4 -7,0,5 100
+l:3 -5,-8,5 200
+l:6 -5,-8,5 200
+l:2 -7,-8,5 100
+l:5 -7,8,5 100
+l:1 -7,0,5 100
+l:4 -7,16,5 100
 frameend
 
 # Midpoot op weg naar achter
 # Achterpoot op weg naar midden
+# Voorpoot in de lucht
 framebegin
 l:3 -5,-4,5 100
 l:6 -5,-4,5 100
@@ -46,26 +50,28 @@ l:1 -7,-8,2 200
 l:4 -7,8,2 200
 frameend
 
-# Midpoot achter
-# Achterpoot midden
+# Midpoot midden
+# Achterpoot voor
+# Voorpoot Achter
 framebegin
-l:3 -5,-8,5 100
-l:6 -5,-8,5 100
-l:2 -7,-8,5 100
-l:5 -7,8,5 100
-l:1 -7,0,5 200
-l:4 -7,16,5 200
+l:3 -5,0,5 100
+l:6 -5,0,5 100
+l:2 -7,0,5 100
+l:5 -7,16,5 100
+l:1 -7,-16,5 200
+l:4 -7,0,5 200
 frameend
 
-# Midpoot in de lucht
-# Achterpoot op weg naar achter
+# Midpoot op weg naar midden
+# Achterpoot in de lucht
+# Voorpoot op weg naar achter
 framebegin
-l:3 -5,0,2 200
-l:6 -5,0,2 200
-l:2 -7,-12,5 100
-l:5 -7,4,5 100
-l:1 -7,-4,5 100
-l:4 -7,12,5 100
+l:3 -5,4,5 100
+l:6 -5,4,5 100
+l:2 -7,-8,2 200
+l:5 -7,8,2 200
+l:1 -7,-12,5 100
+l:4 -7,4,5 100
 frameend
 
 waitlegs
