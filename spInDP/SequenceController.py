@@ -21,16 +21,16 @@ class SequenceController(object):
     offset = 0
     
     LegOffsets = {
-        1: {0,0,0},
-        2: {0,0,0},
-        3: {0,0,0},
-        4: {0,0,0},
-        5: {0,0,0},
-        6: {0,0,0}
+        1: [0,0,0],
+        2: [0,0,0],
+        3: [0,0,0],
+        4: [0,0,0],
+        5: [0,0,0],
+        6: [0,0,0]
     }
     
     def offsetLeg(self, legID, x,y,z):
-        self.LegOffsets[legID] = {x,y,z}
+        self.LegOffsets[legID] = [x,y,z]
 
     def __init__(self, spider):
         self.spider = spider
