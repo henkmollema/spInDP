@@ -24,7 +24,8 @@ class SequenceFrame(object):
       newMov.tibiaSpeed = mov.tibiaSpeed * scaleFactor
       newMov.femurSpeed = mov.femurSpeed * scaleFactor
       
-      newMov.maxExecTime = mov.maxExecTime * scaleFactor
+      #newMov.maxExecTime = mov.maxExecTime * scaleFactor
+      newMov.maxExecTime = self.maxMaxExecTime
       
       scaledMoves[k] = newMov
     return scaledMoves
