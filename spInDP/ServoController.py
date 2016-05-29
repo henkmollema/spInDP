@@ -56,12 +56,17 @@ class ServoController(object):
                 print ("Error setting servo torque for servo " + str(x))
                 continue
     def computeKinematics(self, leg):
-        coxa = leg[1]
-        femur = leg[2]
-        tibia = leg[3]
-        x = math.cos(coxa)*(self.coxaLength+(math.cos(femur)*self.femurLength)+(math.sin(math.pi-tibia-((math.pi/2)-femur))*self.tibiaLength))
-        y = math.sin(coxa)*(self.coxaLength+math.cos(femur)*self.femurLength+math.sin(math.pi-tibia-((math.pi/2)-femur))*self.tibiaLength)
-        z = (math.sin(femur)*self.femurLength)-(math.cos((math.pi-tibia-((math.pi/2)-femur)))*self.tibiaLength)
+        coxa = leg[1] * (math.pi/180)
+        tibia = leg[3] * (math.pi/180)
+		xOffset = 16.347
+        zOffset = 5.59
+		
+		x = math.cos(coxa) * (self.coxaLength + (math.cos(femur) * self.femurLength) + (math.cos(femur - tibia) * self.tibiaLength)) - xOffset
+		z = (math.sin(femur) * self.femurLength) + (math.sin(femur - tibia) * self.tibiaLength) - zOffset
+		
+		if (legID == 2 || legID == 3 || legID == 4):
+			y *= -1
+		
         return x,y,z
     def getAllLegsXYZ(self):
         legs = {}
@@ -76,7 +81,7 @@ class ServoController(object):
                     try:
                         tmp = self.getPosition(servoId)
                         print ("servonr: " + str(servoId) + " in pos: " + str(tmp))
-                        legServos[x] = (tmp/180)*math.pi
+                        legServos[x] = tmp
                     except:
                         # Ignore error
                         print ("Error reading position from servo " + str(servoId) + ". Retrying..")
