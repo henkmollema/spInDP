@@ -30,7 +30,6 @@ public class SpiderController : MonoBehaviour
         {
             legs[i] = this.transform.Find("leg" + (i + 1).ToString()).gameObject.GetComponent<SpiderLeg>();
             legs[i].legID = i + 1;
-
         }
 
 
@@ -55,10 +54,9 @@ public class SpiderController : MonoBehaviour
         }
     }
 
-    public void executeSequence(string filepath, bool validate, int repeat, float speedModifier)
+    public void executeSequenceString(string seqString, bool validate, int repeat, float speedModifier)
     {
-        currentSequence = filepath;
-        StartCoroutine(parseSequence(filepath, validate, repeat, speedModifier));
+		StartCoroutine(parseSequence(seqString, validate, repeat, speedModifier));
     }
 
     public void setEditMode(bool enabled)
@@ -69,20 +67,27 @@ public class SpiderController : MonoBehaviour
         }
     }
 
+	void executeSequence(string filePath, bool validate, int repeat, float speedModifier)
+	{
+		Debug.Log("Parsing sequence at: " + currentSequence);
+
+		StreamReader theReader = new StreamReader(currentSequence, System.Text.Encoding.Default);
+		string filecontent = theReader.ReadToEnd();
+		theReader.Close();
+
+		StartCoroutine(parseSequence (filecontent, validate, repeat, speedModifier));
+
+	}
+
 
     /**
     **  Sequence parsing logic, use executeSequence() to run a sequence file
     **/
-    IEnumerator parseSequence(string filePath, bool validate, int repeat, float speedModifier)
+    IEnumerator parseSequence(string filecontent, bool validate, int repeat, float speedModifier)
     {
-
-        Debug.Log("Parsing sequence at: " + currentSequence);
-        bool hasHeader = false;
-        int lineNr = 0;
-        //string line;
-        StreamReader theReader = new StreamReader(currentSequence, System.Text.Encoding.Default);
-        string filecontent = theReader.ReadToEnd();
-        theReader.Close();
+		bool hasHeader = false;
+		int lineNr = 0;
+        
         string[] lines = filecontent.Split('\n');
         Dictionary<int, SpiderLeg.LegMovement> tmpFrame = null;
 
@@ -212,13 +217,14 @@ public class SpiderController : MonoBehaviour
                         speed = int.Parse(words[2]);
                     }
 
+					speed = (int)(speed * speedModifier);
+
                     if (!validate)
                     {
                         float newAngle = float.Parse(coords[0]);
                         //Debug.Log("Will control servo " + servoID + ", coords: " + newAngle + ", speed: " + speed);
                         foreach (SpiderLeg leg in legs)
                         {
-
                             leg.moveByServoID(servoID, newAngle, speed, false);
                         }
                         //#hier de servocontroller aanroepen met de variabelen wanneer not validate
@@ -250,6 +256,8 @@ public class SpiderController : MonoBehaviour
                     {
                         speed = (int)(int.Parse(words[2]));
                     }
+
+					speed =(int)(speed * speedModifier);
 
                     if (!validate)
                     {
@@ -297,7 +305,7 @@ public class SpiderController : MonoBehaviour
 
         float angleCoxa = thetaIK * (180 / Mathf.PI);
         float angleFemur = -((gammaIK - tauIK) * (180 / Mathf.PI));
-        float angleTibia = 180f - ((betaIK) * (180 / Mathf.PI));
+        float angleTibia = 180 - ((betaIK) * (180 / Mathf.PI)) ;
 
         if (legID == 1 || legID == 2)
         {
@@ -317,9 +325,9 @@ public class SpiderController : MonoBehaviour
 
 
         float deltaCoxa = Quaternion.Angle(Quaternion.Euler(0, angleCoxa, 0), Quaternion.Euler(0, coxaCurr, 0));
-        float deltaFemur = Math.Abs(angleFemur - femurCurr);
-        float deltaTibia = Math.Abs(angleTibia - tibiaCurr);
-        //Debug.Log(("deltas " + deltaCoxa + ", " + deltaFemur + ", " + deltaTibia));
+		float deltaFemur = Quaternion.Angle(Quaternion.Euler(0, 0, angleFemur), Quaternion.Euler(0, 0, femurCurr));;//Math.Abs(angleFemur - femurCurr);
+		float deltaTibia = Quaternion.Angle(Quaternion.Euler(0, 0, angleTibia), Quaternion.Euler(0, 0, tibiaCurr));//Math.Abs(angleTibia - tibiaCurr);
+        Debug.Log(("deltas " + deltaCoxa + ", " + deltaFemur + ", " + deltaTibia));
 
         servoAngleMap[(legID - 1) * 3] = angleCoxa;
         servoAngleMap[(legID - 1) * 3 + 1] = angleFemur;

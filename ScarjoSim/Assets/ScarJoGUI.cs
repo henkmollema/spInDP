@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine.UI;
 using System.IO;
 using System;
@@ -64,8 +66,10 @@ public class ScarJoGUI : MonoBehaviour {
 
     public void browseForFile()
     {
+		#if UNITY_EDITOR
         string path = EditorUtility.OpenFilePanel("Select sequence file", "\\", "txt");
         selectFile(path);
+		#endif
     }
 
     public void selectFile(string filePath)
@@ -105,10 +109,10 @@ public class ScarJoGUI : MonoBehaviour {
 
     public void insertState()
     {
-		sequenceEditor.text += Environment.NewLine + "beginframe" + Environment.NewLine;
+		sequenceEditor.text += "beginframe" + Environment.NewLine;
         foreach (SpiderLeg leg in spider.legs)
         {
-            sequenceEditor.text += leg.getSequenceString(512);
+            sequenceEditor.text += leg.getSequenceString(100);
         }
 		sequenceEditor.text += Environment.NewLine + "frameend" + Environment.NewLine;
     }
@@ -120,7 +124,7 @@ public class ScarJoGUI : MonoBehaviour {
 
     public void playSelectedSequence()
     {
-        spider.executeSequence(selectedSequence, false, repeatCount, delayval * 10f);
+		spider.executeSequenceString(sequenceEditor.text, false, repeatCount, spider.delayModifier);
     }
 
     public void loopCountChanged(float val)
@@ -130,7 +134,6 @@ public class ScarJoGUI : MonoBehaviour {
 
     public void camSliderChanged(float val)
     {
-        Debug.Log(val);
         spider.delayModifier = (val * 10);
     }
 
@@ -143,6 +146,7 @@ public class ScarJoGUI : MonoBehaviour {
 
     public void sequenceEditDone(string newContent)
     {
-        saveSequence();
+		Debug.Log ("Sequence edit done!");
+        //saveSequence();
     }
 }

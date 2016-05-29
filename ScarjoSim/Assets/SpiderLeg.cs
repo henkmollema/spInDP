@@ -2,60 +2,10 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class SpiderLeg : MonoBehaviour
 {
-    public struct LegMovement
-    {
-        public bool valid;
-        public bool empty;
-        public float coxa, tibia, femur;
-        public float coxaSpeed, tibiaSpeed, femurSpeed;
-        public float maxExecTime;
-    }
-
-    public struct SequenceFrame
-    {
-        public Dictionary<int, LegMovement> movements;
-        public float maxMaxExecTime;
-    }
-
-    public static SequenceFrame newSequenceFrame(Dictionary<int, LegMovement> movements)
-    {
-        SequenceFrame retVal = new SequenceFrame();
-        float maxTime = 0f;
-        foreach(KeyValuePair<int, LegMovement> k in movements)
-        {
-            maxTime = Mathf.Max(maxTime, k.Value.maxExecTime);
-        }
-        retVal.maxMaxExecTime = maxTime;
-
-        Dictionary<int, LegMovement> scaledMoves = new Dictionary<int, LegMovement>();
-        foreach (KeyValuePair<int, LegMovement> mov in movements)
-        {
-            float scaleFactor = mov.Value.maxExecTime / retVal.maxMaxExecTime;
-
-            if (retVal.maxMaxExecTime == 0)
-                scaleFactor = 0;
-            
-
-            LegMovement newMov = new LegMovement();
-            newMov.coxa = mov.Value.coxa;
-            newMov.tibia = mov.Value.tibia;
-            newMov.femur = mov.Value.femur;
-
-            newMov.coxaSpeed = mov.Value.coxaSpeed * scaleFactor;
-            newMov.tibiaSpeed = mov.Value.tibiaSpeed * scaleFactor;
-            newMov.maxExecTime = mov.Value.maxExecTime * scaleFactor;
-
-            scaledMoves.Add(mov.Key, newMov);
-        }
-
-        retVal.movements = scaledMoves;
-
-        return retVal;
-    }
-
     public int legID;
     Transform Coxa, Femur, Tibia;
 
@@ -76,6 +26,11 @@ public class SpiderLeg : MonoBehaviour
     bool cChanged, fChanged, tChanged;
 
     public bool shouldAnimate = true;
+
+	GUIStyle guiStyle;
+
+	public Texture2D boxTexture; 
+
     // Use this for initialization
     void Start()
     {
@@ -92,7 +47,21 @@ public class SpiderLeg : MonoBehaviour
         tTarget = Tibia.localRotation;
 
         angleOffsetY = this.transform.localRotation.eulerAngles.y;
+		guiStyle = new GUIStyle();
+		guiStyle.normal.textColor = Color.red;
+		guiStyle.normal.background = this.boxTexture;
+		guiStyle.alignment = TextAnchor.MiddleCenter;
+
     }
+
+	void OnGUI()
+	{
+		Vector3 screenPos = Camera.main.WorldToScreenPoint (this.Tibia.position);
+		
+		Rect labelRect = new Rect (new Vector2(screenPos.x, Screen.height-screenPos.y - 50), new Vector2 (30, 20));
+		GUI.Box (labelRect, "l:" + legID, guiStyle);
+		//GUI.Label (labelRect, "l:" + legID, guiStyle);
+	}
 
     // Update is called once per frame
     void Update()
@@ -173,14 +142,19 @@ public class SpiderLeg : MonoBehaviour
 
 	public Vector3 getCoordinates()
 	{
-		float cCoxa = this.getCoxa ();
-		float cFemur = this.getFemur ();
-		float cTibia = this.getTibia() - 180f;
+		float cCoxa = (this.getCoxa ());
+		float cFemur = -(this.getFemur ());
+		float cTibia = -(this.getTibia()) - 180f;
+		cCoxa *= Mathf.Deg2Rad;
+		cFemur *= Mathf.Deg2Rad;
+		cTibia *= Mathf.Deg2Rad;
 
-		float x = Mathf.Cos (cCoxa) * (SpiderController.lc + (Mathf.Cos (cFemur) * SpiderController.a) + (Mathf.Sin (Mathf.PI - cTibia  - ((Mathf.PI / 2f) - cFemur)) * SpiderController.c));
-		float y = Mathf.Sin(cCoxa)*(SpiderController.lc+Mathf.Cos(cFemur)*SpiderController.a+Mathf.Sin(Mathf.PI-cTibia-((Mathf.PI/2)-cFemur))*SpiderController.c);
-     	float z = (Mathf.Sin(cFemur)*SpiderController.a)-(Mathf.Cos((Mathf.PI-cTibia-((Mathf.PI/2)-cFemur)))*SpiderController.c);
-		Vector3 retVal = new Vector3(x,y,z);
+		float x = Mathf.Cos (cCoxa) * (SpiderController.lc + (Mathf.Sin (cFemur) * SpiderController.a) + (Mathf.Cos (Mathf.PI - cTibia  - ((Mathf.PI / 2f) - cFemur)) * SpiderController.c)) - (SpiderController.lc + SpiderController.d);
+		float y = Mathf.Sin(cCoxa)*(SpiderController.lc+Mathf.Sin(cFemur)*SpiderController.a+Mathf.Cos(Mathf.PI-cTibia-((Mathf.PI/2f)-cFemur))*SpiderController.c) ;
+     	float z = (Mathf.Cos(cFemur)*SpiderController.a)-(Mathf.Sin((Mathf.PI-cTibia-((Mathf.PI/2f)-cFemur)))*SpiderController.c) + 7.7f;
+		Vector3 retVal = new Vector3((float)Math.Round(x,1),(float)Math.Round(y,1),(float)Math.Round(z,1));
+
+		Debug.Log ("From: " + cCoxa + ", " + cFemur + ", " + cTibia + " To: " + retVal);
 		return retVal;
 	}
 
@@ -189,7 +163,7 @@ public class SpiderLeg : MonoBehaviour
         string retVal = "" + Environment.NewLine;
 		Vector3 cCoords = getCoordinates();
 
-		retVal += "l:" + legID + " " + cCoords.x + ","+cCoords.y+","+cCoords.y +" " + speed + Environment.NewLine;
+		retVal += "l:" + legID + " " + cCoords.x + ","+cCoords.y+","+cCoords.z +" " + speed;
 
         return retVal;
     }
@@ -291,4 +265,55 @@ public class SpiderLeg : MonoBehaviour
         this.maxExecTime = Mathf.Max(this.maxExecTime, (((distance) / anglePerSecond) * (speed / 1024f)));
 
     }
+
+	public struct LegMovement
+	{
+		public bool valid;
+		public bool empty;
+		public float coxa, tibia, femur;
+		public float coxaSpeed, tibiaSpeed, femurSpeed;
+		public float maxExecTime;
+	}
+	
+	public struct SequenceFrame
+	{
+		public Dictionary<int, LegMovement> movements;
+		public float maxMaxExecTime;
+	}
+	
+	public static SequenceFrame newSequenceFrame(Dictionary<int, LegMovement> movements)
+	{
+		SequenceFrame retVal = new SequenceFrame();
+		float maxTime = 0f;
+		foreach(KeyValuePair<int, LegMovement> k in movements)
+		{
+			maxTime = Mathf.Max(maxTime, k.Value.maxExecTime);
+		}
+		retVal.maxMaxExecTime = maxTime;
+		
+		Dictionary<int, LegMovement> scaledMoves = new Dictionary<int, LegMovement>();
+		foreach (KeyValuePair<int, LegMovement> mov in movements)
+		{
+			float scaleFactor = mov.Value.maxExecTime / retVal.maxMaxExecTime;
+			
+			if (retVal.maxMaxExecTime == 0)
+				scaleFactor = 0;
+			
+			
+			LegMovement newMov = new LegMovement();
+			newMov.coxa = mov.Value.coxa;
+			newMov.tibia = mov.Value.tibia;
+			newMov.femur = mov.Value.femur;
+			
+			newMov.coxaSpeed = mov.Value.coxaSpeed * scaleFactor;
+			newMov.tibiaSpeed = mov.Value.tibiaSpeed * scaleFactor;
+			newMov.maxExecTime = mov.Value.maxExecTime * scaleFactor;
+			
+			scaledMoves.Add(mov.Key, newMov);
+		}
+		
+		retVal.movements = scaledMoves;
+		
+		return retVal;
+	}
 }
