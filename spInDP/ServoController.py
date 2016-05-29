@@ -23,7 +23,7 @@ class ServoController(object):
             try:
                 pos = self.ax12.readPosition(servo)
             except:
-                print ("Error reading position from servo " + str(servoId) + ". Retrying..")
+                print ("Error reading position from servo " + str(servo) + ". Retrying..")
                 tryCount += 1
                 continue
                 
