@@ -27,9 +27,9 @@ public class SpiderLeg : MonoBehaviour
 
     public bool shouldAnimate = true;
 
-	GUIStyle guiStyle;
+    GUIStyle guiStyle;
 
-	public Texture2D boxTexture; 
+    public Texture2D boxTexture;
 
     // Use this for initialization
     void Start()
@@ -47,21 +47,21 @@ public class SpiderLeg : MonoBehaviour
         tTarget = Tibia.localRotation;
 
         angleOffsetY = this.transform.localRotation.eulerAngles.y;
-		guiStyle = new GUIStyle();
-		guiStyle.normal.textColor = Color.red;
-		guiStyle.normal.background = this.boxTexture;
-		guiStyle.alignment = TextAnchor.MiddleCenter;
+        guiStyle = new GUIStyle();
+        guiStyle.normal.textColor = Color.red;
+        guiStyle.normal.background = this.boxTexture;
+        guiStyle.alignment = TextAnchor.MiddleCenter;
 
     }
 
-	void OnGUI()
-	{
-		Vector3 screenPos = Camera.main.WorldToScreenPoint (this.Tibia.position);
-		
-		Rect labelRect = new Rect (new Vector2(screenPos.x, Screen.height-screenPos.y - 50), new Vector2 (30, 20));
-		GUI.Box (labelRect, "l:" + legID, guiStyle);
-		//GUI.Label (labelRect, "l:" + legID, guiStyle);
-	}
+    void OnGUI()
+    {
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(this.Tibia.position);
+
+        Rect labelRect = new Rect(new Vector2(screenPos.x, Screen.height - screenPos.y - 50), new Vector2(30, 20));
+        GUI.Box(labelRect, "l:" + legID, guiStyle);
+        //GUI.Label (labelRect, "l:" + legID, guiStyle);
+    }
 
     // Update is called once per frame
     void Update()
@@ -77,10 +77,10 @@ public class SpiderLeg : MonoBehaviour
         else
             ratio = ((Time.time - startTime) / maxExecTime);
 
-        if(ratio  <= 1)
+        if (ratio <= 1)
         {
             //Debug.Log("Anim: " + ((Time.time - cStart) / (cFinish - cStart)));
-            if ( !emptyMove)
+            if (!emptyMove)
             {
                 //Mathf.LerpAngle()
                 Quaternion newCoxa = Quaternion.Lerp(lastCoxa, cTarget, ratio);
@@ -106,11 +106,11 @@ public class SpiderLeg : MonoBehaviour
             {
                 maxExecTime = nextMove.maxExecTime;
                 startTime = Time.time;
-                if(!nextMove.empty)
+                if (!nextMove.empty)
                 {
-					this.Coxa.localRotation = cTarget;
-					this.Femur.localRotation = fTarget;
-					this.Tibia.localRotation = tTarget;
+                    this.Coxa.localRotation = cTarget;
+                    this.Femur.localRotation = fTarget;
+                    this.Tibia.localRotation = tTarget;
 
                     //Debug.Log("New Move: " + nextMove.coxa + ", " + fixAngle(nextMove.femur) + ", " + nextMove.tibia + " EXECTIME: " + nextMove.maxExecTime);
                     setCoxa(nextMove.coxa, nextMove.coxaSpeed);
@@ -118,7 +118,7 @@ public class SpiderLeg : MonoBehaviour
                     setTibia(nextMove.tibia, nextMove.tibiaSpeed);
                     emptyMove = false;
                 }
-                else{
+                else {
                     emptyMove = true;
                 }
             }
@@ -140,23 +140,28 @@ public class SpiderLeg : MonoBehaviour
         return retVal;
     }
 
-	public Vector3 getCoordinates()
-	{
-		float cCoxa = (this.getCoxa ());
-		float cFemur = -(this.getFemur ());
-		float cTibia = -(this.getTibia()) - 180f;
-		cCoxa *= Mathf.Deg2Rad;
-		cFemur *= Mathf.Deg2Rad;
-		cTibia *= Mathf.Deg2Rad;
+    public Vector3 getCoordinates()
+    {
+        Debug.Log("coxa: " + this.getCoxa() + " femur: " + this.getFemur() + " tibia: " + this.getTibia());
+        float cCoxa = this.getCoxa() * Mathf.Deg2Rad;
+        float cFemur = this.getFemur() * Mathf.Deg2Rad;
+        float cTibia = this.getTibia() * Mathf.Deg2Rad;
+        float xOffset = 16.347f;
+        float zOffset = 5.59f;
+        float yOffset = 0f;
 
-		float x = Mathf.Cos (cCoxa) * (SpiderController.lc + (Mathf.Sin (cFemur) * SpiderController.a) + (Mathf.Cos (Mathf.PI - cTibia  - ((Mathf.PI / 2f) - cFemur)) * SpiderController.c)) - (SpiderController.lc + SpiderController.d);
-		float y = Mathf.Sin(cCoxa)*(SpiderController.lc+Mathf.Sin(cFemur)*SpiderController.a+Mathf.Cos(Mathf.PI-cTibia-((Mathf.PI/2f)-cFemur))*SpiderController.c) ;
-     	float z = (Mathf.Cos(cFemur)*SpiderController.a)-(Mathf.Sin((Mathf.PI-cTibia-((Mathf.PI/2f)-cFemur)))*SpiderController.c) + 7.7f;
-		Vector3 retVal = new Vector3((float)Math.Round(x,1),(float)Math.Round(y,1),(float)Math.Round(z,1));
 
-		Debug.Log ("From: " + cCoxa + ", " + cFemur + ", " + cTibia + " To: " + retVal);
-		return retVal;
-	}
+        double x = Math.Cos(cCoxa) * ((Math.Cos(cFemur) * SpiderController.a) + (Math.Cos(cFemur + cTibia) * SpiderController.c) + SpiderController.lc) - xOffset;
+        double y = Math.Sin(cCoxa) * (((Math.Cos(cFemur) * SpiderController.a) + ((Math.Cos(cFemur + cTibia) * SpiderController.c)) + SpiderController.lc));
+        double z = (Math.Sin(cFemur) * SpiderController.a) + ((Math.Sin(cFemur + cTibia) * SpiderController.c)) - zOffset;
+        if (legID == 2 || legID == 3 || legID == 4)
+        {
+            y *= -1;
+        }
+
+        Vector3 retVal = new Vector3((float)Math.Round(x, 1), (float)Math.Round(y, 1), (float)Math.Round(z, 1));
+        return retVal;
+    }
 
     public string getSequenceString(float speed)
     {
@@ -307,7 +312,7 @@ public class SpiderLeg : MonoBehaviour
 			
 			newMov.coxaSpeed = mov.Value.coxaSpeed * scaleFactor;
 			newMov.tibiaSpeed = mov.Value.tibiaSpeed * scaleFactor;
-			newMov.maxExecTime = mov.Value.maxExecTime * scaleFactor;
+			newMov.maxExecTime = retVal.maxMaxExecTime;
 			
 			scaledMoves.Add(mov.Key, newMov);
 		}

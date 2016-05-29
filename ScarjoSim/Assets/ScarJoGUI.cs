@@ -109,7 +109,7 @@ public class ScarJoGUI : MonoBehaviour {
 
     public void insertState()
     {
-		sequenceEditor.text += "beginframe" + Environment.NewLine;
+		sequenceEditor.text += "framebegin" + Environment.NewLine;
         foreach (SpiderLeg leg in spider.legs)
         {
             sequenceEditor.text += leg.getSequenceString(100);

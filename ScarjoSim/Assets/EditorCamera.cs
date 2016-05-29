@@ -37,9 +37,9 @@ public enum TransformType
 [RequireComponent(typeof(Camera))]
 public class EditorCamera : MonoBehaviour
 {
-	protected static Material lineMaterial;
-	protected static Material overlayMaterial;
-	protected static Material gridMaterial;
+	public Material lineMaterial;
+    public Material overlayMaterial;
+    public Material gridMaterial;
 	protected static Color colorLightBlue = new Color( 0.59f, 0.71f, 0.89f, 1.0f );
 	protected static Color colorLightGreen = new Color( 0.58f, 0.87f, 0.56f, 1.0f );
 	
