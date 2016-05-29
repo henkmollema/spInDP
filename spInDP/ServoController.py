@@ -57,11 +57,13 @@ class ServoController(object):
                 continue
     def computeKinematics(self, leg):
         coxa = leg[1] * (math.pi/180)
+        femur = (leg[2] + 90) * (math.pi/180)
         tibia = leg[3] * (math.pi/180)
 		xOffset = 16.347
         zOffset = 5.59
 		
 		x = math.cos(coxa) * (self.coxaLength + (math.cos(femur) * self.femurLength) + (math.cos(femur - tibia) * self.tibiaLength)) - xOffset
+		y = math.sin(coxa) * (self.coxaLength + (math.cos(femur) * self.femurLength) + (math.cos(femur - tibia) * self.tibiaLength))
 		z = (math.sin(femur) * self.femurLength) + (math.sin(femur - tibia) * self.tibiaLength) - zOffset
 		
 		if (legID == 2 || legID == 3 || legID == 4):

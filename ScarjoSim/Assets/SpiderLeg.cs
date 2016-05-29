@@ -28,6 +28,7 @@ public class SpiderLeg : MonoBehaviour
     public bool shouldAnimate = true;
 
     GUIStyle guiStyle;
+    ScarJoGUI gui;
 
     public Texture2D boxTexture;
 
@@ -52,14 +53,33 @@ public class SpiderLeg : MonoBehaviour
         guiStyle.normal.background = this.boxTexture;
         guiStyle.alignment = TextAnchor.MiddleCenter;
 
+        gui = GameObject.Find("Canvas").GetComponent<ScarJoGUI>();
+
     }
 
     void OnGUI()
     {
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(this.Tibia.position);
 
-        Rect labelRect = new Rect(new Vector2(screenPos.x, Screen.height - screenPos.y - 50), new Vector2(30, 20));
-        GUI.Box(labelRect, "l:" + legID, guiStyle);
+        Vector3 screenPosLegLabel = Camera.main.WorldToScreenPoint(this.Tibia.position);
+        Rect leglabelRect = new Rect(new Vector2(screenPosLegLabel.x, Screen.height - screenPosLegLabel.y - 50), new Vector2(30, 20));
+        GUI.Box(leglabelRect, "l:" + legID, guiStyle);
+
+        if (gui.showLabels)
+        {
+            Vector3 screenCoxaLabel = Camera.main.WorldToScreenPoint(this.Coxa.position);
+            Rect coxaLabelRect = new Rect(new Vector2(screenCoxaLabel.x, Screen.height - screenCoxaLabel.y - 30), new Vector2(100, 20));
+            Vector3 screenFemurLabel = Camera.main.WorldToScreenPoint(this.Femur.position);
+            Rect femurLabelRect = new Rect(new Vector2(screenFemurLabel.x, Screen.height - screenFemurLabel.y), new Vector2(100, 20));
+            Vector3 screenTibiaLabel = Camera.main.WorldToScreenPoint(this.Tibia.position);
+            Rect tibiaLabelRect = new Rect(new Vector2(screenTibiaLabel.x, Screen.height - screenTibiaLabel.y), new Vector2(100, 20));
+
+
+            GUI.Box(leglabelRect, "l:" + legID, guiStyle);
+
+            GUI.Box(coxaLabelRect, "coxa: " + this.getCoxa(), guiStyle);
+            GUI.Box(femurLabelRect, "Femur: " + this.getFemur(), guiStyle);
+            GUI.Box(tibiaLabelRect, "Tibia: " + this.getTibia(), guiStyle);
+        }
         //GUI.Label (labelRect, "l:" + legID, guiStyle);
     }
 
