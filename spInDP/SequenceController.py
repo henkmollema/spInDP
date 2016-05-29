@@ -1,7 +1,6 @@
-import time
 import math
-import threading
 import Queue
+from spInDP.IKArguments import IKArguments
 from spInDP.LegMovement import LegMovement
 from spInDP.LegThread import LegThread
 from spInDP.SequenceFrame import SequenceFrame
@@ -17,8 +16,12 @@ class SequenceController(object):
     d = 12.24  # Horz. afstand van c tot a (cm)
     lc = 4.107  # Lengte coxa (cm)
     b = math.sqrt(e**2 + d**2)  # diagonal (cm)
+    radToDeg = (180 / math.pi)
 
-    offset = 0
+    # optimal rpm is 114 without load at max speed
+    anglePerSecond = (114.0 * 360.0 / 60.0)
+
+    coxaOffset = 0
     
     LegOffsets = {
         1: [0,0,0],
@@ -28,9 +31,26 @@ class SequenceController(object):
         5: [0,0,0],
         6: [0,0,0]
     }
-    
-    def offsetLeg(self, legID, x,y,z):
-        self.LegOffsets[legID] = [x,y,z]
+
+    legCoordinateMap = {
+        1: [0, 0, 0],
+        2: [0, 0, 0],
+        3: [0, 0, 0],
+        4: [0, 0, 0],
+        5: [0, 0, 0],
+        6: [0, 0, 0]
+    }
+
+    servoAngleMap = {
+        1: 0.0, 2: 0.0, 3: 0.0,
+        4: 0.0, 5: 0.0, 6: 0.0,
+        7: 0.0, 8: 0.0, 9: 0.0,
+        10: 0.0, 11: 0.0, 12: 0.0,
+        13: 0.0, 14: 0.0, 15: 0.0,
+        16: 0.0, 17: 0.0, 18: 0.0
+    }
+
+    sequenceFrame = None
 
     def __init__(self, spider):
         self.spider = spider
@@ -44,6 +64,9 @@ class SequenceController(object):
             self.legQueue[x] = Queue.Queue()
             self.threadMap[x] = LegThread(x, self)
             self.threadMap[x].start()
+
+    def offsetLeg(self, legID, x,y,z):
+        self.LegOffsets[legID] = [x,y,z]
 
     def stop(self):
         self.stopped = True
@@ -60,7 +83,6 @@ class SequenceController(object):
         if sequenceName == "walk":
             self.executeWalk(1)
 
-    
     def executeWalk(self, speedModifier):
         return self.parseSequence("sequences/walk-frame.txt", repeat=1, speedModifier=speedModifier)
         
@@ -91,8 +113,6 @@ class SequenceController(object):
     def executeStartup(self):
         return self.parseSequence("sequences/startup.txt")
 
-    sequenceFrame = None
-
     #Returns the time it takes to execute this sequence in seconds
     def parseSequence(self, filePath, validate=False, speedModifier=1, repeat=1):
         print("Parsing sequence at: " + filePath + " repeating for "  + str(repeat))
@@ -108,9 +128,9 @@ class SequenceController(object):
                 "Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
         else:
             if(len(words) > 3):
-                self.offset = int(words[3])
+                self.coxaOffset = int(words[3])
             else:
-                self.offset = 0
+                self.coxaOffset = 0
 
         for x in range(0, repeat):
             print("repeat count: " + str(x))
@@ -119,12 +139,12 @@ class SequenceController(object):
             if(speedModifier < 0):
                 lineNr = len(lines)
                 for line in reversed(lines):
-                    totalTime += self.interpretLine(line, lineNr, speedModifier, validate)
+                    totalTime += self.interpretLine(line, lineNr, speedModifier)
                     lineNr -= 1
             else:
                 lineNr = 1
                 for line in lines:
-                    totalTime += self.interpretLine(line, lineNr, speedModifier, validate)
+                    totalTime += self.interpretLine(line, lineNr, speedModifier)
                     lineNr += 1
 
         #if (filePath != "sequences/startup.txt"):
@@ -132,7 +152,7 @@ class SequenceController(object):
         
         return totalTime
         
-    def interpretLine(self, line, lineNr, speedModifier=1, validate=False):
+    def interpretLine(self, line, lineNr, speedModifier=1):
         if(lineNr == 1 or line.lstrip().startswith("#") or len(line.strip()) == 0):
             return 0
 
@@ -147,14 +167,19 @@ class SequenceController(object):
             elif (command == "frameend"):
                 command = "framebegin"
 
+
         if(command == "delay"):
             if(len(words) != 2):
                 raise NameError("No argument given for delay at line: " + str(lineNr))
 
             seconds = float(words[1]) / 1000
-
-            if(not validate):
-                time.sleep(seconds)
+            for x in range(1, 7):
+                # Create an 'empty movement
+                mov = LegMovement()
+                mov.empty = True
+                mov.maxExecTime = seconds
+                #Put an empty legmovement with delay as exectime in the leg queue
+                self.legQueue[x].put(mov)
 
         # Wait for all lengs to complete their queued movements
         elif (command == "waitlegs"):
@@ -201,6 +226,7 @@ class SequenceController(object):
             if (self.sequenceFrame is None):
                 return 0
 
+            #Put the movements in the frame on the leg queues
             scaledMovements = self.sequenceFrame.getScaledMovements()
             for x in range(1, 7):
                 mov = scaledMovements.get(x, None)
@@ -210,10 +236,13 @@ class SequenceController(object):
                     mov = LegMovement()
                     mov.empty = True
                     mov.maxExecTime = self.sequenceFrame.maxMaxExecTime
-
+                #Here we put the legmovement object from the frame(or an empty one) in the leg queue
                 self.legQueue[x].put(mov)
 
+            #We return the time it takes for this frame to execute
             ret = self.sequenceFrame.maxMaxExecTime
+
+            #Clear the frame so another one can be created on the next framebegin
             self.sequenceFrame.movements.clear()
             self.sequenceFrame = None
             
@@ -235,27 +264,30 @@ class SequenceController(object):
             if(len(words) == 3):
                 speed = int(words[2])
 
-            if(not validate):
-                s = 200
-                if(speed > 0):
-                    s = speed
-                    vLeg = self.getServoPos(float(coords[0]), float(
-                        coords[1]), float(coords[2]), legID, s * abs(speedModifier))
+            s = 200
+            if(speed > 0):
+                s = speed
 
-                    if (vLeg is None):
-                        return 0
+                ikArgs = IKArguments()
+                ikArgs.x = float(coords[0])
+                ikArgs.y = float(coords[1])
+                ikArgs.z = float(coords[2])
+                ikArgs.legID = legID
+                ikArgs.speed = s * abs(speedModifier)
+                # Todo: put IKArgument objects on the leg queues and create LegMovement objects in the LegThreads
+                legMovement = self.computeInverseKinematics(ikArgs.x, ikArgs.y, ikArgs.z, ikArgs.legID, ikArgs.speed );
 
-                    if (self.sequenceFrame is None):
-                        self.legQueue[legID].put(vLeg)
-                    else:
-                        #print ("add leg move to frame")
-                        # for i in self.sequenceFrame.movements:
-                            # print i, self.sequenceFrame.movements[i].tibia
-                        if (self.sequenceFrame.movements.get(legID, None) is not None):
-                            raise NameError(
-                                "Attempt to move leg " + str(legID) + " more than once in one frame")
+                if (legMovement is None):
+                    return 0
 
-                        self.sequenceFrame.movements[legID] = vLeg
+                if (self.sequenceFrame is None):
+                    self.legQueue[legID].put(legMovement)
+                else:
+                    if (self.sequenceFrame.movements.get(legID, None) is not None):
+                        raise NameError(
+                            "Attempt to move leg " + str(legID) + " more than once in one frame")
+                    #Add the movement to the frame we're building
+                    self.sequenceFrame.movements[legID] = legMovement
 
         # Control individual servo
         elif(words[0].lower().startswith('s:')):
@@ -264,60 +296,31 @@ class SequenceController(object):
                     len(words)) + " at line: " + str(lineNr))
 
             servoID = int(words[0].split(':')[1])
-            coords = words[1].split(',')
-            if(len(coords) != 1):
-                raise NameError(
-                    "Wrong amount of coords: " + str(len(coords)) + " (expected 1) at line: " + str(lineNr))
+            destinationAngle = float(words[1])
 
             speed = -1
             if(len(words) == 3):
                 speed = int(words[2])
+            s = 200
+            if(speed > 0):
+                s = speed
+                self.servoController.move(servoID, int(destinationAngle), s * abs(speedModifier))
+                currAngle = self.servoAngleMap[servoID]
+                delta = abs(destinationAngle - currAngle)
+                return delta / (self.anglePerSecond * (speed / 1023.0))
 
-            if(not validate):
-                s = 200
-                if(speed > 0):
-                    s = speed
-                    self.servoController.move(
-                        servoID, int(coords[0]), s * abs(speedModifier))
+
+
+
         else:
             raise NameError("No valid command found on line: " + str(lineNr))
             
         return 0
 
-    servoAngleMap = {
-        1: 0.0,
-        2: 0.0,
-        3: 0.0,
-        4: 0.0,
-        5: 0.0,
-        6: 0.0,
-        7: 0.0,
-        8: 0.0,
-        9: 0.0,
-        10: 0.0,
-        11: 0.0,
-        12: 0.0,
-        13: 0.0,
-        14: 0.0,
-        15: 0.0,
-        16: 0.0,
-        17: 0.0,
-        18: 0.0
-    }
-    
-    legCoordinateMap = {
-        1: {0,0,0},
-        2: {0,0,0},
-        3: {0,0,0},
-        4: {0,0,0},
-        5: {0,0,0},
-        6: {0,0,0}
-    }
-
+    #Returns a LegMovement Object.
     # True if we need to get initial positions from servo
     first = True
-
-    def getServoPos(self, x, y, z, legID, speed):
+    def computeInverseKinematics(self, x, y, z, legID, speed):
         x += self.LegOffsets[legID][0]
         y += self.LegOffsets[legID][1]
         z += self.LegOffsets[legID][2]
@@ -335,6 +338,7 @@ class SequenceController(object):
         femurCurr = self.servoAngleMap[femurServoId]
         tibiaCurr = self.servoAngleMap[tibiaServoId]
 
+        #If the servomap is empty try to read the position directly from the servo
         if (self.first is True):
             self.first = False
             coxaCurr = self.servoController.getPosition(coxaServoId)
@@ -348,9 +352,9 @@ class SequenceController(object):
         thetaIK = math.asin(y / lIK)
         tauIK = math.atan((self.e + z) / dIK)
 
-        angleCoxa = thetaIK * (180 / math.pi)
-        angleFemur = -90 + ((gammaIK - tauIK) * (180 / math.pi))
-        angleTibia = 180 - ((betaIK) * (180 / math.pi))
+        angleCoxa = thetaIK * self.radToDeg
+        angleFemur = -90 + ((gammaIK - tauIK) * self.radToDeg)
+        angleTibia = 180 - ((betaIK) * self.radToDeg)
 
         if (legID > 1 and legID < 5):
             angleCoxa = -angleCoxa
@@ -361,6 +365,7 @@ class SequenceController(object):
         self.servoAngleMap[femurServoId] = angleFemur
         self.servoAngleMap[tibiaServoId] = angleTibia
 
+        #Create a LegMovement object
         deltaCoxa = abs(angleCoxa - coxaCurr)
         deltaFemur = abs(angleFemur - femurCurr)
         deltaTibia = abs(angleTibia - tibiaCurr)
@@ -388,16 +393,16 @@ class SequenceController(object):
             retVal.femurSpeed = int(round(speed * (deltaFemur / maxDelta), 0))
             retVal.tibiaSpeed = speed
 
-        # optimal rpm is 114 without load
-        timePerAngle = (114.0 * 360.0 / 60.0) * (speed / 1023.0)
-        maxExecTime = maxDelta / timePerAngle
+        maxExecTime = maxDelta / (self.anglePerSecond * (speed / 1023.0))
         retVal.maxExecTime = maxExecTime
 
         retVal.coxa = angleCoxa
         if(legID == 1 or legID == 4):
-            retVal.coxa += self.offset
+            retVal.coxa += self.coxaOffset
         if(legID == 2 or legID == 5):
-            retVal.coxa -= self.offset
+            retVal.coxa -= self.coxaOffset
         retVal.femur = angleFemur
         retVal.tibia = angleTibia
         return retVal
+
+
