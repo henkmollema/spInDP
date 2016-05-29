@@ -18,17 +18,21 @@ class LegThread(threading.Thread):
         q = self.sequenceController.legQueue[self.legId]
         while not self.sequenceController.stopped:
             try:
-                vLeg = q.get()
+
+                #Todo: Compute inverse kinematics here. queue contains legmovement objects as of now,
+                #Todo: change this to objects wrapping the arguments for computeInverseKinematics() in sequenceController
+                legMovement = q.get()
                                 
-                if (vLeg.empty is False):
+                if (legMovement.empty is False):
                     self.sequenceController.servoController.move(
-                        (self.legId - 1) * 3 + 1, vLeg.coxa, vLeg.coxaSpeed)
+                        (self.legId - 1) * 3 + 1, legMovement.coxa, legMovement.coxaSpeed)
                     self.sequenceController.servoController.move(
-                        (self.legId - 1) * 3 + 2, vLeg.femur, vLeg.femurSpeed)
+                        (self.legId - 1) * 3 + 2, legMovement.femur, legMovement.femurSpeed)
                     self.sequenceController.servoController.move(
-                        (self.legId - 1) * 3 + 3, vLeg.tibia, vLeg.tibiaSpeed)
-                
-                time.sleep(vLeg.maxExecTime if vLeg.maxExecTime > 0 else 0.005)
+                        (self.legId - 1) * 3 + 3, legMovement.tibia, legMovement.tibiaSpeed)
+
+                #Sleep this thread for maxexectime seconds
+                time.sleep(legMovement.maxExecTime if legMovement.maxExecTime > 0 else 0.005)
             #except:
                 #print ("error on leg " + str(self.legId))
             finally:

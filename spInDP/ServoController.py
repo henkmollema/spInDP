@@ -44,7 +44,7 @@ class ServoController(object):
     def getVoltage(self, servo):
         volt = self.ax12.readVoltage(servo)
         return volt
-        
+
     # Kinematics (non inverse) for leg positioning
     def setLegTorque(self, leg, status):
         for x in range ((int(leg)-1)*3+1, (int(leg)-1)*3+4):
@@ -65,28 +65,36 @@ class ServoController(object):
                 #ignore error and continue, but tell the user
                 print ("Error setting servo torque for servo " + str(x))
                 continue
-    def computeKinematics(self, leg):
-        coxa = leg[1]
-        femur = leg[2]
-        tibia = leg[3]
-        x = math.cos(coxa)*(self.coxaLength+(math.cos(femur)*self.femurLength)+(math.sin(math.pi-tibia-((math.pi/2)-femur))*self.tibiaLength))
-        y = math.sin(coxa)*(self.coxaLength+math.cos(femur)*self.femurLength+math.sin(math.pi-tibia-((math.pi/2)-femur))*self.tibiaLength)
-        z = (math.sin(femur)*self.femurLength)-(math.cos((math.pi-tibia-((math.pi/2)-femur)))*self.tibiaLength)
+    def computeKinematics(self, leg, legID):
+        coxa = leg[1] * (math.pi/180)
+        femur = (leg[2] + 90) * (math.pi/180)
+        tibia = leg[3] * (math.pi/180)
+        xOffset = 16.347
+        zOffset = 5.59
+
+        x = math.cos(coxa) * (self.coxaLength + (math.cos(femur) * self.femurLength) + (math.cos(femur - tibia) * self.tibiaLength)) - xOffset
+        y = math.sin(coxa) * (self.coxaLength + (math.cos(femur) * self.femurLength) + (math.cos(femur - tibia) * self.tibiaLength))
+        z = (math.sin(femur) * self.femurLength) + (math.sin(femur - tibia) * self.tibiaLength) - zOffset
+
+        if (legID == 2 or legID == 3 or legID == 4):
+            y *= -1
+
         return x,y,z
+
     def getAllLegsXYZ(self):
         legs = {}
         for legId in range(1, 7):
             legServos = {}
             for x in range(1, 4):
                 servoId = (legId-1)*3+x
-                legServos[x] = (self.getPosition(servoId)/180)*math.pi
+                legServos[x] = self.getPosition(servoId)
             try:
-                legs[legId] = self.computeKinematics(legServos)
+                legs[legId] = self.computeKinematics(legServos, legId)
             except:
                 print ("Something went wrong in \"computeKinematics\"...")
                 continue
         return legs
-        
+
     # Generates a JSON string with data from all servos.
     def getServoDataJSON(self):
         retVal = {}

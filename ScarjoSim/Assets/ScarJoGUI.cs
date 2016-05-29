@@ -12,6 +12,7 @@ public class ScarJoGUI : MonoBehaviour {
     public SpiderController spider;
     public string selectedSequence;
     public int repeatCount = 1;
+    public bool showLabels;
     Vector3 camStartAngle;
 
     Text selectedSeqText;
@@ -19,6 +20,7 @@ public class ScarJoGUI : MonoBehaviour {
 
     Text browseButtontext, executeButtontext, stopButtontext, editButtontext;
     InputField sequenceEditor;
+    Toggle labelToggle;
 
     public bool editMode = false;
     public int delayval = 0;
@@ -35,6 +37,7 @@ public class ScarJoGUI : MonoBehaviour {
         stopButtontext = GameObject.Find("StopButton").GetComponentInChildren<Text>();
         editButtontext = GameObject.Find("EditButton").GetComponentInChildren<Text>();
         sequenceEditor = GameObject.Find("SequenceEditor").GetComponent<InputField>();
+        labelToggle = GameObject.Find("labelToggle").GetComponent<Toggle>();
 
         browseButtontext.text = "Browse..";
         executeButtontext.text = "Execute Sequence";
@@ -53,6 +56,12 @@ public class ScarJoGUI : MonoBehaviour {
 	void Update () {
 	
 	}
+
+    public void toggleLabels(bool val)
+    {
+        
+        showLabels = !showLabels;
+    }
 
     public void toggleEditMode()
     {
