@@ -65,10 +65,10 @@ class SequenceController(object):
         return self.parseSequence("sequences/walk-frame.txt", repeat=1, speedModifier=speedModifier)
         
     def executeStepForward(self):
-        return self.parseSequence("sequences/walk-frame.txt", repeat=1, speedModifier=1)
+        return self.parseSequence("sequences/walk-v3.txt", repeat=1, speedModifier=1)
         
     def executeStepBackwards(self):
-        return self.parseSequence("sequences/walk-frame.txt", repeat=1, speedModifier=-1)
+        return self.parseSequence("sequences/walk-v3-backwards.txt", repeat=1, speedModifier=1)
         
     def executeStepLeft(self):
         return self.parseSequence("sequences/crab-walk.txt", repeat=1, speedModifier=-1)

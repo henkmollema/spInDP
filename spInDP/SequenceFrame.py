@@ -9,7 +9,11 @@ class SequenceFrame(object):
     for k in self.movements:
       times.append(self.movements[k].maxExecTime)
       
-    self.maxMaxExecTime = max(times)
+    if(len(times) == 0):
+        self.maxMaxExecTime = 0
+    else:
+        self.maxMaxExecTime = max(times)
+        
     scaledMoves = { }
     for k in self.movements:
       mov = self.movements[k]
