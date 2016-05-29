@@ -55,21 +55,22 @@ class ServoController(object):
                 #ignore error and continue, but tell the user
                 print ("Error setting servo torque for servo " + str(x))
                 continue
-    def computeKinematics(self, leg):
-        coxa = leg[1] * (math.pi/180)
-        femur = (leg[2] + 90) * (math.pi/180)
-        tibia = leg[3] * (math.pi/180)
+    def computeKinematics(self, leg, legID):
+		coxa = leg[1] * (math.pi/180)
+		femur = (leg[2] + 90) * (math.pi/180)
+		tibia = leg[3] * (math.pi/180)
 		xOffset = 16.347
-        zOffset = 5.59
+		zOffset = 5.59
 		
 		x = math.cos(coxa) * (self.coxaLength + (math.cos(femur) * self.femurLength) + (math.cos(femur - tibia) * self.tibiaLength)) - xOffset
 		y = math.sin(coxa) * (self.coxaLength + (math.cos(femur) * self.femurLength) + (math.cos(femur - tibia) * self.tibiaLength))
 		z = (math.sin(femur) * self.femurLength) + (math.sin(femur - tibia) * self.tibiaLength) - zOffset
 		
-		if (legID == 2 || legID == 3 || legID == 4):
+		if (legID == 2 or legID == 3 or legID == 4):
 			y *= -1
+			
+		return x,y,z
 		
-        return x,y,z
     def getAllLegsXYZ(self):
         legs = {}
         for legId in range(1, 7):
@@ -91,7 +92,7 @@ class ServoController(object):
                         continue
                     time.sleep(0.01)
             try:
-                legs[legId] = self.computeKinematics(legServos)
+                legs[legId] = self.computeKinematics(legServos, legId)
             except:
                 print ("Something went wrong in \"computeKinematics\"...")
                 continue
