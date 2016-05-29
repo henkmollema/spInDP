@@ -16,7 +16,17 @@ class ServoController(object):
         self.ax12 = Ax12()
 
     def getPosition(self, servo):
-        pos = self.ax12.readPosition(servo)
+        tryCount = 0
+        maxTryCount = 3
+        pos = None
+        while pos == None and tryCount < maxTryCount:
+            try:
+                pos = self.ax12.readPosition(servo)
+            except:
+                print ("Error reading position from servo " + str(servoId) + ". Retrying..")
+                tryCount += 1
+                continue
+                
         return dxl_angle_to_degrees(pos)
 
     def getSpeed(self, servo):
@@ -69,20 +79,7 @@ class ServoController(object):
             legServos = {}
             for x in range(1, 4):
                 servoId = (legId-1)*3+x
-                legServos[x] = None
-                tryCount = 0
-                maxTryCount = 10
-                while legServos[x] == None and tryCount < maxTryCount:
-                    try:
-                        tmp = self.getPosition(servoId)
-                        print ("servonr: " + str(servoId) + " in pos: " + str(tmp))
-                        legServos[x] = (tmp/180)*math.pi
-                    except:
-                        # Ignore error
-                        print ("Error reading position from servo " + str(servoId) + ". Retrying..")
-                        tryCount += 1
-                        continue
-                    time.sleep(0.01)
+                legServos[x] = (self.getPosition(servoId)/180)*math.pi
             try:
                 legs[legId] = self.computeKinematics(legServos)
             except:
