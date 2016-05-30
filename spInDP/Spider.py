@@ -9,6 +9,7 @@ from spInDP.BehaviorType import BehaviorType
 from spInDP.WebServer import WebServer
 from spInDP.VisionController import VisionController
 from spInDP.FindBalloonBehavior import FindBalloonBehavior
+from spInDP.Animation import AnimationController
 
 
 class Spider(object):
@@ -20,6 +21,7 @@ class Spider(object):
         self.remoteController = RemoteController(self)
         self.servoController = ServoController()
         self.sequenceController = SequenceController(self)
+        self.animationController = AnimationController(self)
         self.visioncontroller = VisionController()
         self.webserver = WebServer(self)
 

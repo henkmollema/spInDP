@@ -18,7 +18,7 @@ class WebServer:
         self.spider = spider
 
     def start(self):
-        self.app.run(host='0.0.0.0', port=80, debug=False, threaded=True)
+        self.app.run(host='0.0.0.0', port=80, debug=True, threaded=True)
 
     def format_response(self, message, mimetype='application/json'):
         resp = Response(message, status=200, mimetype=mimetype)
@@ -77,6 +77,10 @@ class WebServer:
             "sequences/" + animation, repeat=int(repeat), speedModifier=float(speedModifier))
         return webserverinstance.format_response("animation executed: sequences/" + animation)
 
+    @staticmethod
+    @app.route("/erwin/walk/<direction>/<steps>")
+    def api_erwin_walk(direction, steps):
+        webserverinstance.spider.animationController.walk(direction, steps)
    
     @staticmethod
     @app.route("/behavior/<behaviortype>")

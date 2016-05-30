@@ -21,7 +21,7 @@ class SequenceController(object):
     # optimal rpm is 114 without load at max speed
     anglePerSecond = (114.0 * 360.0 / 60.0)
 
-    coxaOffset = 0
+    coxaOffset = 45
     
     LegOffsets = {
         1: [0,0,0],
@@ -130,7 +130,7 @@ class SequenceController(object):
             if(len(words) > 3):
                 self.coxaOffset = int(words[3])
             else:
-                self.coxaOffset = 0
+                self.coxaOffset = 45
 
         for x in range(0, repeat):
             print("repeat count: " + str(x))
