@@ -1,9 +1,5 @@
-import time
 import math
-import threading
-import Queue
 from spInDP.LegMovement import LegMovement
-from spInDP.LegThread import LegThread
 from spInDP.SequenceFrame import SequenceFrame
 
 class AnimationController:
@@ -68,59 +64,60 @@ class AnimationController:
         }
         
         frameNr = frameNr % 6
+        seqCtrl = self.spider.sequenceController;
         if frameNr == 0:
             self.startFrame()
-            self.sequenceFrame.movements[3] = self.spider.sequenceController.computeInverseKinematics(legActualMid[3][0]+(-stepRangeHor/2), legActualMid[3][1]+(stepRangeVert/2), zGround, 3, speedMod * 100)
-            self.sequenceFrame.movements[6] = self.spider.sequenceController.computeInverseKinematics(legActualMid[6][0]+(stepRangeHor/2), legActualMid[6][1]+(stepRangeVert/2), zGround, 6, speedMod * 100)
-            self.sequenceFrame.movements[2] = self.spider.sequenceController.computeInverseKinematics(legActualMid[2][0]-(-stepRangeHor/2), legActualMid[2][1]-(stepRangeVert/2), zGround, 2, speedMod * 200)
-            self.sequenceFrame.movements[5] = self.spider.sequenceController.computeInverseKinematics(legActualMid[5][0]-(stepRangeHor/2), legActualMid[5][1]-(stepRangeVert/2), zGround, 5, speedMod * 200)
-            self.sequenceFrame.movements[1] = self.spider.sequenceController.computeInverseKinematics(legActualMid[1][0], legActualMid[1][1], zGround, 1, speedMod * 100)
-            self.sequenceFrame.movements[4] = self.spider.sequenceController.computeInverseKinematics(legActualMid[4][0], legActualMid[4][1], zGround, 4, speedMod * 100)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] + (-stepRangeHor / 2), legActualMid[3][1] + (stepRangeVert / 2), zGround, 3, speedMod * 100)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0] + (stepRangeHor / 2), legActualMid[6][1] + (stepRangeVert / 2), zGround, 6, speedMod * 100)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0] - (-stepRangeHor / 2), legActualMid[2][1] - (stepRangeVert / 2), zGround, 2, speedMod * 200)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0] - (stepRangeHor / 2), legActualMid[5][1] - (stepRangeVert / 2), zGround, 5, speedMod * 200)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0], legActualMid[1][1], zGround, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0], legActualMid[4][1], zGround, 4, speedMod * 100)
             totalTime += self.endFrame()
         elif frameNr == 1:
             self.startFrame()
-            self.sequenceFrame.movements[3] = self.spider.sequenceController.computeInverseKinematics(legActualMid[3][0], legActualMid[3][1], zAir, 3, speedMod * 200)
-            self.sequenceFrame.movements[6] = self.spider.sequenceController.computeInverseKinematics(legActualMid[6][0], legActualMid[6][1], zAir, 6, speedMod * 200)
-            self.sequenceFrame.movements[2] = self.spider.sequenceController.computeInverseKinematics(legActualMid[2][0]-(-stepRangeHor/4), legActualMid[2][1]-(stepRangeVert/4), zGround, 2, speedMod * 100)
-            self.sequenceFrame.movements[5] = self.spider.sequenceController.computeInverseKinematics(legActualMid[5][0]-(stepRangeHor/4), legActualMid[5][1]-(stepRangeVert/4), zGround, 5, speedMod * 100)
-            self.sequenceFrame.movements[1] = self.spider.sequenceController.computeInverseKinematics(legActualMid[1][0]+(stepRangeHor/4), legActualMid[1][1]+(stepRangeVert/4), zGround, 1, speedMod * 100)
-            self.sequenceFrame.movements[4] = self.spider.sequenceController.computeInverseKinematics(legActualMid[4][0]+(-stepRangeHor/4), legActualMid[4][1]+(stepRangeVert/4), zGround, 4, speedMod * 100)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0], legActualMid[3][1], zAir, 3, speedMod * 200)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0], legActualMid[6][1], zAir, 6, speedMod * 200)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0] - (-stepRangeHor / 4), legActualMid[2][1] - (stepRangeVert / 4), zGround, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0] - (stepRangeHor / 4), legActualMid[5][1] - (stepRangeVert / 4), zGround, 5, speedMod * 100)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0] + (stepRangeHor / 4), legActualMid[1][1] + (stepRangeVert / 4), zGround, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0] + (-stepRangeHor / 4), legActualMid[4][1] + (stepRangeVert / 4), zGround, 4, speedMod * 100)
             totalTime += self.endFrame()
         elif frameNr == 2:
             self.startFrame()
-            self.sequenceFrame.movements[3] = self.spider.sequenceController.computeInverseKinematics(legActualMid[3][0]-(-stepRangeHor/2), legActualMid[3][1]-(stepRangeVert/2), zGround, 3, speedMod * 200)
-            self.sequenceFrame.movements[6] = self.spider.sequenceController.computeInverseKinematics(legActualMid[6][0]-(stepRangeHor/2), legActualMid[6][1]-(stepRangeVert/2), zGround, 6, speedMod * 200)
-            self.sequenceFrame.movements[2] = self.spider.sequenceController.computeInverseKinematics(legActualMid[2][0], legActualMid[2][1], zGround, 2, speedMod * 100)
-            self.sequenceFrame.movements[5] = self.spider.sequenceController.computeInverseKinematics(legActualMid[5][0], legActualMid[5][1], zGround, 5, speedMod * 100)
-            self.sequenceFrame.movements[1] = self.spider.sequenceController.computeInverseKinematics(legActualMid[1][0]+(stepRangeHor/2), legActualMid[1][1]+(stepRangeVert/2), zGround, 1, speedMod * 100)
-            self.sequenceFrame.movements[4] = self.spider.sequenceController.computeInverseKinematics(legActualMid[4][0]+(-stepRangeHor/2), legActualMid[4][1]+(stepRangeVert/2), zGround, 4, speedMod * 100)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] - (-stepRangeHor / 2), legActualMid[3][1] - (stepRangeVert / 2), zGround, 3, speedMod * 200)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0] - (stepRangeHor / 2), legActualMid[6][1] - (stepRangeVert / 2), zGround, 6, speedMod * 200)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0], legActualMid[2][1], zGround, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0], legActualMid[5][1], zGround, 5, speedMod * 100)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0] + (stepRangeHor / 2), legActualMid[1][1] + (stepRangeVert / 2), zGround, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0] + (-stepRangeHor / 2), legActualMid[4][1] + (stepRangeVert / 2), zGround, 4, speedMod * 100)
             totalTime += self.endFrame()
         elif frameNr == 3:
             self.startFrame()
-            self.sequenceFrame.movements[3] = self.spider.sequenceController.computeInverseKinematics(legActualMid[3][0]-(-stepRangeHor/4), legActualMid[3][1]-(stepRangeVert/4), zGround, 3, speedMod * 100)
-            self.sequenceFrame.movements[6] = self.spider.sequenceController.computeInverseKinematics(legActualMid[6][0]-(stepRangeHor/4), legActualMid[6][1]-(stepRangeVert/4), zGround, 6, speedMod * 100)
-            self.sequenceFrame.movements[2] = self.spider.sequenceController.computeInverseKinematics(legActualMid[2][0]+(-stepRangeHor/4), legActualMid[2][1]+(stepRangeVert/4), zGround, 2, speedMod * 100)
-            self.sequenceFrame.movements[5] = self.spider.sequenceController.computeInverseKinematics(legActualMid[5][0]+(stepRangeHor/4), legActualMid[5][1]+(stepRangeVert/4), zGround, 5, speedMod * 100)
-            self.sequenceFrame.movements[1] = self.spider.sequenceController.computeInverseKinematics(legActualMid[1][0], legActualMid[1][1], zAir, 1, speedMod * 200)
-            self.sequenceFrame.movements[4] = self.spider.sequenceController.computeInverseKinematics(legActualMid[4][0], legActualMid[4][1], zAir, 4, speedMod * 200)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] - (-stepRangeHor / 4), legActualMid[3][1] - (stepRangeVert / 4), zGround, 3, speedMod * 100)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0] - (stepRangeHor / 4), legActualMid[6][1] - (stepRangeVert / 4), zGround, 6, speedMod * 100)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0] + (-stepRangeHor / 4), legActualMid[2][1] + (stepRangeVert / 4), zGround, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0] + (stepRangeHor / 4), legActualMid[5][1] + (stepRangeVert / 4), zGround, 5, speedMod * 100)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0], legActualMid[1][1], zAir, 1, speedMod * 200)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0], legActualMid[4][1], zAir, 4, speedMod * 200)
             totalTime += self.endFrame()
         elif frameNr == 4:
             self.startFrame()
-            self.sequenceFrame.movements[3] = self.spider.sequenceController.computeInverseKinematics(legActualMid[3][0], legActualMid[3][1], zGround, 3, speedMod * 100)
-            self.sequenceFrame.movements[6] = self.spider.sequenceController.computeInverseKinematics(legActualMid[6][0], legActualMid[6][1], zGround, 6, speedMod * 100)
-            self.sequenceFrame.movements[2] = self.spider.sequenceController.computeInverseKinematics(legActualMid[2][0]+(-stepRangeHor/2), legActualMid[2][1]+(stepRangeVert/2), zGround, 2, speedMod * 100)
-            self.sequenceFrame.movements[5] = self.spider.sequenceController.computeInverseKinematics(legActualMid[5][0]+(stepRangeHor/2), legActualMid[5][1]+(stepRangeVert/2), zGround, 5, speedMod * 100)
-            self.sequenceFrame.movements[1] = self.spider.sequenceController.computeInverseKinematics(legActualMid[1][0]-(stepRangeHor/2), legActualMid[1][1]-(stepRangeVert/2), zGround, 1, speedMod * 200)
-            self.sequenceFrame.movements[4] = self.spider.sequenceController.computeInverseKinematics(legActualMid[4][0]-(-stepRangeHor/2), legActualMid[4][1]-(stepRangeVert/2), zGround, 4, speedMod * 200)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0], legActualMid[3][1], zGround, 3, speedMod * 100)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0], legActualMid[6][1], zGround, 6, speedMod * 100)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0] + (-stepRangeHor / 2), legActualMid[2][1] + (stepRangeVert / 2), zGround, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0] + (stepRangeHor / 2), legActualMid[5][1] + (stepRangeVert / 2), zGround, 5, speedMod * 100)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0] - (stepRangeHor / 2), legActualMid[1][1] - (stepRangeVert / 2), zGround, 1, speedMod * 200)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0] - (-stepRangeHor / 2), legActualMid[4][1] - (stepRangeVert / 2), zGround, 4, speedMod * 200)
             totalTime += self.endFrame()
         elif frameNr == 5:
             self.startFrame()
-            self.sequenceFrame.movements[3] = self.spider.sequenceController.computeInverseKinematics(legActualMid[3][0]+(-stepRangeHor/4), legActualMid[3][1]+(stepRangeVert/4), zGround, 3, speedMod * 100)
-            self.sequenceFrame.movements[6] = self.spider.sequenceController.computeInverseKinematics(legActualMid[6][0]+(stepRangeHor/4), legActualMid[6][1]+(stepRangeVert/4), zGround, 6, speedMod * 100)
-            self.sequenceFrame.movements[2] = self.spider.sequenceController.computeInverseKinematics(legActualMid[2][0], legActualMid[2][1], zAir, 2, speedMod * 200)
-            self.sequenceFrame.movements[5] = self.spider.sequenceController.computeInverseKinematics(legActualMid[5][0], legActualMid[5][1], zAir, 5, speedMod * 200)
-            self.sequenceFrame.movements[1] = self.spider.sequenceController.computeInverseKinematics(legActualMid[1][0]-(stepRangeHor/4), legActualMid[1][1]-(stepRangeVert/4), zGround, 1, speedMod * 100)
-            self.sequenceFrame.movements[4] = self.spider.sequenceController.computeInverseKinematics(legActualMid[4][0]-(stepRangeHor/4), legActualMid[4][1]-(stepRangeVert/4), zGround, 4, speedMod * 100)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] + (-stepRangeHor / 4), legActualMid[3][1] + (stepRangeVert / 4), zGround, 3, speedMod * 100)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0] + (stepRangeHor / 4), legActualMid[6][1] + (stepRangeVert / 4), zGround, 6, speedMod * 100)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0], legActualMid[2][1], zAir, 2, speedMod * 200)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0], legActualMid[5][1], zAir, 5, speedMod * 200)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0] - (stepRangeHor / 4), legActualMid[1][1] - (stepRangeVert / 4), zGround, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0] - (stepRangeHor / 4), legActualMid[4][1] - (stepRangeVert / 4), zGround, 4, speedMod * 100)
             totalTime += self.endFrame()
         else:
             print("Invalid frameNr")

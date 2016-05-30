@@ -12,6 +12,8 @@ class ServoController(object):
     tibiaLength = 16.4  # Tibia (cm)
     coxaLength = 4.107  # Lengte coxa (cm)
 
+    torqueStatus = [1,1,1,1,1,1]
+
     def __init__(self):
         self.ax12 = Ax12()
 
@@ -45,6 +47,9 @@ class ServoController(object):
         volt = self.ax12.readVoltage(servo)
         return volt
 
+    def getLegTorque(self,leg):
+        return self.torqueStatus[leg - 1]
+
     # Kinematics (non inverse) for leg positioning
     def setLegTorque(self, leg, status):
         for x in range ((int(leg)-1)*3+1, (int(leg)-1)*3+4):
@@ -52,6 +57,7 @@ class ServoController(object):
             try:
                 time.sleep(0.01)
                 self.ax12.setTorqueStatus(x, int(status))
+                self.torqueStatus[int(x / 3)] = status
             except:
                 #ignore error, but tell the user
                 print ("Error setting servo + " + str(x) + " torque for leg " + str(leg))
@@ -61,11 +67,13 @@ class ServoController(object):
             print ("Setting torque for servo " + str(x) + " to " + str(status))
             try:
                 self.ax12.setTorqueStatus(x, status)
+                self.torqueStatus[int(x / 3)] = status
             except:
                 #ignore error and continue, but tell the user
                 print ("Error setting servo torque for servo " + str(x))
                 continue
-    def computeKinematics(self, leg, legID):
+
+    def anglesToCoords(self, leg, legID):
         coxa = leg[1] * (math.pi/180)
         femur = (leg[2] + 90) * (math.pi/180)
         tibia = leg[3] * (math.pi/180)
@@ -79,21 +87,20 @@ class ServoController(object):
         if (legID == 2 or legID == 3 or legID == 4):
             y *= -1
 
-        return x,y,z
+        return round(x,1), round(y,1), round(z,1)
 
     def getAllLegsXYZ(self):
-        legs = {}
         for legId in range(1, 7):
             legServos = {}
             for x in range(1, 4):
                 servoId = (legId-1)*3+x
                 legServos[x] = self.getPosition(servoId)
             try:
-                legs[legId] = self.computeKinematics(legServos, legId)
+                coords = self.anglesToCoords(legServos, legId)
+                legs[legId] = str(coords[0]) + "," + str(coords[1]) + "," + str(coords[2])
             except:
-                print ("Something went wrong in \"computeKinematics\"...")
+                print ("Something went wrong in \"anglesToCoords\"...")
                 continue
-        return legs
 
     # Generates a JSON string with data from all servos.
     def getServoDataJSON(self):
@@ -105,8 +112,7 @@ class ServoController(object):
                 tmp['position'] = self.getPosition(x)
                 tmp['temp'] = self.getTemperature(x)
                 tmp['load'] = self.getLoad(x)
-                tmp['voltage'] = str(
-                    float(float(self.getVoltage(x)) / float(10)))
+                tmp['voltage'] = str(float(float(self.getVoltage(x)) / float(10)))
 
             except:
                 # Ignore errors with servos
@@ -119,9 +125,6 @@ class ServoController(object):
 
     def move(self, servo, angle, speed=200):
         pos = int(degrees_to_dxl_angle(angle))
-
-        #print("moving: " + str(servo) + " to: " + str(angle) + ", pos: " + str(pos) + ", speed: " + str(speed))
-
         self.ax12.moveSpeed(servo, pos, int(speed))
 
 

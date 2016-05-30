@@ -20,7 +20,7 @@ class LegThread(threading.Thread):
             try:
 
                 #Todo: Compute inverse kinematics here. queue contains legmovement objects as of now,
-                #Todo: change this to objects wrapping the arguments for computeInverseKinematics() in sequenceController
+                #Todo: change this to objects wrapping the arguments for coordsToLegMovement() in sequenceController
                 legMovement = q.get()
                                 
                 if (legMovement.empty is False):
