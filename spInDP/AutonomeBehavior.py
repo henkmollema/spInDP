@@ -8,4 +8,4 @@ class AutonomeBehavior(Behavior):
         super(AutonomeBehavior, self).__init__(spider)
 
     def update(self):
-        print("Update from AutonomeBehavior")
+        return

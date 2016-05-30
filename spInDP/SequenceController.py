@@ -75,7 +75,7 @@ class SequenceController(object):
             self.threadMap[key].join()
 
     def execute(self, sequenceName):
-        print("Executing sequence: " + sequenceName)
+        #print("Executing sequence: " + sequenceName)
 
         if sequenceName == "startup":
             self.executeStartup()
@@ -115,7 +115,7 @@ class SequenceController(object):
 
     #Returns the time it takes to execute this sequence in seconds
     def parseSequence(self, filePath, validate=False, speedModifier=1, repeat=1):
-        print("Parsing sequence at: " + filePath + " repeating for "  + str(repeat))
+        #print("Parsing sequence at: " + filePath + " repeating for "  + str(repeat))
 
         with open(filePath, 'r') as f:
             lines = f.readlines()
@@ -146,9 +146,6 @@ class SequenceController(object):
                 for line in lines:
                     totalTime += self.interpretLine(line, lineNr, speedModifier)
                     lineNr += 1
-
-        #if (filePath != "sequences/startup.txt"):
-            #self.parseSequence("sequences/startup.txt")
         
         return totalTime
         

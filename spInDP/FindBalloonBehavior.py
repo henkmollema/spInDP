@@ -1,6 +1,6 @@
 from spInDP.AutonomeBehavior import AutonomeBehavior
 import time
-
+import math
 
 class FindBalloonBehavior(AutonomeBehavior):
     """Provides autonome behavior for destroying a red balloon"""
@@ -11,34 +11,40 @@ class FindBalloonBehavior(AutonomeBehavior):
     def __init__(self, spider):
         super(FindBalloonBehavior, self).__init__(spider)
 
+    deltaTime = 0
+    startTime = 0
     stabPosition = False
     def update(self):
         balloonFound, coords, size = self.spider.visioncontroller.FindBalloon()
 
         if(balloonFound):
-            if(abs(coords[0]) > self.centerDeviation):
-                # Adjust horizontal
-                if(coords[0] > 0):
-                    print("Adjust to right")
-                    self.spider.sequenceController.executeStepRight()
-                    self.stabPosition = False
-                else:
-                    print("Adjust to left")
-                    self.spider.sequenceController.executeStepLeft()
-                    self.stabPosition = False
+            if(size >= self.blobSizeArrive):
+                # When the balloon blob is big enough
+                print("!!! Steek 'm in z'n rug !!!")
+                
+                if (not self.stabPosition):
+                    self.spider.sequenceController.executePreStabLeft()
+                    self.stabPosition = True
+                
+                self.spider.sequenceController.executeStabLeft()
             else:
-                # When the balloon is center screen
-                if(size >= self.blobSizeArrive):
-                    # When the balloon blob is big enough
-                    print("!!! Steek 'm in z'n rug !!!")
-                    
-                    if (not self.stabPosition):
-                        self.spider.sequenceController.executePreStabLeft()
-                        self.stabPosition = True
-                    
-                    self.spider.sequenceController.executeStabLeft()
-                else:
-                    # If the balloon blob is not big enough, take a step
-                    print("Step towards to balloon")
-                    self.spider.sequenceController.executeStepForward()
-                    self.stabPosition = False
+                x = coords[0]
+                y = coords[1]
+                a = 240
+                b = x
+                
+                # Angle to balloon in degrees
+                angle = math.atan(b / a) * (180 / math.pi)
+                angle *= 1.5
+                
+                print ("Walking with angle: " + str(angle) + " a: " + str(a) + " b: " + str(b))
+                
+                # Walk towards balloon
+                execTime = self.spider.animationController.walk(angle, speedMod=1.5)
+                time.sleep(execTime - self.deltaTime)
+                self.stabPosition = False
+        
+        ctime = time.time()
+        deltaTime = ctime - self.startTime
+        self.startTime = ctime
+ 

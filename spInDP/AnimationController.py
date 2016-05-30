@@ -32,8 +32,8 @@ class AnimationController:
         return ret
 
     def walk(self, direction, frameNr, steps = 1):
+    def walk(self, direction, frameNr, speedMod = 1, steps = 1):
         totalTime = 0
-        speedMod = 1
         
         zGround = 5
         zAir = 2
@@ -124,4 +124,5 @@ class AnimationController:
             totalTime += self.endFrame()
         else:
             print("Invalid frameNr")
-        return totalTime
+        
+        return totalTime / speedMod
