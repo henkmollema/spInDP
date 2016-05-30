@@ -13,13 +13,10 @@ class VisionController:
     
     def __init__(self):
         self.__camera = Camera()
-        self.__vision = Vision(self.__camera.resolution)
+        self.__vision = Vision(self, self.__camera.resolution)
 
     def FindBalloon(self):
-        frame = self.__camera.getFrame()
-        frame = np.fromstring(frame, dtype=np.uint8)
-        frame = cv2.imdecode(frame, 1)
-        foundBlob, frame, coords, size = self.__vision.detect(frame)
+        foundBlob, frame, coords, size = self.__vision.getValues()
         return foundBlob, coords, size
 
     def GetImage(self):
@@ -27,10 +24,7 @@ class VisionController:
         return frame
         
     def GetImageVision(self):
-        originalImage = self.__camera.getFrame()
-        frame = np.fromstring(originalImage, dtype=np.uint8)
-        frame = cv2.imdecode(frame, 1)
-        foundBlob, frame, coords, size = self.__vision.detect(frame)
+        foundBlob, frame, coords, size = self.__vision.getValues()
         #print("coords: " + str(coords) + " size: " + str(size))
         return cv2.imencode('.jpeg', frame)[1].tostring()
 
@@ -96,11 +90,38 @@ class Camera(object):
         self.thread = None
         
 class Vision:
+    visionController = None
+    thread = None 
     __resolution = None
+    last_access = 0
+        
+    foundBlob = None
+    image = None
+    coords = None
+    size = None
     
-    def __init__(self, resolution):
+    def __init__(self, visionController, resolution):
+        self.visionController = visionController
         self.__resolution = resolution
-    
+    def initialize(self):
+        if Vision.thread == None:
+            Vision.thread = threading.Thread(target=self._thread)
+            Vision.thread.start()
+            while self.image is None:
+                time.sleep(0)
+    def _thread(self):
+        while time.time() - self.last_access < 5:
+            frame = self.visionController.GetImage()
+            frame = np.fromstring(frame, dtype=np.uint8)
+            frame = cv2.imdecode(frame, 1)
+            self.foundBlob, self.image, self.coords, self.size = self.detect(frame)
+        self.thread = None
+
+    def getValues(self):
+        Vision.last_access = time.time()
+        self.initialize()
+        return self.foundBlob, self.image, self.coords, self.size
+        
     def thresholdRange(self, img, min, max):
         ret,img1 = cv2.threshold(img, min, 1, cv2.THRESH_BINARY)
         ret,img2 = cv2.threshold(img, max, 1, cv2.THRESH_BINARY_INV)
@@ -157,3 +178,4 @@ class Vision:
             image = cv2.drawKeypoints(imageBin, keypoints, np.array([]), (255,0,0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 		
         return foundBlob, image, coords, size
+
