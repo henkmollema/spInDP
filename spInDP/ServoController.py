@@ -90,6 +90,7 @@ class ServoController(object):
         return round(x,1), round(y,1), round(z,1)
 
     def getAllLegsXYZ(self):
+        legs = ["","","","","",""]
         for legId in range(1, 7):
             legServos = {}
             for x in range(1, 4):
@@ -101,6 +102,7 @@ class ServoController(object):
             except:
                 print ("Something went wrong in \"anglesToCoords\"...")
                 continue
+        return ' '.join([str(x) for x in legs])
 
     # Generates a JSON string with data from all servos.
     def getServoDataJSON(self):
