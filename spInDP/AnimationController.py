@@ -31,8 +31,7 @@ class AnimationController:
         self.sequenceFrame = None
         return ret
 
-    def walk(self, direction, frameNr, steps = 1):
-    def walk(self, direction, frameNr, speedMod = 1, steps = 1):
+    def walk(self, direction, frameNr, speedMod = 1):
         totalTime = 0
         
         zGround = 5
@@ -68,6 +67,7 @@ class AnimationController:
             
         }
         
+        frameNr = frameNr % 6
         if frameNr == 0:
             self.startFrame()
             self.sequenceFrame.movements[3] = self.spider.sequenceController.computeInverseKinematics(legActualMid[3][0]+(-stepRangeHor/2), legActualMid[3][1]+(stepRangeVert/2), zGround, 3, speedMod * 100)
