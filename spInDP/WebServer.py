@@ -76,9 +76,13 @@ class WebServer:
         return webserverinstance.format_response("animation executed: sequences/" + animation)
 
     @staticmethod
-    @app.route("/erwin/walk/<direction>/<steps>")
-    def api_erwin_walk(direction, steps):
-        webserverinstance.spider.animationController.walk(direction, steps)
+    @app.route("/erwin/walk/<direction>")
+    def api_erwin_walk(direction):
+        frameNr = 0
+        for x in range(1, 50):
+            execTime = webserverinstance.spider.animationController.walk(direction, frameNr, 1)
+            time.sleep(execTime)
+            frameNr += 1
    
     @staticmethod
     @app.route("/behavior/<behaviortype>")
