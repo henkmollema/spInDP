@@ -75,11 +75,17 @@ class SequenceController(object):
     def executeStabLeft(self):
         return self.parseSequence("sequences/stab-left.txt", repeat=1, speedModifier=1)
         
+    def executePostStabLeft(self):
+        return self.parseSequence("sequences/post-stab-left.txt", repeat=1, speedModifier=1)
+        
     def executePreStabRight(self):
         self.parseSequence("sequences/pre-stab-right.txt", repeat=1, speedModifier=1)
         
     def executeStabRight(self):
         self.parseSequence("sequences/stab-right.txt", repeat=1, speedModifier=1)
+        
+    def executePostStabRight(self):
+        self.parseSequence("sequences/post-stab-right.txt", repeat=1, speedModifier=1)
 
     def executeStartup(self):
         return self.parseSequence("sequences/startup.txt")
@@ -104,7 +110,6 @@ class SequenceController(object):
                 self.coxaOffset = 45
 
         for x in range(0, repeat):
-            print("repeat count: " + str(x))
             lineNr = 0
 
             if(speedModifier < 0):
@@ -159,12 +164,9 @@ class SequenceController(object):
         # Wait for a single leg to complete its queued movement
         elif (command == "waitleg"):
             if (len(words) != 2):
-                raise NameError(
-                    "Wrong amount of arguments for 'waitleg' command. Expected: 1.")
+                raise NameError(                    "Wrong amount of arguments for 'waitleg' command. Expected: 1.")
 
             legId = int(words[1])
-            print("waiting for movement of leg " +
-                  str(legId) + " to finish")
 
             # Join will block the calling thread until all items in
             # the queue are processed
@@ -181,7 +183,7 @@ class SequenceController(object):
                 raise NameError("No sequence file given")
 
             seq = words[1]
-            print("including sequence: " + seq)
+            print("Including sequence: " + seq)
             repeat = 1
             if (len(words) > 2):
                 repeat = int(words[2])
@@ -274,6 +276,7 @@ class SequenceController(object):
                 self.servoController.move(servoID, int(destinationAngle), s * abs(speedModifier))
                 currAngle = self.servoAngleMap[servoID]
                 delta = abs(destinationAngle - currAngle)
+                self.servoAngleMap[servoID] = destinationAngle
                 return delta / (self.anglePerSecond * (speed / 1023.0))
 
 
