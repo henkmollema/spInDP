@@ -56,7 +56,7 @@ class AnimationController:
         return ret
 
     def turn(self, amountDegrees, frameNr, speedMod = 1):
-        
+        print "turn"
     def walk(self, direction, frameNr, speedMod = 1):
         totalTime = 0
         
