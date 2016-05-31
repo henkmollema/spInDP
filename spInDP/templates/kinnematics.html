@@ -62,27 +62,30 @@ $(document).ready(function(){
     });
     $('#sub-leg').click(function(){
         msg = "";
+
+        //Get the torquestatus to write to the legs
         $('.leg').each(function(){
             if($(this).hasClass('pressed')){
                 if(msg.length > 0)
                     {msg += '_'}
-                    msg += 1;
+                    msg += '1';
             } else {
                 if(msg.length > 0)
                     {msg += '_'}
-                msg += 0;
+                msg += '0';
             }
         });
-        $.get('/kinematics/' + msg + '/');
+
+        //Set leg torques
+        $.get('/kinematics/leg/' + msg + '/');
     });
     $('#sub-val').click(function(){
-        $.get('/kinematics/', function(){
-            $('#leg1').html("{{legs[1]}}")
-            $('#leg2').html("{{legs[2]}}")
-            $('#leg3').html("{{legs[3]}}")
-            $('#leg4').html("{{legs[4]}}")
-            $('#leg5').html("{{legs[5]}}")
-            $('#leg6').html("{{legs[6]}}")
+        $.get('/kinematics/coords/', function(data){
+            legCoords = data.split(' ');
+            for (i = 1; i <= legCoords.length; i++)
+            {
+                $('#leg'+i).html(legCoords[i-1]);
+            }
         });
     });
 });

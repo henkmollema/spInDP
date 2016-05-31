@@ -1,9 +1,7 @@
-import subprocess
 import time
-import os
 import json
 import glob
-from flask import Flask, render_template, Response, request
+from flask import Flask, render_template, Response
 
 webserverinstance = None
 
@@ -41,7 +39,7 @@ class WebServer:
     @staticmethod
     @app.route("/")
     def api_root():
-        return webserverinstance.format_response("Hello World!")
+        return webserverinstance.format_response("ScarJo says 'Hi!'")
 
     @staticmethod
     @app.route("/camera")
@@ -93,7 +91,8 @@ class WebServer:
     @app.route("/control/joystick/<x>/<y>")
     def api_control_walk(jX, jY):
         print("Got control joystick command: " + jX + ", " + jY)
-
+        webserverinstance.spider.remoteController.context.JoystickX = jX
+        webserverinstance.spider.remoteController.context.JoystickY = jY
         return webserverinstance.format_response( jX + "," + jY)
 
     @staticmethod
@@ -121,18 +120,26 @@ class WebServer:
     @staticmethod
     @app.route("/kinematics/")
     def api_kinematics():
-        legs = webserverinstance.spider.servoController.getAllLegsXYZ()
-        return render_template('kinnematics.html', legs = legs)
+
+        return render_template('kinnematics.html')
+
     @staticmethod
-    @app.route("/kinematics/<leg>/")   
+    @app.route("/kinematics/coords/")
+    def api_get_coords():
+        return webserverinstance.format_response(webserverinstance.spider.servoController.getAllLegsXYZ())
+
+    @staticmethod
+    @app.route("/kinematics/leg/<leg>/")
     def api_kinematics_legsOnOff(leg):
-        index = 1;
-        legs = [0,0,0,0,0,0,0]
+        index = 1
+
         for x in leg.split('_'):
             webserverinstance.spider.servoController.setLegTorque(index, x)
             print(x)
             index += 1
-        return render_template('kinnematics.html', legs = legs)
+
+        legTorques = webserverinstance.spider.servoController.torqueStatus
+        return webserverinstance.format_response(','.join(str(x) for x in legTorques))
         
 
     @staticmethod
@@ -140,4 +147,5 @@ class WebServer:
     def api_kinematics_jquery():
         with open ("spInDP/templates/jquery.min.js") as jquery:
             data = jquery.readlines()
-            return webserverinstance.format_response(data)
+
+        return webserverinstance.format_response(data)

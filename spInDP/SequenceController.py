@@ -22,24 +22,6 @@ class SequenceController(object):
     anglePerSecond = (114.0 * 360.0 / 60.0)
 
     coxaOffset = 45
-    
-    LegOffsets = {
-        1: [0,0,0],
-        2: [0,0,0],
-        3: [0,0,0],
-        4: [0,0,0],
-        5: [0,0,0],
-        6: [0,0,0]
-    }
-
-    legCoordinateMap = {
-        1: [0, 0, 0],
-        2: [0, 0, 0],
-        3: [0, 0, 0],
-        4: [0, 0, 0],
-        5: [0, 0, 0],
-        6: [0, 0, 0]
-    }
 
     servoAngleMap = {
         1: 0.0, 2: 0.0, 3: 0.0,
@@ -65,23 +47,11 @@ class SequenceController(object):
             self.threadMap[x] = LegThread(x, self)
             self.threadMap[x].start()
 
-    def offsetLeg(self, legID, x,y,z):
-        self.LegOffsets[legID] = [x,y,z]
-
     def stop(self):
         self.stopped = True
 
         for key in self.threadMap:
             self.threadMap[key].join()
-
-    def execute(self, sequenceName):
-        #print("Executing sequence: " + sequenceName)
-
-        if sequenceName == "startup":
-            self.executeStartup()
-
-        if sequenceName == "walk":
-            self.executeWalk(1)
 
     def executeWalk(self, speedModifier):
         return self.parseSequence("sequences/walk-frame.txt", repeat=1, speedModifier=speedModifier)
@@ -271,8 +241,8 @@ class SequenceController(object):
                 ikArgs.z = float(coords[2])
                 ikArgs.legID = legID
                 ikArgs.speed = s * abs(speedModifier)
-                # Todo: put IKArgument objects on the leg queues and create LegMovement objects in the LegThreads
-                legMovement = self.computeInverseKinematics(ikArgs.x, ikArgs.y, ikArgs.z, ikArgs.legID, ikArgs.speed );
+
+                legMovement = self.coordsToLegMovement(ikArgs.x, ikArgs.y, ikArgs.z, ikArgs.legID, ikArgs.speed);
 
                 if (legMovement is None):
                     return 0
@@ -280,11 +250,8 @@ class SequenceController(object):
                 if (self.sequenceFrame is None):
                     self.legQueue[legID].put(legMovement)
                 else:
-                    if (self.sequenceFrame.movements.get(legID, None) is not None):
-                        raise NameError(
-                            "Attempt to move leg " + str(legID) + " more than once in one frame")
                     #Add the movement to the frame we're building
-                    self.sequenceFrame.movements[legID] = legMovement
+                    self.sequenceFrame.setMovement(legID, legMovement)
 
         # Control individual servo
         elif(words[0].lower().startswith('s:')):
@@ -317,7 +284,7 @@ class SequenceController(object):
     #Returns a LegMovement Object.
     # True if we need to get initial positions from servo
     first = True
-    def computeInverseKinematics(self, x, y, z, legID, speed):
+    def coordsToLegMovement(self, x, y, z, legID, speed):
         x += self.LegOffsets[legID][0]
         y += self.LegOffsets[legID][1]
         z += self.LegOffsets[legID][2]

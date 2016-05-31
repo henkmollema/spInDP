@@ -8,6 +8,7 @@ class RemoteController(object):
     """Provides interaction with the physical remote controller."""
 
     Context = RemoteContext()
+    spider = None
 
     def __init__(self, spider):
         global RemoteControllerInstance
