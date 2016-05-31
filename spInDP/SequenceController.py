@@ -164,7 +164,7 @@ class SequenceController(object):
         # Wait for a single leg to complete its queued movement
         elif (command == "waitleg"):
             if (len(words) != 2):
-                raise NameError(                    "Wrong amount of arguments for 'waitleg' command. Expected: 1.")
+                raise NameError("Wrong amount of arguments for 'waitleg' command. Expected: 1.")
 
             legId = int(words[1])
 

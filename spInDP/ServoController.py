@@ -49,6 +49,19 @@ class ServoController(object):
 
     def getLegTorque(self,leg):
         return self.torqueStatus[leg - 1]
+        
+    def setComplianceMargin(self):
+        for x in range(1, 19):
+            tries = 0
+            maxTries = 3
+            while tries <= maxTries:
+                try:
+                    print ("set compliance of servo " + str(x))
+                    self.ax12.setCompliance(x, 1, 1, 32, 32)
+                    break
+                except:
+                    print ("compliance failed for servo " + str(x))
+                    tries += 1
 
     # Kinematics (non inverse) for leg positioning
     def setLegTorque(self, leg, status):
