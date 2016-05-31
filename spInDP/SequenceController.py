@@ -1,5 +1,6 @@
 import math
 import Queue
+import time
 from spInDP.IKArguments import IKArguments
 from spInDP.LegMovement import LegMovement
 from spInDP.LegThread import LegThread
@@ -69,10 +70,10 @@ class SequenceController(object):
         return self.parseSequence("sequences/crab-walk.txt", repeat=1, speedModifier=1)
         
     def executePreStabLeft(self):
-        self.parseSequence("sequences/pre-stab-left.txt", repeat=1, speedModifier=1)
+        return self.parseSequence("sequences/pre-stab-left.txt", repeat=1, speedModifier=1)
         
     def executeStabLeft(self):
-        self.parseSequence("sequences/stab-left.txt", repeat=1, speedModifier=1)
+        return self.parseSequence("sequences/stab-left.txt", repeat=1, speedModifier=1)
         
     def executePreStabRight(self):
         self.parseSequence("sequences/pre-stab-right.txt", repeat=1, speedModifier=1)
@@ -140,13 +141,15 @@ class SequenceController(object):
                 raise NameError("No argument given for delay at line: " + str(lineNr))
 
             seconds = float(words[1]) / 1000
-            for x in range(1, 7):
-                # Create an 'empty movement
-                mov = LegMovement()
-                mov.empty = True
-                mov.maxExecTime = seconds
-                #Put an empty legmovement with delay as exectime in the leg queue
-                self.legQueue[x].put(mov)
+            #for x in range(1, 7):
+                ## Create an 'empty movement
+               # mov = LegMovement()
+               # mov.empty = True
+               # mov.maxExecTime = seconds
+                ##Put an empty legmovement with delay as exectime in the leg queue
+               # self.legQueue[x].put(mov)
+               # return seconds 
+            time.sleep(seconds)
 
         # Wait for all lengs to complete their queued movements
         elif (command == "waitlegs"):

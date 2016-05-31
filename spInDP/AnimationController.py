@@ -26,18 +26,18 @@ class AnimationController:
     def __init__(self, spider):
         self.spider = spider
     
-    def setWideCrabWalk(value):
+    def setWideCrabWalk(self, value):
         if value:
-            legHorMid[1][1] = -8
-            legHorMid[2][1] = -8
-            legHorMid[4][1] = 8
-            legHorMid[5][1] = 8
+            self.legHorMid[1][1] = -8
+            self.legHorMid[2][1] = -8
+            self.legHorMid[4][1] = 8
+            self.legHorMid[5][1] = 8
         else:
-            legHorMid[1][1] = -3
-            legHorMid[2][1] = -3
-            legHorMid[4][1] = 3
-            legHorMid[5][1] = 3
-    def setStrafeMode(value):
+            self.legHorMid[1][1] = -3
+            self.legHorMid[2][1] = -3
+            self.legHorMid[4][1] = 3
+            self.legHorMid[5][1] = 3
+    def setStrafeMode(self, value):
         self.StrafeMode = value
     
     def startFrame(self):
@@ -139,4 +139,4 @@ class AnimationController:
         else:
             print("Invalid frameNr")
         
-        return totalTime / speedMod
+        return totalTime

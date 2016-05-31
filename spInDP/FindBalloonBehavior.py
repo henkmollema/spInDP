@@ -27,6 +27,7 @@ class FindBalloonBehavior(AutonomeBehavior):
                     self.spider.sequenceController.executePreStabLeft()
                     self.stabPosition = True
                 
+                print("execute stab")
                 self.spider.sequenceController.executeStabLeft()
             else:
                 x = coords[0]
@@ -38,11 +39,12 @@ class FindBalloonBehavior(AutonomeBehavior):
                 angle = math.atan(b / a) * (180 / math.pi)
                 angle *= 1.5
                 
-                print ("Walking with angle: " + str(angle) + " a: " + str(a) + " b: " + str(b))
+                #print ("Walking with angle: " + str(angle) + " a: " + str(a) + " b: " + str(b))
                 
                 # Walk towards balloon
                 execTime = self.spider.animationController.walk(angle, speedMod=1.5, frameNr=self.frameNr)
                 time.sleep(execTime)
+                #print "Exectime: " + str(execTime);
                 self.stabPosition = False
                 self.frameNr += 1
         
