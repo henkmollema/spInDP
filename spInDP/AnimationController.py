@@ -95,7 +95,7 @@ class AnimationController:
         
         totalTime += self.endFrame
         
-        return totalTime / speedMod
+        return totalTime
         
         
     def walk(self, direction, frameNr, speedMod = 1):
@@ -174,4 +174,4 @@ class AnimationController:
             self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0] - (stepRangeHor / 4), legActualMid[4][1] - (stepRangeVert / 4), zGround, 4, speedMod * 100)
             totalTime += self.endFrame()
         
-        return totalTime / speedMod
+        return totalTime

@@ -3,9 +3,7 @@ Sequence pre-stab-left
 s:1 0 100
 s:2 -10 100
 s:3 10 100
-
-delay 1500
-
+delay 1000
 s:1 -60 100
+delay 1000
 
-delay 1500

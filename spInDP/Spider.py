@@ -31,7 +31,7 @@ class Spider(object):
 
     def start(self):
         print("Starting the spider")
-        self.sequenceController.execute("startup")
+        self.sequenceController.executeStartup()
 
     def updateLoop(self):
         # Simulate 60fps update.

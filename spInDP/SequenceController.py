@@ -1,5 +1,6 @@
 import math
 import Queue
+import time
 from spInDP.IKArguments import IKArguments
 from spInDP.LegMovement import LegMovement
 from spInDP.LegThread import LegThread
@@ -69,16 +70,22 @@ class SequenceController(object):
         return self.parseSequence("sequences/crab-walk.txt", repeat=1, speedModifier=1)
         
     def executePreStabLeft(self):
-        self.parseSequence("sequences/pre-stab-left.txt", repeat=1, speedModifier=1)
+        return self.parseSequence("sequences/pre-stab-left.txt", repeat=1, speedModifier=1)
         
     def executeStabLeft(self):
-        self.parseSequence("sequences/stab-left.txt", repeat=1, speedModifier=1)
+        return self.parseSequence("sequences/stab-left.txt", repeat=1, speedModifier=1)
+        
+    def executePostStabLeft(self):
+        return self.parseSequence("sequences/post-stab-left.txt", repeat=1, speedModifier=1)
         
     def executePreStabRight(self):
         self.parseSequence("sequences/pre-stab-right.txt", repeat=1, speedModifier=1)
         
     def executeStabRight(self):
         self.parseSequence("sequences/stab-right.txt", repeat=1, speedModifier=1)
+        
+    def executePostStabRight(self):
+        self.parseSequence("sequences/post-stab-right.txt", repeat=1, speedModifier=1)
 
     def executeStartup(self):
         return self.parseSequence("sequences/startup.txt")
@@ -103,7 +110,6 @@ class SequenceController(object):
                 self.coxaOffset = 45
 
         for x in range(0, repeat):
-            print("repeat count: " + str(x))
             lineNr = 0
 
             if(speedModifier < 0):
@@ -140,13 +146,15 @@ class SequenceController(object):
                 raise NameError("No argument given for delay at line: " + str(lineNr))
 
             seconds = float(words[1]) / 1000
-            for x in range(1, 7):
-                # Create an 'empty movement
-                mov = LegMovement()
-                mov.empty = True
-                mov.maxExecTime = seconds
-                #Put an empty legmovement with delay as exectime in the leg queue
-                self.legQueue[x].put(mov)
+            #for x in range(1, 7):
+                ## Create an 'empty movement
+               # mov = LegMovement()
+               # mov.empty = True
+               # mov.maxExecTime = seconds
+                ##Put an empty legmovement with delay as exectime in the leg queue
+               # self.legQueue[x].put(mov)
+               # return seconds 
+            time.sleep(seconds)
 
         # Wait for all lengs to complete their queued movements
         elif (command == "waitlegs"):
@@ -156,12 +164,9 @@ class SequenceController(object):
         # Wait for a single leg to complete its queued movement
         elif (command == "waitleg"):
             if (len(words) != 2):
-                raise NameError(
-                    "Wrong amount of arguments for 'waitleg' command. Expected: 1.")
+                raise NameError(                    "Wrong amount of arguments for 'waitleg' command. Expected: 1.")
 
             legId = int(words[1])
-            print("waiting for movement of leg " +
-                  str(legId) + " to finish")
 
             # Join will block the calling thread until all items in
             # the queue are processed
@@ -178,7 +183,7 @@ class SequenceController(object):
                 raise NameError("No sequence file given")
 
             seq = words[1]
-            print("including sequence: " + seq)
+            print("Including sequence: " + seq)
             repeat = 1
             if (len(words) > 2):
                 repeat = int(words[2])
@@ -271,6 +276,7 @@ class SequenceController(object):
                 self.servoController.move(servoID, int(destinationAngle), s * abs(speedModifier))
                 currAngle = self.servoAngleMap[servoID]
                 delta = abs(destinationAngle - currAngle)
+                self.servoAngleMap[servoID] = destinationAngle
                 return delta / (self.anglePerSecond * (speed / 1023.0))
 
 
@@ -284,11 +290,7 @@ class SequenceController(object):
     #Returns a LegMovement Object.
     # True if we need to get initial positions from servo
     first = True
-    def coordsToLegMovement(self, x, y, z, legID, speed):
-        x += self.LegOffsets[legID][0]
-        y += self.LegOffsets[legID][1]
-        z += self.LegOffsets[legID][2]
-    
+    def coordsToLegMovement(self, x, y, z, legID, speed):    
         lIK = math.sqrt((self.d + self.lc + x)**2 + y**2)
         dIK = lIK - self.lc
         bIK = math.sqrt((self.e + z)**2 + dIK**2)
