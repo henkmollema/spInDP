@@ -7,6 +7,7 @@ class FindBalloonBehavior(AutonomeBehavior):
 
     centerDeviation = 100
     blobSizeArrive = 200
+    frameNr = 0
 
     def __init__(self, spider):
         super(FindBalloonBehavior, self).__init__(spider)
@@ -40,9 +41,10 @@ class FindBalloonBehavior(AutonomeBehavior):
                 print ("Walking with angle: " + str(angle) + " a: " + str(a) + " b: " + str(b))
                 
                 # Walk towards balloon
-                execTime = self.spider.animationController.walk(angle, speedMod=1.5)
-                time.sleep(execTime - self.deltaTime)
+                execTime = self.spider.animationController.walk(angle, speedMod=1.5, frameNr=self.frameNr)
+                time.sleep(execTime)
                 self.stabPosition = False
+                self.frameNr += 1
         
         ctime = time.time()
         deltaTime = ctime - self.startTime
