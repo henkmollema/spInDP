@@ -57,7 +57,7 @@ class AnimationController:
         return ret
 
     def turn(self, amountDegrees, frameNr, speedMod = 1):
-        totalTIme = 0
+        totalTime = 0
         
         zGround = 5
         zAir = 2
