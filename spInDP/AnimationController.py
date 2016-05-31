@@ -64,7 +64,6 @@ class AnimationController:
         
         frameNr = frameNr % 6
         seqCtrl = self.spider.sequenceController;
-        if frameNr == 0:
             
         legSizeX = 16.347
         legSideCoxaDistanceX = 10.45
