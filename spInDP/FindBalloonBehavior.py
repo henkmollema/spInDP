@@ -41,9 +41,19 @@ class FindBalloonBehavior(AutonomeBehavior):
                 # Angle to balloon in degrees
                 angle = math.atan(b / a) * (180 / math.pi)
                 angle *= 1.5
+                
 
                 # Walk towards balloon
-                execTime = self.spider.animationController.walk(angle, speedMod=1.5, frameNr=self.frameNr)
+                execTime = self.spider.animationController.walk(angle, frameNr=self.frameNr, speedMod=1.5)
                 time.sleep(execTime)
                 self.stabPosition = False
                 self.frameNr += 1
+        else:
+            #print "Balloon not found"
+            #execTime = self.spider.animationController.turn(20, frameNr=self.frameNr, speedMod=1)
+            #time.sleep(execTime)
+            #self.stabPosition = False
+            #self.frameNr += 1
+
+            
+           

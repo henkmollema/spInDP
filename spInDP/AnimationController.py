@@ -42,11 +42,10 @@ class AnimationController:
         scaledMovements = self.sequenceFrame.getScaledMovements()
         for x in range(1, 7):
             mov = scaledMovements.get(x, None)
-            
             # Create an 'empty movement
             if (mov is None):
                 mov = LegMovement()
-                mov.empty = True
+                mov.empty = True 
                 mov.maxExecTime = self.sequenceFrame.maxMaxExecTime
                 
             self.spider.sequenceController.legQueue[x].put(mov)
@@ -57,45 +56,6 @@ class AnimationController:
         return ret
 
     def turn(self, amountDegrees, frameNr, speedMod = 1):
-        totalTime = 0
-        
-        zGround = 5
-        zAir = 2
-        
-        frameNr = frameNr % 6
-        seqCtrl = self.spider.sequenceController;
-            
-        legSizeX = 16.347
-        legSideCoxaDistanceX = 10.45
-        legCornerCoxaDistanceX = 13.845
-        sLegX = legSizeX + legSideCoxaDistanceX
-        cLegX = legSizeX + legCornerCoxaDistanceX
-        
-        self.startFrame()
-        turnAmount = (amountDegrees / 4)*math.pi/180
-        
-        legTurnAmount = turnAmount * (frameNr + 4 % 6)
-        if frameNr == 5:
-            legTurnAmount = turnAmount * 2
-        self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(math.cos(legTurnAmount) * sLegX-sLegX, math.sin(legTurnAmount) * sLegX-sLegX, zAir if legTurnAmount == 5 else zGround, 3, speedMod * 100)
-        self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(math.cos(legTurnAmount) * sLegX-sLegX, math.sin(legTurnAmount) * sLegX-sLegX, zAir if legTurnAmount == 5 else zGround, 6, speedMod * 100)
-        
-        legTurnAmount = turnAmount * (frameNr + 0 % 6)
-        if frameNr == 5:
-            legTurnAmount = turnAmount * 2
-        self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(math.cos(legTurnAmount) * cLegX-cLegX, math.sin(legTurnAmount) * cLegX-cLegX, zAir if legTurnAmount == 5 else zGround, 2, speedMod * 100)
-        self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(math.cos(legTurnAmount) * cLegX-cLegX, math.sin(legTurnAmount) * cLegX-cLegX, zAir if legTurnAmount == 5 else zGround, 5, speedMod * 100)
-        
-        legTurnAmount = turnAmount * (frameNr + 2 % 6)
-        if frameNr == 5:
-            legTurnAmount = turnAmount * 2
-        self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(math.cos(legTurnAmount) * cLegX-cLegX, math.sin(legTurnAmount) * cLegX-cLegX, zAir if legTurnAmount == 5 else zGround, 1, speedMod * 100)
-        self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(math.cos(legTurnAmount) * cLegX-cLegX, math.sin(legTurnAmount) * cLegX-cLegX, zAir if legTurnAmount == 5 else zGround, 4, speedMod * 100)
-        
-        totalTime += self.endFrame
-        
-        return totalTime
-        
         
     def walk(self, direction, frameNr, speedMod = 1):
         totalTime = 0
