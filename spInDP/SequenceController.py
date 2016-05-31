@@ -284,11 +284,7 @@ class SequenceController(object):
     #Returns a LegMovement Object.
     # True if we need to get initial positions from servo
     first = True
-    def coordsToLegMovement(self, x, y, z, legID, speed):
-        x += self.LegOffsets[legID][0]
-        y += self.LegOffsets[legID][1]
-        z += self.LegOffsets[legID][2]
-    
+    def coordsToLegMovement(self, x, y, z, legID, speed):    
         lIK = math.sqrt((self.d + self.lc + x)**2 + y**2)
         dIK = lIK - self.lc
         bIK = math.sqrt((self.e + z)**2 + dIK**2)
