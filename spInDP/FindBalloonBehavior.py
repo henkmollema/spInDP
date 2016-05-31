@@ -48,7 +48,7 @@ class FindBalloonBehavior(AutonomeBehavior):
                 time.sleep(execTime)
                 self.stabPosition = False
                 self.frameNr += 1
-        else:
+        #else:
             #print "Balloon not found"
             #execTime = self.spider.animationController.turn(20, frameNr=self.frameNr, speedMod=1)
             #time.sleep(execTime)
