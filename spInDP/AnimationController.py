@@ -8,8 +8,41 @@ from spInDP.SequenceFrame import SequenceFrame
 
 class AnimationController:
 
+    StrafeMode = True
+    
+    legVertMid = {
+        1: [-7, -8],
+        2: [-7, -8],
+        3: [-5, 0],
+        4: [-7, 8],
+        5: [-7, 8],
+        6: [-5, 0]
+    }
+    legHorMid = {
+        1: [-4, -8],
+        2: [-4, -8],
+        3: [-4, 0],
+        4: [-4, 8],
+        5: [-4, 8],
+        6: [-4, 0]
+    }
+
     def __init__(self, spider):
         self.spider = spider
+    
+    def setWideCrabWalk(value):
+        if value:
+            legHorMid[1][1] = -8
+            legHorMid[2][1] = -8
+            legHorMid[4][1] = 8
+            legHorMid[5][1] = 8
+        else:
+            legHorMid[1][1] = -3
+            legHorMid[2][1] = -3
+            legHorMid[4][1] = 3
+            legHorMid[5][1] = 3
+    def setStrafeMode(value):
+        self.StrafeMode = value
     
     def startFrame(self):
         self.sequenceFrame = SequenceFrame()
@@ -40,30 +73,14 @@ class AnimationController:
         sinDirection = math.sin(int(direction)*math.pi/180)
         stepRangeVert = cosDirection * 16
         stepRangeHor = sinDirection * 8
-        
-        legVertMid = {
-            1: [-7, -8],
-            2: [-7, -8],
-            3: [-5, 0],
-            4: [-7, 8],
-            5: [-7, 8],
-            6: [-5, 0]
-        }
-        legHorMid = {
-            1: [-4, -8],
-            2: [-4, -8],
-            3: [-4, 0],
-            4: [-4, 8],
-            5: [-4, 8],
-            6: [-4, 0]
-        }
+
         legActualMid = {
-            1: [legHorMid[1][0] + abs(cosDirection) * (legVertMid[1][0]-legHorMid[1][0]), legHorMid[1][1] + abs(cosDirection) * (legVertMid[1][1]-legHorMid[1][1])],
-            2: [legHorMid[2][0] + abs(cosDirection) * (legVertMid[2][0]-legHorMid[2][0]), legHorMid[2][1] + abs(cosDirection) * (legVertMid[2][1]-legHorMid[2][1])],
-            3: [legHorMid[3][0] + abs(cosDirection) * (legVertMid[3][0]-legHorMid[3][0]), legHorMid[3][1] + abs(cosDirection) * (legVertMid[3][1]-legHorMid[3][1])],
-            4: [legHorMid[4][0] + abs(cosDirection) * (legVertMid[4][0]-legHorMid[4][0]), legHorMid[4][1] + abs(cosDirection) * (legVertMid[4][1]-legHorMid[4][1])],
-            5: [legHorMid[5][0] + abs(cosDirection) * (legVertMid[5][0]-legHorMid[5][0]), legHorMid[5][1] + abs(cosDirection) * (legVertMid[5][1]-legHorMid[5][1])],
-            6: [legHorMid[6][0] + abs(cosDirection) * (legVertMid[6][0]-legHorMid[6][0]), legHorMid[6][1] + abs(cosDirection) * (legVertMid[6][1]-legHorMid[6][1])]
+            1: [self.legHorMid[1][0] + abs(cosDirection) * (self.legVertMid[1][0]-self.legHorMid[1][0]), self.legHorMid[1][1] + abs(cosDirection) * (self.legVertMid[1][1]-self.legHorMid[1][1])],
+            2: [self.legHorMid[2][0] + abs(cosDirection) * (self.legVertMid[2][0]-self.legHorMid[2][0]), self.legHorMid[2][1] + abs(cosDirection) * (self.legVertMid[2][1]-self.legHorMid[2][1])],
+            3: [self.legHorMid[3][0] + abs(cosDirection) * (self.legVertMid[3][0]-self.legHorMid[3][0]), self.legHorMid[3][1] + abs(cosDirection) * (self.legVertMid[3][1]-self.legHorMid[3][1])],
+            4: [self.legHorMid[4][0] + abs(cosDirection) * (self.legVertMid[4][0]-self.legHorMid[4][0]), self.legHorMid[4][1] + abs(cosDirection) * (self.legVertMid[4][1]-self.legHorMid[4][1])],
+            5: [self.legHorMid[5][0] + abs(cosDirection) * (self.legVertMid[5][0]-self.legHorMid[5][0]), self.legHorMid[5][1] + abs(cosDirection) * (self.legVertMid[5][1]-self.legHorMid[5][1])],
+            6: [self.legHorMid[6][0] + abs(cosDirection) * (self.legVertMid[6][0]-self.legHorMid[6][0]), self.legHorMid[6][1] + abs(cosDirection) * (self.legVertMid[6][1]-self.legHorMid[6][1])]
             
         }
         
