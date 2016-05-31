@@ -104,18 +104,19 @@ class Vision:
         self.visionController = visionController
         self.__resolution = resolution
     def initialize(self):
-        if Vision.thread == None:
+        if Vision.thread is None:
             Vision.thread = threading.Thread(target=self._thread)
             Vision.thread.start()
             while self.image is None:
                 time.sleep(0)
+
     def _thread(self):
         while time.time() - self.last_access < 5:
             frame = self.visionController.GetImage()
             frame = np.fromstring(frame, dtype=np.uint8)
             frame = cv2.imdecode(frame, 1)
             self.foundBlob, self.image, self.coords, self.size = self.detect(frame)
-        self.thread = None
+        Vision.thread = None
 
     def getValues(self):
         Vision.last_access = time.time()
