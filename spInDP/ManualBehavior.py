@@ -36,7 +36,7 @@ class ManualBehavior(Behavior):
         
         return
         
-        def restrict (val, minval, maxval):
-            if val < minval: return minval
-            if val > maxval: return maxval
-            return val
+    def restrict (self,val, minval, maxval):
+        if val < minval: return minval
+        if val > maxval: return maxval
+        return val
