@@ -16,6 +16,7 @@ class RemoteController(object):
         self.spider = spider
         self.Context = RemoteContext()
         try:
+            print("Initializing Bluetooth connection")
             self.sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
             self.sock.connect(("20:16:03:30:80:85", 1))
             self.updateLoop = threading.Thread(target=self.updateContextLoop)
@@ -24,6 +25,7 @@ class RemoteController(object):
             print ("Initializing bluetooth failed")
             
     def updateContextLoop(self):
+        print ("Start updateContextLoop")
         rec = ""
         while not self.stop:
             try:
@@ -57,3 +59,7 @@ class RemoteController(object):
 
             rec = rec[rec_end+1:]
             continue
+
+        print ("Closing socket")
+        self.sock.close()
+

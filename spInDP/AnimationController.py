@@ -36,38 +36,43 @@ class AnimationController:
         self.spider = spider
         self.seqCtrl = spider.sequenceController
 
-    def blendToFrame(self, destination, speed):
-        cLegCoords = {}
 
-        for x in range(1,7):
-            cLegCoords[x].IKCoordinates = self.spider.sequenceController.getLegCoords(x)
+    """
+        FIND ANOTHER WAY TO SORT A DICTIONAIRY
+    """
+    # def blendToFrame(self, destination, speed):
+    #     cLegCoords = {}
 
-        zSortedLegCoords = cLegCoords.sort(key=lambda leg: leg.IKCoordinates[2])
-        cGroundedLegs = zSortedLegCoords[-3:] #Get 3 legs with highest z coordinate
-        cElevatedLegs    = zSortedLegCoords[:-3] #the other 3 legs
+    #     for x in range(1,7):
+    #         cLegCoords[x].IKCoordinates = self.spider.sequenceController.getLegCoords(x)
 
-        zSortedDestCoords = destination.movements.sort(key=lambda leg: leg.IKCoordinates[2])
-        destGroundedLegs = zSortedDestCoords[-3:]
-        destElevatedLegs = zSortedDestCoords[:-3]
-        highestDestZ = destGroundedLegs[2].IKCoordinates[2]
-        elevatedZ = highestDestZ - 2
+    #     zSortedLegCoords = cLegCoords.sort(key=lambda leg: leg.IKCoordinates[2])
+    #     cGroundedLegs = zSortedLegCoords[-3:] #Get 3 legs with highest z coordinate
+    #     cElevatedLegs    = zSortedLegCoords[:-3] #the other 3 legs
 
-        # if legs are elevated set them to 0,0,highestDestZ
-        self.startFrame()
-        for legID in cElevatedLegs:
-                if cElevatedLegs[legID].IKCoordinates[2] > highestDestZ:
-                    self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(0, 0, highestDestZ, legID, speed)
-        self.endFrame()
+    #     zSortedDestCoords = destination.movements.sort(key=lambda leg: leg.IKCoordinates[2])
+    #     destGroundedLegs = zSortedDestCoords[-3:]
+    #     destElevatedLegs = zSortedDestCoords[:-3]
+    #     highestDestZ = destGroundedLegs[2].IKCoordinates[2]
+    #     elevatedZ = highestDestZ - 2
 
-        #after that, one by one, elevate the legs a little and send them to their destination
-        for legID in range(1,7):
-            destCoords = destGroundedLegs[legID].IKCoordinates
-            self.startFrame()
-            self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(destCoords[0], destCoords[1], elevatedZ, legID, speed)
-            self.endFrame()
-            self.startFrame()
-            self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(destCoords[0], destCoords[1], destCoords[2], legID, speed)
-            self.endFrame()
+    #     # if legs are elevated set them to 0,0,highestDestZ
+    #     self.startFrame()
+    #     for legID in cElevatedLegs:
+    #             if cElevatedLegs[legID].IKCoordinates[2] > highestDestZ:
+    #                 self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(0, 0, highestDestZ, legID, speed)
+    #     self.endFrame()
+
+    #     #after that, one by one, elevate the legs a little and send them to their destination
+    #     for legID in range(1,7):
+    #         destCoords = destGroundedLegs[legID].IKCoordinates
+    #         self.startFrame()
+    #         self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(destCoords[0], destCoords[1], elevatedZ, legID, speed)
+    #         self.endFrame()
+    #         self.startFrame()
+    #         self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(destCoords[0], destCoords[1], destCoords[2], legID, speed)
+    #         self.endFrame()
+    
 
     #Adjust midpoint of the crabwalk to fit through 'het poortje'
     def setWideCrabWalk(self, value):

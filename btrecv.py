@@ -36,4 +36,5 @@ while True:
 
   rec = rec[rec_end+1:]
 
+print ("Closing socket")
 sock.close()

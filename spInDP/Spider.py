@@ -79,4 +79,5 @@ class Spider(object):
             self.updatethread.join()
 
         self.sequenceController.stop()
+        self.remoteController.stop = True
         print("Stopped the spider")
