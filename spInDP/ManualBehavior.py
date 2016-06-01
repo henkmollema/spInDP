@@ -1,5 +1,6 @@
 from spInDP.Behavior import Behavior
 import math
+import time
 
 
 class ManualBehavior(Behavior):
@@ -11,25 +12,32 @@ class ManualBehavior(Behavior):
         self.remoteContext = spider.remoteController.Context
 
     def update(self):
-        cJX = -(self.remoteContext.jX - 512) / 512
-        cJY = -(self.remoteContext.jX - 512) / 512
+        jX = int(self.remoteContext.jX)
+        jY = int(self.remoteContext.jY)
+        jZ = int(self.remoteContext.jZ)
+        
+        #print ("Updateloop: Joystick = X: " + str(jX) + ", Y: " + str(jY) + ", Z: " + str(jZ))
+        
+        cJX = -(jX - 512) / 512
+        cJY = -(jY - 512) / 512
         cJZ = self.remoteContext.jZ
         
-        if(self.remoteContext.jX > -0.2 and self.remoteContext.jX < 0.2):
+        if(jX > -0.2 and jX < 0.2):
             cJX = 0
             
-        if(self.remoteContext.jY > -0.2 and self.remoteContext.jY < 0.2):
+        if(jY > -0.2 and jY < 0.2):
             cJY = 0
             
-        if(cJX != 0 or cJY != 0):
+        if(cJX is not 0 or cJY is not 0):
         
             angle = math.atan2(cJY, cJX) * (180/math.pi) - 90
             magnitute = math.sqrt(cJX**2 + cJY**2)
             
             if(cJZ == 0): #strafemode
-                self.spider.animationController.walk(direction = angle, frameNr = self.frameNr, speedMod = magnitute)
+                time.sleep(self.spider.animationController.walk(direction = angle, frameNr = self.frameNr, speedMod = magnitute))
             else: #turnmode
                 angle = self.restrict(angle, -30, 30)
+                #print ("turn: " + str(angle))
                 self.spider.animationController.turn(amountDegrees = angle, frameNr = self.frameNr, speedMod = magnitute)
                 
             self.frameNr += 1
