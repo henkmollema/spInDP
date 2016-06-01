@@ -5,6 +5,8 @@ import threading
 class LegThread(threading.Thread):
     """Provides a thread for handling leg movements."""
 
+    cCoordinates = [0,0,0]
+
     def __init__(self, legId, sequenceController, group=None, target=None, args=(), kwargs=None, verbose=None):
         super(LegThread, self).__init__()
         self.target = target
@@ -18,9 +20,6 @@ class LegThread(threading.Thread):
         q = self.sequenceController.legQueue[self.legId]
         while not self.sequenceController.stopped:
             try:
-
-                #Todo: Compute inverse kinematics here. queue contains legmovement objects as of now,
-                #Todo: change this to objects wrapping the arguments for coordsToLegMovement() in sequenceController
                 legMovement = q.get()
                                 
                 if (legMovement.empty is False):
@@ -33,6 +32,7 @@ class LegThread(threading.Thread):
 
                 #Sleep this thread for maxexectime seconds
                 time.sleep(legMovement.maxExecTime if legMovement.maxExecTime > 0 else 0.005)
+                self.cCoordinates = legMovement.IKCoordinates
             #except:
                 #print ("error on leg " + str(self.legId))
             finally:

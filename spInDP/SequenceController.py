@@ -21,9 +21,10 @@ class SequenceController(object):
 
     # optimal rpm is 114 without load at max speed
     anglePerSecond = (114.0 * 360.0 / 60.0)
-
     coxaOffset = 45
 
+    threadMap = {}
+    sequenceFrame = None
     servoAngleMap = {
         1: 0.0, 2: 0.0, 3: 0.0,
         4: 0.0, 5: 0.0, 6: 0.0,
@@ -32,8 +33,6 @@ class SequenceController(object):
         13: 0.0, 14: 0.0, 15: 0.0,
         16: 0.0, 17: 0.0, 18: 0.0
     }
-
-    sequenceFrame = None
 
     def __init__(self, spider):
         self.spider = spider
@@ -89,6 +88,9 @@ class SequenceController(object):
 
     def executeStartup(self):
         return self.parseSequence("sequences/startup.txt")
+
+    def getLegCoords(self, legID):
+        return self.threadMap[legID].cCoordinates;
 
     #Returns the time it takes to execute this sequence in seconds
     def parseSequence(self, filePath, validate=False, speedModifier=1, repeat=1):
@@ -369,6 +371,8 @@ class SequenceController(object):
             retVal.coxa -= self.coxaOffset
         retVal.femur = angleFemur
         retVal.tibia = angleTibia
+
+        retVal.IKCoordinates = [x,y,z]
         return retVal
 
 
