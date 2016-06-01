@@ -25,7 +25,7 @@ class Spider(object):
         self.visioncontroller = VisionController()
         self.webserver = WebServer(self)
 
-        self.behavior = ManualBehavior(self.remoteController.Context)
+        self.behavior = ManualBehavior(self)
         self.updatethread = None
         self.webserverthread = None
 
