@@ -20,6 +20,14 @@ class AnimationController:
         5: [-4, 8],
         6: [-4, 0]
     }
+    legTurnMid = {
+        1: [-4, -8],
+        2: [-4, -8],
+        3: [-4, 0],
+        4: [-4, 8],
+        5: [-4, 8],
+        6: [-4, 0]
+    }
 
     def __init__(self, spider):
         self.spider = spider
@@ -51,12 +59,135 @@ class AnimationController:
             self.spider.sequenceController.legQueue[x].put(mov)
             
         ret = self.sequenceFrame.maxMaxExecTime
-        self.sequenceFrame.movements.clear()
+        self.sequenceFrame.movements = {} #Clear the previous frame
         self.sequenceFrame = None
         return ret
 
-    def turn(self, amountDegrees, frameNr, speedMod = 1):
-        print "turn"
+    def turn(self, direction, frameNr, speedMod = 1):
+        totalTime = 0
+        
+        zGround = 5
+        zAir = 2
+        steppingRange = 8
+        
+        directionStepSize = int(direction) / 4
+        
+        sideLegDistanceFromCenter = 10.45
+        cornerLegDistanceFromCenter = 13.845
+        sideLegLengthX = math.sqrt((16.347 + self.legTurnMid[3][0])**2 + abs(self.legTurnMid[3][1])**2)
+        cornerLegLength = math.sqrt((16.347 + self.legTurnMid[1][0])**2 + abs(self.legTurnMid[1][1])**2)
+        
+        sideLegDistance = math.sqrt(sideLegDistanceFromCenter**2 + sideLegLengthX**2 - 2*sideLegDistanceFromCenter*sideLegLengthX*math.cos(0*math.pi/180))
+        cornerLegDistanceFront = math.sqrt(cornerLegDistanceFromCenter**2 + cornerLegLength**2 - 2*cornerLegDistanceFromCenter*cornerLegLength*abs(math.cos((119.5+math.asin(-self.legTurnMid[1][1]/cornerLegLength))*math.pi/180)))
+        cornerLegDistanceBack = math.sqrt(cornerLegDistanceFromCenter**2 + cornerLegLength**2 - 2*cornerLegDistanceFromCenter*cornerLegLength*abs(math.cos((119.5+math.asin(self.legTurnMid[1][1]/cornerLegLength))*math.pi/180)))
+        
+        frameNr = frameNr % 6
+        seqCtrl = self.spider.sequenceController;
+        if frameNr == 0:
+            self.startFrame()
+            cosDirection = math.cos(-2*directionStepSize*math.pi/180)
+            sinDirection = math.sin(-2*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(cosDirection * sideLegDistance - sideLegDistance, sinDirection * sideLegDistance, zGround, 3, speedMod * 100)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(cosDirection * sideLegDistance - sideLegDistance, -sinDirection * sideLegDistance, zGround, 6, speedMod * 100)
+            
+            cosDirection = math.cos(2*directionStepSize*math.pi/180)
+            sinDirection = math.sin(2*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 2, speedMod * 200)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 5, speedMod * 200)
+            
+            cosDirection = math.cos(0*directionStepSize*math.pi/180)
+            sinDirection = math.sin(0*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 4, speedMod * 100)
+            totalTime += self.endFrame()
+        elif frameNr == 1:
+            self.startFrame()
+            cosDirection = math.cos(0*directionStepSize*math.pi/180)
+            sinDirection = math.sin(0*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(cosDirection * sideLegDistance - sideLegDistance, sinDirection * sideLegDistance, zAir, 3, speedMod * 200)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(cosDirection * sideLegDistance - sideLegDistance, -sinDirection * sideLegDistance, zAir, 6, speedMod * 200)
+            
+            cosDirection = math.cos(1*directionStepSize*math.pi/180)
+            sinDirection = math.sin(1*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 5, speedMod * 100)
+            
+            cosDirection = math.cos(-1*directionStepSize*math.pi/180)
+            sinDirection = math.sin(-1*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 4, speedMod * 100)
+            totalTime += self.endFrame()
+        elif frameNr == 2:
+            self.startFrame()
+            cosDirection = math.cos(2*directionStepSize*math.pi/180)
+            sinDirection = math.sin(2*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(cosDirection * sideLegDistance - sideLegDistance, sinDirection * sideLegDistance, zGround, 3, speedMod * 200)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(cosDirection * sideLegDistance - sideLegDistance, -sinDirection * sideLegDistance, zGround, 6, speedMod * 200)
+            
+            cosDirection = math.cos(0*directionStepSize*math.pi/180)
+            sinDirection = math.sin(0*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 5, speedMod * 100)
+            
+            cosDirection = math.cos(-2*directionStepSize*math.pi/180)
+            sinDirection = math.sin(-2*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 4, speedMod * 100)
+            totalTime += self.endFrame()
+        elif frameNr == 3:
+            self.startFrame()
+            cosDirection = math.cos(1*directionStepSize*math.pi/180)
+            sinDirection = math.sin(1*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(cosDirection * sideLegDistance - sideLegDistance, sinDirection * sideLegDistance, zGround, 3, speedMod * 100)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(cosDirection * sideLegDistance - sideLegDistance, -sinDirection * sideLegDistance, zGround, 6, speedMod * 100)
+            
+            cosDirection = math.cos(-1*directionStepSize*math.pi/180)
+            sinDirection = math.sin(-1*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 5, speedMod * 100)
+            
+            cosDirection = math.cos(0*directionStepSize*math.pi/180)
+            sinDirection = math.sin(0*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zAir, 1, speedMod * 200)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zAir, 4, speedMod * 200)
+            totalTime += self.endFrame()
+        elif frameNr == 4:
+            self.startFrame()
+            cosDirection = math.cos(0*directionStepSize*math.pi/180)
+            sinDirection = math.sin(0*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(cosDirection * sideLegDistance - sideLegDistance, sinDirection * sideLegDistance, zGround, 3, speedMod * 100)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(cosDirection * sideLegDistance - sideLegDistance, -sinDirection * sideLegDistance, zGround, 6, speedMod * 100)
+            
+            cosDirection = math.cos(-2*directionStepSize*math.pi/180)
+            sinDirection = math.sin(-2*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 5, speedMod * 100)
+            
+            cosDirection = math.cos(2*directionStepSize*math.pi/180)
+            sinDirection = math.sin(2*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 1, speedMod * 200)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 4, speedMod * 200)
+            totalTime += self.endFrame()
+        elif frameNr == 5:
+            self.startFrame()
+            cosDirection = math.cos(-1*directionStepSize*math.pi/180)
+            sinDirection = math.sin(-1*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(cosDirection * sideLegDistance - sideLegDistance, sinDirection * sideLegDistance, zGround, 3, speedMod * 100)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(cosDirection * sideLegDistance - sideLegDistance, -sinDirection * sideLegDistance, zGround, 6, speedMod * 100)
+            
+            cosDirection = math.cos(0*directionStepSize*math.pi/180)
+            sinDirection = math.sin(0*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zAir, 2, speedMod * 200)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zAir, 5, speedMod * 200)
+            
+            cosDirection = math.cos(1*directionStepSize*math.pi/180)
+            sinDirection = math.sin(1*directionStepSize*math.pi/180)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 4, speedMod * 100)
+            totalTime += self.endFrame()
+        
+        return totalTime
+        
     def walk(self, direction, frameNr, speedMod = 1):
         totalTime = 0
         
