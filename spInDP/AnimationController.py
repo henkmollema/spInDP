@@ -131,13 +131,13 @@ class AnimationController:
             
             cosDirection = math.cos(2*directionStepSize*math.pi/180)
             sinDirection = math.sin(2*directionStepSize*math.pi/180)
-            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 2, speedMod * 200)
-            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 5, speedMod * 200)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceFront - cornerLegDistanceFront, sinDirection * cornerLegDistanceFront, zGround, 2, speedMod * 200)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceBack - cornerLegDistanceBack, -sinDirection * cornerLegDistanceBack, zGround, 5, speedMod * 200)
             
             cosDirection = math.cos(0*directionStepSize*math.pi/180)
             sinDirection = math.sin(0*directionStepSize*math.pi/180)
-            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 1, speedMod * 100)
-            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 4, speedMod * 100)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceFront - cornerLegDistanceFront, -sinDirection * cornerLegDistanceFront, zGround, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceBack - cornerLegDistanceBack, sinDirection * cornerLegDistanceBack, zGround, 4, speedMod * 100)
             totalTime += self.endFrame()
         elif frameNr == 1:
             self.startFrame()
@@ -148,13 +148,13 @@ class AnimationController:
             
             cosDirection = math.cos(1*directionStepSize*math.pi/180)
             sinDirection = math.sin(1*directionStepSize*math.pi/180)
-            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 2, speedMod * 100)
-            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 5, speedMod * 100)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceFront - cornerLegDistanceFront, sinDirection * cornerLegDistanceFront, zGround, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceBack - cornerLegDistanceBack, -sinDirection * cornerLegDistanceBack, zGround, 5, speedMod * 100)
             
             cosDirection = math.cos(-1*directionStepSize*math.pi/180)
             sinDirection = math.sin(-1*directionStepSize*math.pi/180)
-            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 1, speedMod * 100)
-            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 4, speedMod * 100)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceFront - cornerLegDistanceFront, -sinDirection * cornerLegDistanceFront, zGround, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceBack - cornerLegDistanceBack, sinDirection * cornerLegDistanceBack, zGround, 4, speedMod * 100)
             totalTime += self.endFrame()
         elif frameNr == 2:
             self.startFrame()
@@ -165,13 +165,13 @@ class AnimationController:
             
             cosDirection = math.cos(0*directionStepSize*math.pi/180)
             sinDirection = math.sin(0*directionStepSize*math.pi/180)
-            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 2, speedMod * 100)
-            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 5, speedMod * 100)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceFront - cornerLegDistanceFront, sinDirection * cornerLegDistanceFront, zGround, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceBack - cornerLegDistanceBack, -sinDirection * cornerLegDistanceBack, zGround, 5, speedMod * 100)
             
             cosDirection = math.cos(-2*directionStepSize*math.pi/180)
             sinDirection = math.sin(-2*directionStepSize*math.pi/180)
-            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 1, speedMod * 100)
-            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 4, speedMod * 100)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceFront - cornerLegDistanceFront, -sinDirection * cornerLegDistanceFront, zGround, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceBack - cornerLegDistanceBack, sinDirection * cornerLegDistanceBack, zGround, 4, speedMod * 100)
             totalTime += self.endFrame()
         elif frameNr == 3:
             self.startFrame()
@@ -182,13 +182,13 @@ class AnimationController:
             
             cosDirection = math.cos(-1*directionStepSize*math.pi/180)
             sinDirection = math.sin(-1*directionStepSize*math.pi/180)
-            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 2, speedMod * 100)
-            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 5, speedMod * 100)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceFront - cornerLegDistanceFront, sinDirection * cornerLegDistanceFront, zGround, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceBack - cornerLegDistanceBack, -sinDirection * cornerLegDistanceBack, zGround, 5, speedMod * 100)
             
             cosDirection = math.cos(0*directionStepSize*math.pi/180)
             sinDirection = math.sin(0*directionStepSize*math.pi/180)
-            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zAir, 1, speedMod * 200)
-            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zAir, 4, speedMod * 200)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceFront - cornerLegDistanceFront, -sinDirection * cornerLegDistanceFront, zAir, 1, speedMod * 200)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceBack - cornerLegDistanceBack, sinDirection * cornerLegDistanceBack, zAir, 4, speedMod * 200)
             totalTime += self.endFrame()
         elif frameNr == 4:
             self.startFrame()
@@ -199,13 +199,13 @@ class AnimationController:
             
             cosDirection = math.cos(-2*directionStepSize*math.pi/180)
             sinDirection = math.sin(-2*directionStepSize*math.pi/180)
-            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 2, speedMod * 100)
-            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 5, speedMod * 100)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceFront - cornerLegDistanceFront, sinDirection * cornerLegDistanceFront, zGround, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceBack - cornerLegDistanceBack, -sinDirection * cornerLegDistanceBack, zGround, 5, speedMod * 100)
             
             cosDirection = math.cos(2*directionStepSize*math.pi/180)
             sinDirection = math.sin(2*directionStepSize*math.pi/180)
-            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 1, speedMod * 200)
-            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 4, speedMod * 200)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceFront - cornerLegDistanceFront, -sinDirection * cornerLegDistanceFront, zGround, 1, speedMod * 200)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceBack - cornerLegDistanceBack, sinDirection * cornerLegDistanceBack, zGround, 4, speedMod * 200)
             totalTime += self.endFrame()
         elif frameNr == 5:
             self.startFrame()
@@ -216,13 +216,13 @@ class AnimationController:
             
             cosDirection = math.cos(0*directionStepSize*math.pi/180)
             sinDirection = math.sin(0*directionStepSize*math.pi/180)
-            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zAir, 2, speedMod * 200)
-            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zAir, 5, speedMod * 200)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceFront - cornerLegDistanceFront, sinDirection * cornerLegDistanceFront, zAir, 2, speedMod * 200)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceBack - cornerLegDistanceBack, -sinDirection * cornerLegDistanceBack, zAir, 5, speedMod * 200)
             
             cosDirection = math.cos(1*directionStepSize*math.pi/180)
             sinDirection = math.sin(1*directionStepSize*math.pi/180)
-            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, -sinDirection * cornerLegDistance, zGround, 1, speedMod * 100)
-            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistance - cornerLegDistance, sinDirection * cornerLegDistance, zGround, 4, speedMod * 100)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceFront - cornerLegDistanceFront, -sinDirection * cornerLegDistanceFront, zGround, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(cosDirection * cornerLegDistanceBack - cornerLegDistanceBack, sinDirection * cornerLegDistanceBack, zGround, 4, speedMod * 100)
             totalTime += self.endFrame()
         
         return totalTime
