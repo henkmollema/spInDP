@@ -64,6 +64,9 @@ class Camera(object):
             camera.awb_gains = (1.19, 1.43)
             camera.shutter_speed = 20000
 
+            camera.hflip = True
+            camera.vflip = True
+            
             #camera.start_preview()
             #time.sleep(1)
 			
