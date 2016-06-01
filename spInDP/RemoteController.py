@@ -61,5 +61,5 @@ class RemoteController(object):
             continue
 
         print ("Closing socket")
-        sock.close()
+        self.sock.close()
 
