@@ -43,9 +43,9 @@ class RemoteController(object):
             # Read joystick position
             if (data.startswith('J:')):
                 xs = data.split(':')[1].split(',')
-                x = xs[0]
-                y = xs[1]
-                z = xs[2]
+                x = float(xs[0])
+                y = float(xs[1])
+                z = float(xs[2])
                 self.Context.jX = x
                 self.Context.jY = y
                 self.Context.jZ = z

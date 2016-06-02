@@ -28,6 +28,8 @@ class Spider(object):
         self.behavior = ManualBehavior(self)
         self.updatethread = None
         self.webserverthread = None
+        
+        self.updateSleepTime = 0.032
 
     def start(self):
         print("Starting the spider")
@@ -37,7 +39,7 @@ class Spider(object):
         #60fps update Limit.
         while not self.stopLoop:
             self.behavior.update()
-            time.sleep(0.0166667)
+            time.sleep(self.updateSleepTime)
 
     def startUpdateLoopThread(self):
         self.updatethread = Thread(target=self.updateLoop)
