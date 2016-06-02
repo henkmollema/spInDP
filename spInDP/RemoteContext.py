@@ -1,6 +1,6 @@
 class RemoteContext(object):
     """Represents a context for the remote controller."""
     
-    jX = 0
-    jY = 0
+    jX = 512
+    jY = 512
     jZ = 0

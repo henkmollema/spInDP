@@ -25,13 +25,18 @@ class ManualBehavior(Behavior):
         magnitute = self.restrict(magnitute, 0, 1)
         
         #print "Joystick = X: " + str(cJX) + ", Y: " + str(cJY) + ", Z: " + str(cJZ) + " magnitude: " + str(magnitute)
-           
-        #print "mag: " + str(magnitute)
+   
+        #DEBUG
+        #print "GYRO Y: " + str(((float(self.spider.sensorDataProvider.getAccelerometer()[1]) / 1000.0) / 16.0) * 90.0)
+        #time.sleep(self.spider.animationController.walk(direction = 0, frameNr = 0, speedMod = 2, keepLeveled = True))
+        #self.frameNr += 1
+        #print "GYRO ANGLES: " + str(self.spider.sensorDataProvider.getAccelerometer()[0]) + ", " + str(self.spider.sensorDataProvider.getAccelerometer()[1]) + ", " + str(self.spider.sensorDataProvider.getAccelerometer()[2])
+        #DEBUG
+
         if(magnitute > 0.4):
             magnitute *= 2
 
             if(cJZ == 0): #strafemode
-                kut = "python"
                 time.sleep(self.spider.animationController.walk(direction = angle, frameNr = self.frameNr, speedMod = magnitute) - self.spider.updateSleepTime)
             else:
                 angle = self.restrict(angle, -30, 30)

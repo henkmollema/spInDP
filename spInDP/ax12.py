@@ -373,6 +373,15 @@ class Ax12:
         return None
 
     def moveSpeed(self, id, position, speed):
+        if(position < 0):
+            print "Tried to move to " + str(position) + " corrected to: 0"
+            position = 0
+            
+        if(position > 1023):
+            print "Tried to move to " + str(position) + " corrected to: 1023"
+            position = 1023
+        
+    
         self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
