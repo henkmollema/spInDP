@@ -9,7 +9,7 @@ class ManualBehavior(Behavior):
 
     def __init__(self, spider):
         super(ManualBehavior, self).__init__(spider)
-        self.remoteContext = spider.remoteController.Context
+        self.remoteContext = spider.remoteController.context
 
     def update(self):
         jX = self.remoteContext.jX

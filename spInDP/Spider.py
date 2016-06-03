@@ -38,7 +38,6 @@ class Spider(object):
         self.sequenceController.executeStartup()
 
     def updateLoop(self):
-        #60fps update Limit.
         while not self.stopLoop:
             self.behavior.update()
             time.sleep(self.updateSleepTime)
