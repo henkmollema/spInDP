@@ -35,7 +35,7 @@ class Spider(object):
 
     def start(self):
         print("Starting the spider")
-        self.sequenceController.executeStartup()
+        #self.sequenceController.executeStartup()
 
     def updateLoop(self):
         while not self.stopLoop:

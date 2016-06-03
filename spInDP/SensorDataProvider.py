@@ -1,6 +1,7 @@
 import smbus
 import time
 import math
+import threading
 
 class SensorDataProvider(object):
         """Provides data from sensors"""
@@ -17,42 +18,120 @@ class SensorDataProvider(object):
         To scale accelerometer values to radians
         """
         aclScale = 0.0000981748
-        windowSize = 5 #Number of readings to average over
-        measureInterval = 0.0001 #increase this if reading fails
+        
+        
+        
+        """Used for averaging"""
+        windowSize = 10 #Number of readings to average over
+        accelWindow = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
+        
+        cAccelIndex = 0
+        
+        measureInterval = 0.1 #increase this if reading fails
+        shouldMeasure = False
+        
+        smoothAccelX = 0
+        smoothAccelY = 0
+        smoothAccelZ = 0
+        
+        """Used for Kalmanfilter"""
+        Q_angle  =  0.1
+        Q_gyro   =  0.003
+        R_angle  =  0.1
+        y_bias = 0
+        YP_00 = 0
+        YP_01 = 0
+        YP_10 = 0
+        YP_11 = 0
+        KFangleY = 0.0
+        
+        def kalmanFilterY(self, accAngle, gyroRate, DT):
+            y = 0
+            S = 0
+            K_0 = 0
+            K_1 = 0
+            
+            self.KFangleY += DT * (gyroRate - self.y_bias);
+            
+            self.YP_00 +=  - DT * (self.YP_10 + self.YP_01) + self.Q_angle * DT;
+            self.YP_01 +=  - DT * self.YP_11;
+            self.YP_10 +=  - DT * self.YP_11;
+            self.YP_11 +=  + self.Q_gyro * DT;
+            
+            y = accAngle - self.KFangleY;
+            S = self.YP_00 + self.R_angle;
+            K_0 = self.YP_00 / S;
+            K_1 = self.YP_10 / S;
+            
+            self.KFangleY +=  K_0 * y;
+            self.y_bias  +=  K_1 * y;
+            self.YP_00 -= K_0 * self.YP_00;
+            self.YP_01 -= K_0 * self.YP_01;
+            self.YP_10 -= K_1 * self.YP_00;
+            self.YP_11 -= K_1 * self.YP_01;
+        
+            return self.KFangleY;
+        
 
         def __init__(self):
             # Now wake the 6050 up as it starts in sleep mode
             #TODO: Check if the device will go to sleep mode automatically, this will cause problems
             self.bus.write_byte_data(self.address, self.power_mgmt_1, 0)
+            self.startMeasuring()
+            
+        def stopMeasuring(self):
+            self.shouldMeasure = False
+        
+        def startMeasuring(self):
+            if(not self.shouldMeasure):
+                self.shouldMeasure = True
+                t = threading.Thread(target=self.measureCycle)
+                t.start()
+        
+        def measureCycle(self):
+            while(self.shouldMeasure):
+                if(self.cAccelIndex + 1 >= self.windowSize):
+                    self.cAccelIndex = 0
+                    
+                self.accelWindow[self.cAccelIndex] = self.getAccelerometer()
+                
+                xSum = 0
+                ySum = 0
+                zSum = 0
+                for x in range(0, self.windowSize):
+                    xSum += self.accelWindow[x][0]
+                    ySum += self.accelWindow[x][1]
+                    zSum += self.accelWindow[x][2]
+                self.cAccelIndex += 1
 
+                self.smoothAccelX = xSum / self.windowSize
+                self.smoothAccelY = ySum / self.windowSize
+                self.smoothAccelZ = zSum / self.windowSize
+                
+                
+                # gyroValY = self.getGyro()[1]
+                # AccelValY = self.getAccelerometer()[1]
+                # self.smoothAccelY = self.kalmanFilterY(AccelValY, gyroValY, self.measureInterval)
+                               
+                # time.sleep(self.measureInterval)
+                
+                #print "SmoothY: " + str(self.smoothAccelY * 180 / math.pi) + " RawY: " + str(AccelValY)
+                
+            #
+                
+        def getSmoothAccelerometer(self):
+            return self.smoothAccelX, self.smoothAccelY, self.smoothAccelZ
+                
         def getGyro(self):
-            xSum = 0
-            ySum = 0
-            zSum = 0
-            for x in range(0,self.windowSize):
-                xSum += float(self.read_word_2c(0x43))
-                ySum += float(self.read_word_2c(0x45))
-                zSum += float(self.read_word_2c(0x47))
-                time.sleep(self.measureInterval)
-
-            gyro_xout = xSum / self.windowSize
-            gyro_yout = ySum / self.windowSize
-            gyro_zout = zSum / self.windowSize
-            return (gyro_xout, gyro_yout, gyro_zout)
+            gyro_xout = float(self.read_word_2c(0x43))
+            gyro_yout = float(self.read_word_2c(0x45))
+            gyro_zout = float(self.read_word_2c(0x47))
+            return (gyro_xout * self.aclScale, gyro_yout * self.aclScale, gyro_zout * self.aclScale)
 
         def getAccelerometer(self):
-            xSum = 0
-            ySum = 0
-            zSum = 0
-            for x in range(0, self.windowSize):
-                xSum += float(self.read_word_2c(0x3b))
-                ySum += float(self.read_word_2c(0x3d))
-                zSum += float(self.read_word_2c(0x3f))
-                time.sleep(self.measureInterval)
-
-            accel_xout = xSum / self.windowSize
-            accel_yout = ySum / self.windowSize
-            accel_zout = zSum / self.windowSize
+            accel_xout = float(self.read_word_2c(0x3b))
+            accel_yout = float(self.read_word_2c(0x3d))
+            accel_zout = float(self.read_word_2c(0x3f))
             return (accel_xout * self.aclScale, accel_yout * self.aclScale, accel_zout * self.aclScale)
 
         def read_byte(self, adr):

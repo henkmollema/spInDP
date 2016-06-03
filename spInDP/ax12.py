@@ -8,7 +8,6 @@ http://savageelectronics.blogspot.it/2011/01/arduino-y-dynamixel-ax-12.html
 
 from time import sleep
 import threading
-import long
 from serial import Serial
 import RPi.GPIO as GPIO
 

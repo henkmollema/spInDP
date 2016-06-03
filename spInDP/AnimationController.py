@@ -238,6 +238,7 @@ class AnimationController:
         return totalTime
 
     realYAngle = 0
+    yAdjustment = 0
     def walk(self, direction, frameNr, speedMod = 1, keepLeveled = False):
         totalTime = 0
         
@@ -265,22 +266,19 @@ class AnimationController:
 
 
         if(keepLeveled):
-            #read y-axis from accelerometer
-            cAccelY = float(self.spider.sensorDataProvider.getAccelerometer()[1])
-            if (cAccelY < 5 * math.pi / 180): #give the sensor a 'dead zone' of 5 degrees
+            #Start measuring so we can get a smooth value
+            self.spider.sensorDataProvider.startMeasuring() 
+            cAccelY = float(self.spider.sensorDataProvider.getSmoothAccelerometer()[1])
+            if abs(cAccelY * (180 / math.pi)) < 3:
                 cAccelY = 0
+            
+            self.realYAngle = self.yAdjustment + cAccelY
+            self.yAdjustment += cAccelY
+        else:
+            #Stop measuring accel
+            self.spider.sensorDataProvider.stopMeasuring() 
 
-            ##TODO: Maybe this should be + xAccelY
-            self.realYAngle = self.yAdjustment - cAccelY
-            self.yAdjustment = self.realYAngle
-
-            # read x-axis from accelerometer
-            cAccelX = float(self.spider.sensorDataProvider.getAccelerometer()[0])
-            if (cAccelX < 5 * math.pi / 180):  # give the sensor a 'dead zone' of 5 degrees
-                cAccelX = 0
-
-            self.realXAngle = self.xAdjustment - cAccelX
-            self.xAdjustment = self.realXAngle
+        
 
         legActualMid = {
             1: [self.legHorMid[1][0] + abs(cosDirection) * (self.legVertMid[1][0]-self.legHorMid[1][0]), self.legHorMid[1][1] + abs(cosDirection) * (self.legVertMid[1][1]-self.legHorMid[1][1])],
@@ -295,13 +293,12 @@ class AnimationController:
         seqCtrl = self.seqCtrl
         if frameNr == 0:
             if(keepLeveled):
-                #TODO: Also take in account the x angle
-                zGround3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1] + (stepRangeVert / 2))) / 2 / 2 + zGround
-                zGround6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1] + (stepRangeVert / 2))) / 2 + zGround
-                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1] - (stepRangeVert / 2))) / 2 + zGround
-                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1] - (stepRangeVert / 2))) / 2 + zGround
-                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[1][1])) / 2 + zGround
-                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[4][1])) / 2 + zGround
+                zGround3 = -math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1] + (stepRangeVert / 2))) / 4 + zGround
+                zGround6 = -math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1] + (stepRangeVert / 2))) / 4 + zGround
+                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1] - (stepRangeVert / 2))) / 4 + zGround
+                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1] - (stepRangeVert / 2))) / 4 + zGround
+                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[1][1])) / 4 + zGround
+                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[4][1])) / 4 + zGround
                 
             self.startFrame()
             self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] + (-stepRangeHor / 2), legActualMid[3][1] + (stepRangeVert / 2), zGround3, 3, speedMod * 100)
@@ -313,12 +310,12 @@ class AnimationController:
             totalTime += self.endFrame()
         elif frameNr == 1:
             if(keepLeveled):
-                zAir3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1])) / 2 + zAir
-                zAir6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1])) / 2 + zAir
-                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1] - (stepRangeVert / 4))) / 2 + zGround
-                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1] - (stepRangeVert / 4))) / 2 + zGround
-                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1] + (stepRangeVert / 4)) / 2 + zGround
-                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1] + (stepRangeVert / 4)) / 2 + zGround
+                zAir3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1])) / 4 + zAir
+                zAir6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1])) / 4 + zAir
+                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1] - (stepRangeVert / 4))) / 4 + zGround
+                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1] - (stepRangeVert / 4))) / 4 + zGround
+                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1] + (stepRangeVert / 4)) / 4 + zGround
+                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1] + (stepRangeVert / 4)) / 4 + zGround
         
             self.startFrame()
             self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0], legActualMid[3][1], zAir3, 3, speedMod * 200)
@@ -330,12 +327,12 @@ class AnimationController:
             totalTime += self.endFrame()
         elif frameNr == 2:
             if(keepLeveled):
-                zGround3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1] - (stepRangeVert / 2))) / 2 + zGround
-                zGround6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1] - (stepRangeVert / 2))) / 2 + zGround
-                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1])) / 2 + zGround
-                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1])) / 2 + zGround
-                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1] + (stepRangeVert / 2)) / 2 + zGround
-                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1] + (stepRangeVert / 2)) / 2 + zGround
+                zGround3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1] - (stepRangeVert / 2))) / 4 + zGround
+                zGround6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1] - (stepRangeVert / 2))) / 4 + zGround
+                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1])) / 4 + zGround
+                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1])) / 4 + zGround
+                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1] + (stepRangeVert / 2)) / 4 + zGround
+                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1] + (stepRangeVert / 2)) / 4 + zGround
         
             self.startFrame()
             self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] - (-stepRangeHor / 2), legActualMid[3][1] - (stepRangeVert / 2), zGround3, 3, speedMod * 200)
@@ -347,12 +344,12 @@ class AnimationController:
             totalTime += self.endFrame()
         elif frameNr == 3:
             if(keepLeveled):
-                zGround3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1] - (stepRangeVert / 4))) / 2 + zGround
-                zGround6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1] - (stepRangeVert / 4))) / 2 + zGround
-                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1]) + (stepRangeVert / 4)) / 2 + zGround
-                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1]) + (stepRangeVert / 4)) / 2 + zGround
-                zAir1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1]) / 2 + zAir
-                zAir4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1]) / 2 + zAir
+                zGround3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1] - (stepRangeVert / 4))) / 4 + zGround
+                zGround6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1] - (stepRangeVert / 4))) / 4 + zGround
+                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1]) + (stepRangeVert / 4)) / 4 + zGround
+                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1]) + (stepRangeVert / 4)) / 4 + zGround
+                zAir1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1]) / 4 + zAir
+                zAir4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1]) / 4 + zAir
         
             self.startFrame()
             self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] - (-stepRangeHor / 4), legActualMid[3][1] - (stepRangeVert / 4), zGround3, 3, speedMod * 100)
@@ -364,12 +361,12 @@ class AnimationController:
             totalTime += self.endFrame()
         elif frameNr == 4:
             if(keepLeveled):
-                zGround3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1])) / 2 + zGround
-                zGround6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1])) / 2 + zGround
-                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1]) + (stepRangeVert / 2)) / 2 + zGround
-                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1]) + (stepRangeVert / 2)) / 2 + zGround
-                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1] - (stepRangeVert / 2)) / 2 + zGround
-                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1] - (stepRangeVert / 2)) / 2 + zGround
+                zGround3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1])) / 4 + zGround
+                zGround6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1])) / 4 + zGround
+                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1]) + (stepRangeVert / 2)) / 4 + zGround
+                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1]) + (stepRangeVert / 2)) / 4 + zGround
+                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1] - (stepRangeVert / 2)) / 4 + zGround
+                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1] - (stepRangeVert / 2)) / 4 + zGround
         
             self.startFrame()
             self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0], legActualMid[3][1], zGround3, 3, speedMod * 100)
@@ -381,12 +378,12 @@ class AnimationController:
             totalTime += self.endFrame()
         elif frameNr == 5:
             if(keepLeveled):
-                zGround3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1]) + (stepRangeVert / 4)) / 2 + zGround
-                zGround6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1]) + (stepRangeVert / 4)) / 2 + zGround
-                zAir2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1])) / 2 + zAir
-                zAir5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1])) / 2 + zAir
-                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1] - (stepRangeVert / 4)) / 2 + zGround
-                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1] - (stepRangeVert / 4)) / 2 + zGround
+                zGround3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1]) + (stepRangeVert / 4)) / 4 + zGround
+                zGround6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1]) + (stepRangeVert / 4)) / 4 + zGround
+                zAir2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1])) / 4 + zAir
+                zAir5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1])) / 4 + zAir
+                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1] - (stepRangeVert / 4)) / 4 + zGround
+                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1] - (stepRangeVert / 4)) / 4 + zGround
             
         
             self.startFrame()
