@@ -112,7 +112,163 @@ class AnimationController:
         
         zGround = 5
         zAir = 2
-        steppingRange = 8
+        
+        stepSize = 5
+        
+        sideLegDistanceFromCenter = 10.45
+        cornerLegDistanceFromCenter = 13.845
+        stockLegLength = 16.347
+        stockCoxaAngle = 119.5
+
+        actualLegLength = math.sqrt((stockLegLength+self.legTurnMid[1][0])**2+self.legTurnMid[1][1]**2)
+        actualCoxaAngle = stockCoxaAngle - math.asin(self.legTurnMid[1][1]/actualLegLength)/math.pi*180
+        totalDistance = math.sqrt(cornerLegDistanceFromCenter**2 + actualLegLength**2 - 2*cornerLegDistanceFromCenter*actualLegLength*math.cos(actualCoxaAngle*math.pi/180))
+        
+        beta1 = math.asin((actualLegLength * math.sin(actualCoxaAngle*math.pi/180))/totalDistance)/math.pi*180
+        beta2 = stockCoxaAngle-90
+        betaSum = beta1+beta2
+        
+        xMidCompensator = totalDistance*math.cos(betaSum*math.pi/180) - totalDistance
+        yMidCompensator = totalDistance*math.sin(betaSum*math.pi/180) - totalDistance
+        
+        frameNr = frameNr % 6
+        seqCtrl = self.spider.sequenceController
+        self.startFrame()
+        if frameNr == 0:
+            x = self.legTurnMid[3][0] + totalDistance * math.cos(-2 * stepSize * math.pi / 180) - totalDistance
+            y = self.legTurnMid[3][1] + totalDistance * math.sin(-2 * stepSize * math.pi / 180)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(x, y, zGround, 3, speedMod * 100)
+            x = self.legTurnMid[6][0] + totalDistance * math.cos(2 * stepSize * math.pi / 180) - totalDistance
+            y = self.legTurnMid[6][1] + totalDistance * math.sin(2 * stepSize * math.pi / 180)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(x, y, zGround, 6, speedMod * 100)
+        
+            x = self.legTurnMid[2][0] + (totalDistance * math.cos((-2 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[2][1] - (totalDistance * math.sin((-2 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) + totalDistance  # -8
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(x, y, zGround, 2, speedMod * 200)
+            x = self.legTurnMid[5][0] + (totalDistance * math.cos((-2 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[5][1] + (totalDistance * math.sin((-2 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) - totalDistance  # -8
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(x, y, zGround, 5, speedMod * 200)
+        
+            x = self.legTurnMid[1][0] + (totalDistance * math.cos((0 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[1][1] - (totalDistance * math.sin((0 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) + totalDistance  # -8
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(x, y, zGround, 1, speedMod * 100)
+            x = self.legTurnMid[4][0] + (totalDistance * math.cos((0 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[4][1] + (totalDistance * math.sin((0 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) - totalDistance  # -8
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(x, y, zGround, 4, speedMod * 100)
+        elif frameNr == 1:
+            x = self.legTurnMid[3][0] + totalDistance * math.cos(0 * stepSize * math.pi / 180) - totalDistance
+            y = self.legTurnMid[3][1] + totalDistance * math.sin(0 * stepSize * math.pi / 180)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(x, y, zAir, 3, speedMod * 200)
+            x = self.legTurnMid[6][0] + totalDistance * math.cos(0 * stepSize * math.pi / 180) - totalDistance
+            y = self.legTurnMid[6][1] + totalDistance * math.sin(0 * stepSize * math.pi / 180)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(x, y, zAir, 6, speedMod * 200)
+
+            x = self.legTurnMid[2][0] + (totalDistance * math.cos((-1 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[2][1] - (totalDistance * math.sin((-1 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) + totalDistance  # -8
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(x, y, zGround, 2, speedMod * 100)
+            x = self.legTurnMid[5][0] + (totalDistance * math.cos((-1 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[5][1] + (totalDistance * math.sin((-1 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) - totalDistance  # -8
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(x, y, zGround, 5, speedMod * 100)
+
+            x = self.legTurnMid[1][0] + (totalDistance * math.cos((-1 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -2.406
+            y = self.legTurnMid[1][1] - (totalDistance * math.sin((-1 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) + totalDistance  # -9.82
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(x, y, zGround, 1, speedMod * 100)
+            x = self.legTurnMid[4][0] + (totalDistance * math.cos((-1 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[4][1] + (totalDistance * math.sin((-1 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) - totalDistance  # -8
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(x, y, zGround, 4, speedMod * 100)
+        elif frameNr == 2:
+            x = self.legTurnMid[3][0] + totalDistance * math.cos(2 * stepSize * math.pi / 180) - totalDistance
+            y = self.legTurnMid[3][1] + totalDistance * math.sin(2 * stepSize * math.pi / 180)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(x, y, zGround, 3, speedMod * 200)
+            x = self.legTurnMid[6][0] + totalDistance * math.cos(-2 * stepSize * math.pi / 180) - totalDistance
+            y = self.legTurnMid[6][1] + totalDistance * math.sin(-2 * stepSize * math.pi / 180)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(x, y, zGround, 6, speedMod * 200)
+
+            x = self.legTurnMid[2][0] + (totalDistance * math.cos((0 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[2][1] - (totalDistance * math.sin((0 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) + totalDistance  # -8
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(x, y, zGround, 2, speedMod * 100)
+            x = self.legTurnMid[5][0] + (totalDistance * math.cos((0 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[5][1] + (totalDistance * math.sin((0 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) - totalDistance  # -8
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(x, y, zGround, 5, speedMod * 100)
+
+            x = self.legTurnMid[1][0] + (totalDistance * math.cos((-2 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -0.977
+            y = self.legTurnMid[1][1] - (totalDistance * math.sin((-2 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) + totalDistance  # -11.773
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(x, y, zGround, 1, speedMod * 100)
+            x = self.legTurnMid[4][0] + (totalDistance * math.cos((-2 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[4][1] + (totalDistance * math.sin((-2 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) - totalDistance  # -8
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(x, y, zGround, 4, speedMod * 100)
+        elif frameNr == 3:
+            x = self.legTurnMid[3][0] + totalDistance * math.cos(1 * stepSize * math.pi / 180) - totalDistance
+            y = self.legTurnMid[3][1] + totalDistance * math.sin(1 * stepSize * math.pi / 180)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(x, y, zGround, 3, speedMod * 100)
+            x = self.legTurnMid[6][0] + totalDistance * math.cos(-1 * stepSize * math.pi / 180) - totalDistance
+            y = self.legTurnMid[6][1] + totalDistance * math.sin(-1 * stepSize * math.pi / 180)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(x, y, zGround, 6, speedMod * 100)
+
+            x = self.legTurnMid[2][0] + (totalDistance * math.cos((1 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[2][1] - (totalDistance * math.sin((1 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) + totalDistance  # -8
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(x, y, zGround, 2, speedMod * 100)
+            x = self.legTurnMid[5][0] + (totalDistance * math.cos((1 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[5][1] + (totalDistance * math.sin((1 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) - totalDistance  # -8
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(x, y, zGround, 5, speedMod * 100)
+
+            x = self.legTurnMid[1][0] + (totalDistance * math.cos((0 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[1][1] - (totalDistance * math.sin((0 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) + totalDistance  # -8
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(x, y, zAir, 1, speedMod * 200)
+            x = self.legTurnMid[4][0] + (totalDistance * math.cos((0 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[4][1] + (totalDistance * math.sin((0 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) - totalDistance  # -8
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(x, y, zAir, 4, speedMod * 200)
+        elif frameNr == 4:
+            x = self.legTurnMid[3][0] + totalDistance * math.cos(0 * stepSize * math.pi / 180) - totalDistance
+            y = self.legTurnMid[3][1] + totalDistance * math.sin(0 * stepSize * math.pi / 180)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(x, y, zGround, 3, speedMod * 100)
+            x = self.legTurnMid[6][0] + totalDistance * math.cos(0 * stepSize * math.pi / 180) - totalDistance
+            y = self.legTurnMid[6][1] + totalDistance * math.sin(0 * stepSize * math.pi / 180)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(x, y, zGround, 6, speedMod * 100)
+
+            x = self.legTurnMid[2][0] + (totalDistance * math.cos((2 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[2][1] - (totalDistance * math.sin((2 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) + totalDistance  # -8
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(x, y, zGround, 2, speedMod * 100)
+            x = self.legTurnMid[5][0] + (totalDistance * math.cos((2 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[5][1] + (totalDistance * math.sin((2 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) - totalDistance  # -8
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(x, y, zGround, 5, speedMod * 100)
+
+            x = self.legTurnMid[1][0] + (totalDistance * math.cos((2 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -7.63
+            y = self.legTurnMid[1][1] - (totalDistance * math.sin((2 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) + totalDistance  # -4.809
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(x, y, zGround, 1, speedMod * 200)
+            x = self.legTurnMid[4][0] + (totalDistance * math.cos((2 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[4][1] + (totalDistance * math.sin((2 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) - totalDistance  # -8
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(x, y, zGround, 4, speedMod * 200)
+        elif frameNr == 5:
+            x = self.legTurnMid[3][0] + totalDistance * math.cos(-1 * stepSize * math.pi / 180) - totalDistance
+            y = self.legTurnMid[3][1] + totalDistance * math.sin(-1 * stepSize * math.pi / 180)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(x, y, zGround, 3, speedMod * 100)
+            x = self.legTurnMid[6][0] + totalDistance * math.cos(1 * stepSize * math.pi / 180) - totalDistance
+            y = self.legTurnMid[6][1] + totalDistance * math.sin(1 * stepSize * math.pi / 180)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(x, y, zGround, 6, speedMod * 100)
+
+            x = self.legTurnMid[2][0] + (totalDistance * math.cos((0 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[2][1] - (totalDistance * math.sin((0 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) + totalDistance  # -8
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(x, y, zAir, 2, speedMod * 200)
+            x = self.legTurnMid[5][0] + (totalDistance * math.cos((0 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[5][1] + (totalDistance * math.sin((0 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) - totalDistance  # -8
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(x, y, zAir, 5, speedMod * 200)
+
+            x = self.legTurnMid[1][0] + (totalDistance * math.cos((1 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -5.75
+            y = self.legTurnMid[1][1] - (totalDistance * math.sin((1 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) + totalDistance  # -9.6746
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(x, y, zGround, 1, speedMod * 100)
+            x = self.legTurnMid[4][0] + (totalDistance * math.cos((1 * stepSize + betaSum) * math.pi / 180) - xMidCompensator) - totalDistance  # -4
+            y = self.legTurnMid[4][1] + (totalDistance * math.sin((1 * stepSize + betaSum) * math.pi / 180) - yMidCompensator) - totalDistance  # -8
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(x, y, zGround, 4, speedMod * 100)
+        totalTime += self.endFrame()
+        
+        return totalTime
+        
+    def turnold(self, direction, frameNr, speedMod = 1):
+        totalTime = 0
+        
+        zGround = 5
+        zAir = 2
         
         directionStepSize = int(direction) / 4
         
@@ -126,7 +282,7 @@ class AnimationController:
         cornerLegDistanceBack = math.sqrt(cornerLegDistanceFromCenter**2 + cornerLegLength**2 - 2*cornerLegDistanceFromCenter*cornerLegLength*abs(math.cos((119.5+math.asin(self.legTurnMid[1][1]/cornerLegLength))*math.pi/180)))
         
         frameNr = frameNr % 6
-        seqCtrl = self.spider.sequenceController;
+        seqCtrl = self.spider.sequenceController
         if frameNr == 0:
             self.startFrame()
             cosDirection = math.cos(-2*directionStepSize*math.pi/180)

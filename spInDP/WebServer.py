@@ -89,7 +89,7 @@ class WebServer:
     def api_erwin_turn(direction):
         frameNr = 0
         for x in range(1, 50):
-            execTime = webserverinstance.spider.animationController.turn(direction, frameNr, 1)
+            execTime = webserverinstance.spider.animationController.turn(direction, frameNr, 0.5)
             time.sleep(execTime)
             frameNr += 1
         return webserverinstance.format_response("Turn executed")
