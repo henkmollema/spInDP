@@ -44,6 +44,7 @@ class AnimationController:
     """
         FIND ANOTHER WAY TO SORT A DICTIONAIRY
     """
+    """
     def blendToFrame(self, destination, speed):
         cLegCoords = {}
 
@@ -76,7 +77,7 @@ class AnimationController:
             self.startFrame()
             self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(destCoords[0], destCoords[1], destCoords[2], legID, speed)
             self.endFrame()
-    
+    """
 
     #Adjust midpoint of the crabwalk to fit through 'het poortje'
     def setWideCrabWalk(self, value):
