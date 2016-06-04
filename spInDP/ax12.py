@@ -14,7 +14,7 @@ import RPi.GPIO as GPIO
 
 class Ax12:
     # important AX-12 constants
-    # /////////////////////////////////////////////////////////// EEPROM AREA
+    # EEPROM AREA
     AX_MODEL_NUMBER_L = 0
     AX_MODEL_NUMBER_H = 1
     AX_VERSION = 2
@@ -68,12 +68,12 @@ class Ax12:
     AX_PUNCH_L = 48
     AX_PUNCH_H = 49
 
-    # /////////////////////////////////////////////////////////////// Status Return Levels
+    # Status Return Levels
     AX_RETURN_NONE = 0
     AX_RETURN_READ = 1
     AX_RETURN_ALL = 2
 
-    # /////////////////////////////////////////////////////////////// Instruction Set
+    # Instruction Set
     AX_PING = 1
     AX_READ_DATA = 2
     AX_WRITE_DATA = 3
@@ -82,7 +82,7 @@ class Ax12:
     AX_RESET = 6
     AX_SYNC_WRITE = 131
 
-    # /////////////////////////////////////////////////////////////// Lengths
+    # Lengths
     AX_RESET_LENGTH = 2
     AX_ACTION_LENGTH = 2
     AX_ID_LENGTH = 4
@@ -113,7 +113,7 @@ class Ax12:
     AX_SPEED_LENGTH = 5
     AX_GOAL_SP_LENGTH = 7
 
-    # /////////////////////////////////////////////////////////////// Specials
+    # Specials
     AX_BYTE_READ = 1
     AX_INT_READ = 2
     AX_ACTION_CHECKSUM = 250
@@ -174,6 +174,9 @@ class Ax12:
     def direction(self, d):
         GPIO.output(Ax12.RPI_DIRECTION_PIN, d)
         sleep(Ax12.RPI_DIRECTION_SWITCH_DELAY)
+
+    def releaseMutex(self):
+        self.mutex.release()
 
     def readData(self, id):
         self.direction(Ax12.RPI_DIRECTION_RX)
@@ -245,7 +248,8 @@ class Ax12:
             outData += chr(checksum)
             Ax12.port.write(outData)
             sleep(Ax12.TX_DELAY_TIME)
-            return self.readData(id)
+            self.releaseMutex()
+            return None
         else:
             print("nothing done, please send confirm = True as this fuction reset to the factory default value, i.e reset the motor ID")
             return
@@ -266,7 +270,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def setBaudRate(self, id, baudRate):
         self.mutex.acquire()
@@ -285,7 +290,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def setStatusReturnLevel(self, id, level):
         self.mutex.acquire()
@@ -303,7 +309,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def setReturnDelayTime(self, id, delay):
         self.mutex.acquire()
@@ -321,7 +328,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def lockRegister(self, id):
         self.mutex.acquire()
@@ -339,7 +347,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def move(self, id, position):
         self.mutex.acquire()
@@ -359,9 +368,19 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def moveSpeed(self, id, position, speed):
+        if(position < 0):
+            print "Tried to move to " + str(position) + " corrected to: 0"
+            position = 0
+            
+        if(position > 1023):
+            print "Tried to move to " + str(position) + " corrected to: 1023"
+            position = 1023
+        
+    
         self.mutex.acquire()
         self.direction(Ax12.RPI_DIRECTION_TX)
         Ax12.port.flushInput()
@@ -382,10 +401,7 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        self.mutex.release()
-        # try:
-        # return self.readData(id)
-        # except:
+        self.releaseMutex()
         return None
 
     def moveRW(self, id, position):
@@ -406,7 +422,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def moveSpeedRW(self, id, position, speed):
         self.mutex.acquire()
@@ -429,7 +446,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def action(self):
         self.mutex.acquire()
@@ -461,7 +479,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def setLedStatus(self, id, status):
         self.mutex.acquire()
@@ -480,7 +499,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def setTemperatureLimit(self, id, temp):
         self.mutex.acquire()
@@ -498,7 +518,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def setVoltageLimit(self, id, lowVolt, highVolt):
         self.mutex.acquire()
@@ -517,7 +538,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def setAngleLimit(self, id, cwLimit, ccwLimit):
         self.mutex.acquire()
@@ -540,7 +562,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def setTorqueLimit(self, id, torque):
         self.mutex.acquire()
@@ -560,7 +583,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def setPunchLimit(self, id, punch):
         self.mutex.acquire()
@@ -580,7 +604,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def setCompliance(self, id, cwMargin, ccwMargin, cwSlope, ccwSlope):
         self.mutex.acquire()
@@ -601,7 +626,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def setLedAlarm(self, id, alarm):
         self.mutex.acquire()
@@ -619,7 +645,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def setShutdownAlarm(self, id, alarm):
         self.mutex.acquire()
@@ -637,7 +664,8 @@ class Ax12:
         outData += chr(checksum)
         Ax12.port.write(outData)
         sleep(Ax12.TX_DELAY_TIME)
-        return self.readData(id)
+        self.releaseMutex()
+        return None
 
     def readTemperature(self, id):
         self.mutex.acquire()
@@ -781,41 +809,3 @@ class Ax12:
                           str(i) + ': ' + str(detail))
                 pass
         return servoList
-
-#
-# def playPose() :
-#    '''
-#    Open a file and move the servos to specified positions in a group move
-#    '''
-#    infile=open(Arguments.playpose, 'r')    # Open the file
-#    poseDict = {}                           # Dictionary to hold poses and positions
-#    if Arguments.verbose : print "Reading pose from", Arguments.playpose
-#    for line in infile.readlines() :        # Read the file and step through it
-#        servo = int(line.split(':')[0])     # Servo is first
-#        position = int(line.split(':')[1])  # Position is second
-#        poseDict[servo]=position            # add the servo to the Dictionary
-#
-#    groupMove2(poseDict)
-#
-#
-#
-# def writePose() :
-#    '''
-#    Read the servos and save the positions to a file
-#    '''
-#    of = open(Arguments.savepose, 'w')      # open the output file
-#    pose = getPose2(connectedServos)        # get the positions
-#    if Arguments.verbose :
-#        print "Servo Positions"
-#        print "---------------"
-#
-#    for key in  pose.keys():                # step through the keys, writing to the file
-#        if Arguments.verbose : print "Servo " + str(key), pose[key]
-#        of.write(str(key) + ':' + str(pose[key]) + '\n')    # Write to the file
-#
-#    if Arguments.verbose :
-#        print "Wrote pose to " + Arguments.savepose
-#        print
-#
-#    of.close()      # close the file
-#

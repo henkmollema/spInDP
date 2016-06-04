@@ -9,36 +9,40 @@ class ManualBehavior(Behavior):
 
     def __init__(self, spider):
         super(ManualBehavior, self).__init__(spider)
-        self.remoteContext = spider.remoteController.Context
+        self.remoteContext = spider.remoteController.context
 
     def update(self):
-        jX = int(self.remoteContext.jX)
-        jY = int(self.remoteContext.jY)
-        jZ = int(self.remoteContext.jZ)
+        jX = self.remoteContext.jX
+        jY = self.remoteContext.jY
+        jZ = self.remoteContext.jZ
+                
+        cJX = float((jX - 512.0) / 512.0)
+        cJY = float((jY - 512.0) / 512.0)
+        cJZ = float(self.remoteContext.jZ)
         
-        #print ("Updateloop: Joystick = X: " + str(jX) + ", Y: " + str(jY) + ", Z: " + str(jZ))
+        angle = math.atan2(cJY, cJX) * (180/math.pi) + 180
         
-        cJX = -(jX - 512) / 512
-        cJY = -(jY - 512) / 512
-        cJZ = self.remoteContext.jZ
+        magnitute = math.sqrt((cJX**2) + (cJY**2))
+        magnitute = self.restrict(magnitute, 0, 1)
         
-        if(jX > -0.2 and jX < 0.2):
-            cJX = 0
-            
-        if(jY > -0.2 and jY < 0.2):
-            cJY = 0
-            
-        if(cJX is not 0 or cJY is not 0):
-        
-            angle = math.atan2(cJY, cJX) * (180/math.pi) - 90
-            magnitute = math.sqrt(cJX**2 + cJY**2)
-            
+        #print "Joystick = X: " + str(jX) + ", Y: " + str(jY) + ", Z: " + str(jZ) + " magnitude: " + str(magnitute) + " angle: " + str(angle)
+   
+        #DEBUG
+        #print "GYRO Y: " + str(((float(self.spider.sensorDataProvider.getAccelerometer()[1]) / 1000.0) / 16.0) * 90.0)
+        #time.sleep(self.spider.animationController.walk(direction = 0, frameNr = 0, speedMod = 0.5, keepLeveled = True))
+        #self.frameNr += 1
+        #print "GYRO ANGLES: " + str(self.spider.sensorDataProvider.getAccelerometer()[0]) + ", " + str(self.spider.sensorDataProvider.getAccelerometer()[1]) + ", " + str(self.spider.sensorDataProvider.getAccelerometer()[2])
+        #DEBUG
+
+        if(magnitute > 0.4):
+            magnitute *= 2
+
             if(cJZ == 0): #strafemode
-                time.sleep(self.spider.animationController.walk(direction = angle, frameNr = self.frameNr, speedMod = magnitute))
-            else: #turnmode
+                time.sleep(max(self.spider.animationController.walk(direction = angle, frameNr = self.frameNr, speedMod = magnitute) - self.spider.updateSleepTime, 0))
+            else:
                 angle = self.restrict(angle, -30, 30)
-                #print ("turn: " + str(angle))
-                self.spider.animationController.turn(amountDegrees = angle, frameNr = self.frameNr, speedMod = magnitute)
+                time.sleep(max(self.spider.animationController.turn(direction = angle, frameNr = self.frameNr, speedMod = magnitute) - self.spider.updateSleepTime, 0))
+                
                 
             self.frameNr += 1
         

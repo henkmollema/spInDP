@@ -10,6 +10,7 @@ from spInDP.WebServer import WebServer
 from spInDP.VisionController import VisionController
 from spInDP.FindBalloonBehavior import FindBalloonBehavior
 from spInDP.AnimationController import AnimationController
+from spInDP.SensorDataProvider import SensorDataProvider
 
 
 class Spider(object):
@@ -20,6 +21,7 @@ class Spider(object):
     def __init__(self):
         self.remoteController = RemoteController(self)
         self.servoController = ServoController()
+        self.sensorDataProvider = SensorDataProvider()
         self.sequenceController = SequenceController(self)
         self.animationController = AnimationController(self)
         self.visioncontroller = VisionController()
@@ -28,16 +30,17 @@ class Spider(object):
         self.behavior = ManualBehavior(self)
         self.updatethread = None
         self.webserverthread = None
+        
+        self.updateSleepTime = 0.032
 
     def start(self):
         print("Starting the spider")
-        self.sequenceController.executeStartup()
+        #self.sequenceController.executeStartup()
 
     def updateLoop(self):
-        #60fps update Limit.
         while not self.stopLoop:
             self.behavior.update()
-            time.sleep(0.0166667)
+            time.sleep(self.updateSleepTime)
 
     def startUpdateLoopThread(self):
         self.updatethread = Thread(target=self.updateLoop)

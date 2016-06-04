@@ -30,7 +30,11 @@ class AnimationController:
         6: [-4, 0]
     }
 
-    seqCtrl = None;
+    seqCtrl = None
+    yAdjustment = 0
+    
+    bodytoSensorMid = 0  # from mid body to mid coxas X-axis
+    bodytoSensor = 12.05 # from mid body to back and front coxas X-axis
 
     def __init__(self, spider):
         self.spider = spider
@@ -40,38 +44,38 @@ class AnimationController:
     """
         FIND ANOTHER WAY TO SORT A DICTIONAIRY
     """
-    # def blendToFrame(self, destination, speed):
-    #     cLegCoords = {}
+    def blendToFrame(self, destination, speed):
+        cLegCoords = {}
 
-    #     for x in range(1,7):
-    #         cLegCoords[x].IKCoordinates = self.spider.sequenceController.getLegCoords(x)
+        for x in range(1,7):
+            cLegCoords[x].IKCoordinates = self.spider.sequenceController.getLegCoords(x)
 
-    #     zSortedLegCoords = cLegCoords.sort(key=lambda leg: leg.IKCoordinates[2])
-    #     cGroundedLegs = zSortedLegCoords[-3:] #Get 3 legs with highest z coordinate
-    #     cElevatedLegs    = zSortedLegCoords[:-3] #the other 3 legs
+        zSortedLegCoords = cLegCoords.sort(key=lambda leg: leg.IKCoordinates[2])
+        cGroundedLegs = zSortedLegCoords[-3:] #Get 3 legs with highest z coordinate
+        cElevatedLegs    = zSortedLegCoords[:-3] #the other 3 legs
 
-    #     zSortedDestCoords = destination.movements.sort(key=lambda leg: leg.IKCoordinates[2])
-    #     destGroundedLegs = zSortedDestCoords[-3:]
-    #     destElevatedLegs = zSortedDestCoords[:-3]
-    #     highestDestZ = destGroundedLegs[2].IKCoordinates[2]
-    #     elevatedZ = highestDestZ - 2
+        zSortedDestCoords = sorted(destination.movements, key=lambda legID: destination.movements[legID].IKCoordinates[2])
+        destGroundedLegs = zSortedDestCoords[-3:]
+        destElevatedLegs = zSortedDestCoords[:-3]
+        highestDestZ = destGroundedLegs[2].IKCoordinates[2]
+        elevatedZ = highestDestZ - 2
 
-    #     # if legs are elevated set them to 0,0,highestDestZ
-    #     self.startFrame()
-    #     for legID in cElevatedLegs:
-    #             if cElevatedLegs[legID].IKCoordinates[2] > highestDestZ:
-    #                 self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(0, 0, highestDestZ, legID, speed)
-    #     self.endFrame()
+        # if legs are elevated set them to 0,0,highestDestZ
+        self.startFrame()
+        for legID in cElevatedLegs:
+                if cElevatedLegs[legID].IKCoordinates[2] > highestDestZ:
+                    self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(0, 0, highestDestZ, legID, speed)
+        self.endFrame()
 
-    #     #after that, one by one, elevate the legs a little and send them to their destination
-    #     for legID in range(1,7):
-    #         destCoords = destGroundedLegs[legID].IKCoordinates
-    #         self.startFrame()
-    #         self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(destCoords[0], destCoords[1], elevatedZ, legID, speed)
-    #         self.endFrame()
-    #         self.startFrame()
-    #         self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(destCoords[0], destCoords[1], destCoords[2], legID, speed)
-    #         self.endFrame()
+        #after that, one by one, elevate the legs a little and send them to their destination
+        for legID in range(1,7):
+            destCoords = destGroundedLegs[legID].IKCoordinates
+            self.startFrame()
+            self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(destCoords[0], destCoords[1], elevatedZ, legID, speed)
+            self.endFrame()
+            self.startFrame()
+            self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(destCoords[0], destCoords[1], destCoords[2], legID, speed)
+            self.endFrame()
     
 
     #Adjust midpoint of the crabwalk to fit through 'het poortje'
@@ -106,6 +110,7 @@ class AnimationController:
         self.sequenceFrame.movements = {} #Clear the previous frame
         self.sequenceFrame = None
         return ret
+
 
     def turn(self, direction, frameNr, speedMod = 1):
         totalTime = 0
@@ -387,16 +392,49 @@ class AnimationController:
             totalTime += self.endFrame()
         
         return totalTime
-        
-    def walk(self, direction, frameNr, speedMod = 1):
+
+    realYAngle = 0
+    yAdjustment = 0
+    def walk(self, direction, frameNr, speedMod = 1, keepLeveled = False):
         totalTime = 0
         
-        zGround = 5
-        zAir = 2
+        zGround = 5 #When not using keepLeveled
+        zGround1 = zGround
+        zGround2 = zGround
+        zGround3 = zGround
+        zGround4 = zGround
+        zGround5 = zGround
+        zGround6 = zGround
+
+        zAir = 2 #When not using keepLeveled
+        zAir1 = zAir
+        zAir2 = zAir
+        zAir3 = zAir
+        zAir4 = zAir
+        zAir5 = zAir
+        zAir6 = zAir
+        
         cosDirection = math.cos(int(direction)*math.pi/180)
         sinDirection = math.sin(int(direction)*math.pi/180)
-        stepRangeVert = cosDirection * 16
+        stepRangeVert = cosDirection * 14
         stepRangeHor = sinDirection * 8
+
+
+
+        if(keepLeveled):
+            #Start measuring so we can get a smooth value
+            self.spider.sensorDataProvider.startMeasuring() 
+            cAccelY = float(self.spider.sensorDataProvider.getSmoothAccelerometer()[1])
+            if abs(cAccelY * (180 / math.pi)) < 3:
+                cAccelY = 0
+            
+            self.realYAngle = self.yAdjustment + cAccelY
+            self.yAdjustment += cAccelY
+        else:
+            #Stop measuring accel
+            self.spider.sensorDataProvider.stopMeasuring() 
+
+        
 
         legActualMid = {
             1: [self.legHorMid[1][0] + abs(cosDirection) * (self.legVertMid[1][0]-self.legHorMid[1][0]), self.legHorMid[1][1] + abs(cosDirection) * (self.legVertMid[1][1]-self.legHorMid[1][1])],
@@ -410,58 +448,107 @@ class AnimationController:
         frameNr = frameNr % 6
         seqCtrl = self.seqCtrl
         if frameNr == 0:
+            if(keepLeveled):
+                zGround3 = -math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1] + (stepRangeVert / 2))) / 4 + zGround
+                zGround6 = -math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1] + (stepRangeVert / 2))) / 4 + zGround
+                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1] - (stepRangeVert / 2))) / 4 + zGround
+                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1] - (stepRangeVert / 2))) / 4 + zGround
+                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[1][1])) / 4 + zGround
+                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[4][1])) / 4 + zGround
+                
             self.startFrame()
-            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] + (-stepRangeHor / 2), legActualMid[3][1] + (stepRangeVert / 2), zGround, 3, speedMod * 100)
-            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0] + (stepRangeHor / 2), legActualMid[6][1] + (stepRangeVert / 2), zGround, 6, speedMod * 100)
-            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0] - (-stepRangeHor / 2), legActualMid[2][1] - (stepRangeVert / 2), zGround, 2, speedMod * 200)
-            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0] - (stepRangeHor / 2), legActualMid[5][1] - (stepRangeVert / 2), zGround, 5, speedMod * 200)
-            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0], legActualMid[1][1], zGround, 1, speedMod * 100)
-            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0], legActualMid[4][1], zGround, 4, speedMod * 100)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] + (-stepRangeHor / 2), legActualMid[3][1] + (stepRangeVert / 2), zGround3, 3, speedMod * 100)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0] + (stepRangeHor / 2), legActualMid[6][1] + (stepRangeVert / 2), zGround6, 6, speedMod * 100)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0] - (-stepRangeHor / 2), legActualMid[2][1] - (stepRangeVert / 2), zGround2, 2, speedMod * 200)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0] - (stepRangeHor / 2), legActualMid[5][1] - (stepRangeVert / 2), zGround5, 5, speedMod * 200)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0], legActualMid[1][1], zGround1, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0], legActualMid[4][1], zGround4, 4, speedMod * 100)
             totalTime += self.endFrame()
         elif frameNr == 1:
+            if(keepLeveled):
+                zAir3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1])) / 4 + zAir
+                zAir6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1])) / 4 + zAir
+                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1] - (stepRangeVert / 4))) / 4 + zGround
+                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1] - (stepRangeVert / 4))) / 4 + zGround
+                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1] + (stepRangeVert / 4)) / 4 + zGround
+                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1] + (stepRangeVert / 4)) / 4 + zGround
+        
             self.startFrame()
-            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0], legActualMid[3][1], zAir, 3, speedMod * 200)
-            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0], legActualMid[6][1], zAir, 6, speedMod * 200)
-            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0] - (-stepRangeHor / 4), legActualMid[2][1] - (stepRangeVert / 4), zGround, 2, speedMod * 100)
-            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0] - (stepRangeHor / 4), legActualMid[5][1] - (stepRangeVert / 4), zGround, 5, speedMod * 100)
-            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0] + (stepRangeHor / 4), legActualMid[1][1] + (stepRangeVert / 4), zGround, 1, speedMod * 100)
-            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0] + (-stepRangeHor / 4), legActualMid[4][1] + (stepRangeVert / 4), zGround, 4, speedMod * 100)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0], legActualMid[3][1], zAir3, 3, speedMod * 200)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0], legActualMid[6][1], zAir6, 6, speedMod * 200)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0] - (-stepRangeHor / 4), legActualMid[2][1] - (stepRangeVert / 4), zGround2, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0] - (stepRangeHor / 4), legActualMid[5][1] - (stepRangeVert / 4), zGround5, 5, speedMod * 100)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0] + (stepRangeHor / 4), legActualMid[1][1] + (stepRangeVert / 4), zGround1, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0] + (-stepRangeHor / 4), legActualMid[4][1] + (stepRangeVert / 4), zGround4, 4, speedMod * 100)
             totalTime += self.endFrame()
         elif frameNr == 2:
+            if(keepLeveled):
+                zGround3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1] - (stepRangeVert / 2))) / 4 + zGround
+                zGround6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1] - (stepRangeVert / 2))) / 4 + zGround
+                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1])) / 4 + zGround
+                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1])) / 4 + zGround
+                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1] + (stepRangeVert / 2)) / 4 + zGround
+                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1] + (stepRangeVert / 2)) / 4 + zGround
+        
             self.startFrame()
-            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] - (-stepRangeHor / 2), legActualMid[3][1] - (stepRangeVert / 2), zGround, 3, speedMod * 200)
-            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0] - (stepRangeHor / 2), legActualMid[6][1] - (stepRangeVert / 2), zGround, 6, speedMod * 200)
-            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0], legActualMid[2][1], zGround, 2, speedMod * 100)
-            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0], legActualMid[5][1], zGround, 5, speedMod * 100)
-            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0] + (stepRangeHor / 2), legActualMid[1][1] + (stepRangeVert / 2), zGround, 1, speedMod * 100)
-            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0] + (-stepRangeHor / 2), legActualMid[4][1] + (stepRangeVert / 2), zGround, 4, speedMod * 100)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] - (-stepRangeHor / 2), legActualMid[3][1] - (stepRangeVert / 2), zGround3, 3, speedMod * 200)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0] - (stepRangeHor / 2), legActualMid[6][1] - (stepRangeVert / 2), zGround6, 6, speedMod * 200)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0], legActualMid[2][1], zGround2, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0], legActualMid[5][1], zGround5, 5, speedMod * 100)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0] + (stepRangeHor / 2), legActualMid[1][1] + (stepRangeVert / 2), zGround1, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0] + (-stepRangeHor / 2), legActualMid[4][1] + (stepRangeVert / 2), zGround4, 4, speedMod * 100)
             totalTime += self.endFrame()
         elif frameNr == 3:
+            if(keepLeveled):
+                zGround3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1] - (stepRangeVert / 4))) / 4 + zGround
+                zGround6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1] - (stepRangeVert / 4))) / 4 + zGround
+                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1]) + (stepRangeVert / 4)) / 4 + zGround
+                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1]) + (stepRangeVert / 4)) / 4 + zGround
+                zAir1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1]) / 4 + zAir
+                zAir4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1]) / 4 + zAir
+        
             self.startFrame()
-            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] - (-stepRangeHor / 4), legActualMid[3][1] - (stepRangeVert / 4), zGround, 3, speedMod * 100)
-            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0] - (stepRangeHor / 4), legActualMid[6][1] - (stepRangeVert / 4), zGround, 6, speedMod * 100)
-            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0] + (-stepRangeHor / 4), legActualMid[2][1] + (stepRangeVert / 4), zGround, 2, speedMod * 100)
-            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0] + (stepRangeHor / 4), legActualMid[5][1] + (stepRangeVert / 4), zGround, 5, speedMod * 100)
-            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0], legActualMid[1][1], zAir, 1, speedMod * 200)
-            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0], legActualMid[4][1], zAir, 4, speedMod * 200)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] - (-stepRangeHor / 4), legActualMid[3][1] - (stepRangeVert / 4), zGround3, 3, speedMod * 100)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0] - (stepRangeHor / 4), legActualMid[6][1] - (stepRangeVert / 4), zGround6, 6, speedMod * 100)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0] + (-stepRangeHor / 4), legActualMid[2][1] + (stepRangeVert / 4), zGround2, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0] + (stepRangeHor / 4), legActualMid[5][1] + (stepRangeVert / 4), zGround5, 5, speedMod * 100)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0], legActualMid[1][1], zAir1, 1, speedMod * 200)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0], legActualMid[4][1], zAir4, 4, speedMod * 200)
             totalTime += self.endFrame()
         elif frameNr == 4:
+            if(keepLeveled):
+                zGround3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1])) / 4 + zGround
+                zGround6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1])) / 4 + zGround
+                zGround2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1]) + (stepRangeVert / 2)) / 4 + zGround
+                zGround5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1]) + (stepRangeVert / 2)) / 4 + zGround
+                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1] - (stepRangeVert / 2)) / 4 + zGround
+                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1] - (stepRangeVert / 2)) / 4 + zGround
+        
             self.startFrame()
-            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0], legActualMid[3][1], zGround, 3, speedMod * 100)
-            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0], legActualMid[6][1], zGround, 6, speedMod * 100)
-            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0] + (-stepRangeHor / 2), legActualMid[2][1] + (stepRangeVert / 2), zGround, 2, speedMod * 100)
-            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0] + (stepRangeHor / 2), legActualMid[5][1] + (stepRangeVert / 2), zGround, 5, speedMod * 100)
-            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0] - (stepRangeHor / 2), legActualMid[1][1] - (stepRangeVert / 2), zGround, 1, speedMod * 200)
-            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0] - (-stepRangeHor / 2), legActualMid[4][1] - (stepRangeVert / 2), zGround, 4, speedMod * 200)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0], legActualMid[3][1], zGround3, 3, speedMod * 100)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0], legActualMid[6][1], zGround6, 6, speedMod * 100)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0] + (-stepRangeHor / 2), legActualMid[2][1] + (stepRangeVert / 2), zGround2, 2, speedMod * 100)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0] + (stepRangeHor / 2), legActualMid[5][1] + (stepRangeVert / 2), zGround5, 5, speedMod * 100)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0] - (stepRangeHor / 2), legActualMid[1][1] - (stepRangeVert / 2), zGround1, 1, speedMod * 200)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0] - (-stepRangeHor / 2), legActualMid[4][1] - (stepRangeVert / 2), zGround4, 4, speedMod * 200)
             totalTime += self.endFrame()
         elif frameNr == 5:
+            if(keepLeveled):
+                zGround3 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[3][1]) + (stepRangeVert / 4)) / 4 + zGround
+                zGround6 = math.sin(self.realYAngle) * (self.bodytoSensorMid + (legActualMid[6][1]) + (stepRangeVert / 4)) / 4 + zGround
+                zAir2 = math.sin(self.realYAngle) * (self.bodytoSensor - (legActualMid[2][1])) / 4 + zAir
+                zAir5 = -math.sin(self.realYAngle) * (self.bodytoSensor + (legActualMid[5][1])) / 4 + zAir
+                zGround1 = math.sin(self.realYAngle) * (self.bodytoSensor - legActualMid[1][1] - (stepRangeVert / 4)) / 4 + zGround
+                zGround4 = -math.sin(self.realYAngle) * (self.bodytoSensor + legActualMid[4][1] - (stepRangeVert / 4)) / 4 + zGround
+            
+        
             self.startFrame()
-            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] + (-stepRangeHor / 4), legActualMid[3][1] + (stepRangeVert / 4), zGround, 3, speedMod * 100)
-            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0] + (stepRangeHor / 4), legActualMid[6][1] + (stepRangeVert / 4), zGround, 6, speedMod * 100)
-            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0], legActualMid[2][1], zAir, 2, speedMod * 200)
-            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0], legActualMid[5][1], zAir, 5, speedMod * 200)
-            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0] - (stepRangeHor / 4), legActualMid[1][1] - (stepRangeVert / 4), zGround, 1, speedMod * 100)
-            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0] - (-stepRangeHor / 4), legActualMid[4][1] - (stepRangeVert / 4), zGround, 4, speedMod * 100)
+            self.sequenceFrame.movements[3] = seqCtrl.coordsToLegMovement(legActualMid[3][0] + (-stepRangeHor / 4), legActualMid[3][1] + (stepRangeVert / 4), zGround3, 3, speedMod * 100)
+            self.sequenceFrame.movements[6] = seqCtrl.coordsToLegMovement(legActualMid[6][0] + (stepRangeHor / 4), legActualMid[6][1] + (stepRangeVert / 4), zGround6, 6, speedMod * 100)
+            self.sequenceFrame.movements[2] = seqCtrl.coordsToLegMovement(legActualMid[2][0], legActualMid[2][1], zAir2, 2, speedMod * 200)
+            self.sequenceFrame.movements[5] = seqCtrl.coordsToLegMovement(legActualMid[5][0], legActualMid[5][1], zAir5, 5, speedMod * 200)
+            self.sequenceFrame.movements[1] = seqCtrl.coordsToLegMovement(legActualMid[1][0] - (stepRangeHor / 4), legActualMid[1][1] - (stepRangeVert / 4), zGround1, 1, speedMod * 100)
+            self.sequenceFrame.movements[4] = seqCtrl.coordsToLegMovement(legActualMid[4][0] - (-stepRangeHor / 4), legActualMid[4][1] - (stepRangeVert / 4), zGround4, 4, speedMod * 100)
             totalTime += self.endFrame()
         
         return totalTime
