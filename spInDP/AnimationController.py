@@ -39,7 +39,6 @@ class AnimationController:
         self.spider = spider
         self.seqCtrl = spider.sequenceController
 
-
     """
         destination is a sequenceframe
     """
@@ -114,11 +113,10 @@ class AnimationController:
         zGround = 5
         zAir = 2
 
-        if self.turnInfo == None:
-            self.turnInfo = { 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}}
+        if self.turnInfo is None:
+            self.turnInfo = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}}
             for x in range(1, 7):
-                actualLegLength = math.sqrt(
-                    (self.stockLegLength + self.legHorMid[x][0]) ** 2 + self.legHorMid[x][1] ** 2)
+                actualLegLength = math.sqrt((self.stockLegLength + self.legHorMid[x][0]) ** 2 + self.legHorMid[x][1] ** 2)
                 actualCoxaAngle = self.stockCornerCoxaAngle - math.asin(self.legHorMid[1][1]/actualLegLength)/math.pi*180
                 totalDistance = math.sqrt(self.cornerLegDistanceFromCenter**2 + actualLegLength**2 - 2*self.cornerLegDistanceFromCenter*actualLegLength*math.cos(actualCoxaAngle*math.pi/180))
 
