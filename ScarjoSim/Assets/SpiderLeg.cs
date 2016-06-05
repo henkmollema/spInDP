@@ -174,10 +174,10 @@ public class SpiderLeg : MonoBehaviour
         double x = Math.Cos(cCoxa) * ((Math.Cos(cFemur) * SpiderController.a) + (Math.Cos(cFemur + cTibia) * SpiderController.c) + SpiderController.lc) - xOffset;
         double y = Math.Sin(cCoxa) * (((Math.Cos(cFemur) * SpiderController.a) + ((Math.Cos(cFemur + cTibia) * SpiderController.c)) + SpiderController.lc));
         double z = (Math.Sin(cFemur) * SpiderController.a) + ((Math.Sin(cFemur + cTibia) * SpiderController.c)) - zOffset;
-        if (legID == 2 || legID == 3 || legID == 4)
-        {
-            y *= -1;
-        }
+		if (legID == 1 || legID == 6 || legID == 5)
+		{
+			y *= -1;
+		}
 
         Vector3 retVal = new Vector3((float)Math.Round(x, 1), (float)Math.Round(y, 1), (float)Math.Round(z, 1));
         return retVal;

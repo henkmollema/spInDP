@@ -285,6 +285,12 @@ public class SpiderController : MonoBehaviour
     float offset = 0f;
     private SpiderLeg.LegMovement setServoPos(float x, float y, float z, int legID, float speed)
     {
+
+		if (legID == 1 || legID == 6 || legID == 5)
+		{
+			y *= -1;
+		}
+
         float lIK = (float)Math.Sqrt(Math.Pow((d + lc + x), 2) + (Math.Pow(y, 2)));
         float dIK = lIK - lc;
         float bIK = (float)Math.Sqrt(Math.Pow((e + z), 2) + Math.Pow(dIK, 2));
@@ -307,22 +313,14 @@ public class SpiderController : MonoBehaviour
         float angleFemur = -((gammaIK - tauIK) * (180 / Mathf.PI));
         float angleTibia = 180 - ((betaIK) * (180 / Mathf.PI)) ;
 
-        if (legID == 1 || legID == 2)
+        if (legID == 1 || legID == 4)
         {
             angleCoxa -= offset;
         }
-        else if (legID == 4 || legID == 5)
+        else if (legID == 5 || legID == 2)
         {
             angleCoxa += offset;
         }
-        
-        if (legID == 2 || legID == 3 || legID == 4)
-        {
-            angleCoxa *= -1;
-        }
-
-        
-
 
         float deltaCoxa = Quaternion.Angle(Quaternion.Euler(0, angleCoxa, 0), Quaternion.Euler(0, coxaCurr, 0));
 		float deltaFemur = Quaternion.Angle(Quaternion.Euler(0, 0, angleFemur), Quaternion.Euler(0, 0, femurCurr));;//Math.Abs(angleFemur - femurCurr);
