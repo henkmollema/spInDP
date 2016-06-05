@@ -22,6 +22,8 @@ class AnimationController:
         6: [-4, 0]
     }
 
+    turnInfo = None
+
     sideLegDistanceFromCenter = 10.45
     cornerLegDistanceFromCenter = 13.845
     stockLegLength = 16.347
@@ -118,7 +120,7 @@ class AnimationController:
             for x in range(1, 7):
                 actualLegLength = math.sqrt(
                     (self.stockLegLength + self.legHorMid[x][0]) ** 2 + self.legHorMid[x][1] ** 2)
-                actualCoxaAngle = self.stockCornerCoxaAngle - math.asin(self.legTurnMid[1][1]/actualLegLength)/math.pi*180
+                actualCoxaAngle = self.stockCornerCoxaAngle - math.asin(self.legHorMid[1][1]/actualLegLength)/math.pi*180
                 totalDistance = math.sqrt(self.cornerLegDistanceFromCenter**2 + actualLegLength**2 - 2*self.cornerLegDistanceFromCenter*actualLegLength*math.cos(actualCoxaAngle*math.pi/180))
         
                 beta1 = math.asin((actualLegLength * math.sin(actualCoxaAngle*math.pi/180))/totalDistance)/math.pi*180
