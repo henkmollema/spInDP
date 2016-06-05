@@ -70,7 +70,7 @@ class SensorDataProvider(object):
                 and accelBias(0.02) parts from accelerometer data to compensate for drift
                 """
                 deltaT = time.time() - self.lastUpdate
-                self.smoothAccelY = 0.98*(self.smoothAccelY + gyroY*deltaT) + 0.02*accAngle
+                self.smoothAccelY = 0.98*(self.smoothAccelY + gyroY*deltaT) + 0.02*accelVal
                 print "compY: " + self.smoothAccelY
 
 
