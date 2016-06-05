@@ -319,6 +319,11 @@ class SequenceController(object):
             angleCoxa = -angleCoxa
             angleFemur = -angleFemur
             angleTibia = -angleTibia
+            
+        if(legID == 1 or legID == 4):
+            angleCoxa += self.coxaOffset
+        if(legID == 2 or legID == 5):
+            angleCoxa -= self.coxaOffset
 
         self.servoAngleMap[coxaServoId] = angleCoxa
         self.servoAngleMap[femurServoId] = angleFemur
@@ -356,10 +361,6 @@ class SequenceController(object):
         retVal.maxExecTime = maxExecTime
 
         retVal.coxa = angleCoxa
-        if(legID == 1 or legID == 4):
-            retVal.coxa += self.coxaOffset
-        if(legID == 2 or legID == 5):
-            retVal.coxa -= self.coxaOffset
         retVal.femur = angleFemur
         retVal.tibia = angleTibia
 

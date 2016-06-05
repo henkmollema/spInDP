@@ -37,8 +37,6 @@ class ImmediateBehavior(AutonomeBehavior):
                 yAngle = 0
                 xAngle = 0
             
-             
-            
             #Change the z-coordinate based on joystick position and legID
             if (x == 1 or x == 2 ): #front legs
                 newIKCoordinates[2] += math.sin(yAngle) * (self.bodytoSensor - self.basePose[x][1])
