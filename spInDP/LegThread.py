@@ -30,7 +30,7 @@ class LegThread(threading.Thread):
                     self.sequenceController.servoController.move(
                         (self.legId - 1) * 3 + 3, legMovement.tibia, legMovement.tibiaSpeed)
 
-                #Sleep this thread for maxexectime seconds
+                #Sleep this thread for maxexectime seconds (until the move has been completed)
                 time.sleep(legMovement.maxExecTime if legMovement.maxExecTime > 0 else 0.005)
                 self.cCoordinates = legMovement.IKCoordinates
             #except:

@@ -201,17 +201,7 @@ class SequenceController(object):
                 return 0
 
             #Put the movements in the frame on the leg queues
-            scaledMovements = self.sequenceFrame.getScaledMovements()
-            for x in range(1, 7):
-                mov = scaledMovements.get(x, None)
-
-                # Create an 'empty movement
-                if (mov is None):
-                    mov = LegMovement()
-                    mov.empty = True
-                    mov.maxExecTime = self.sequenceFrame.maxMaxExecTime
-                #Here we put the legmovement object from the frame(or an empty one) in the leg queue
-                self.legQueue[x].put(mov)
+            self.addFrameToQueue(self.sequenceFrame)
 
             #We return the time it takes for this frame to execute
             ret = self.sequenceFrame.maxMaxExecTime
@@ -288,9 +278,10 @@ class SequenceController(object):
             raise NameError("No valid command found on line: " + str(lineNr))
             
         return 0
-
-    #Returns a LegMovement Object.
-    # True if we need to get initial positions from servo
+    """
+    Returns a LegMovement Object.
+    first = True if we need to get initial positions from servo
+    """
     first = True
     def coordsToLegMovement(self, x, y, z, legID, speed):    
         lIK = math.sqrt((self.d + self.lc + x)**2 + y**2)
@@ -374,5 +365,35 @@ class SequenceController(object):
 
         retVal.IKCoordinates = [x,y,z]
         return retVal
-
+        
+    def addFrameToQueue(self, frame):
+        scaledMovements = frame.getScaledMovements()
+        for x in range(1, 7):
+            mov = scaledMovements.get(x, None)
+            # Create an 'empty movement
+            if (mov is None):
+                mov = LegMovement()
+                mov.empty = True 
+                mov.maxExecTime = frame.maxMaxExecTime
+                
+            self.legQueue[x].put(mov)
+            
+    def setFrame(self, frame):
+        if(self.legQueueIsEmpty()):
+            scaledMovements = frame.getScaledMovements()
+            for x in scaledMovements:
+                self.servoController.move((x - 1) * 3 + 1, scaledMovements[x].coxa, scaledMovements[x].coxaSpeed)
+                self.servoController.move((x - 1) * 3 + 2, scaledMovements[x].femur, scaledMovements[x].femurSpeed)
+                self.servoController.move((x - 1) * 3 + 3, scaledMovements[x].tibia, scaledMovements[x].tibiaSpeed)
+        else:
+            print "setFrame() failed, legQueues not empty"
+        
+        
+    def legQueueIsEmpty(self):
+        for x in range(1,7):
+            if (len(self.legQueue[x]) > 0):
+                return False
+        return True
+        
+        
 

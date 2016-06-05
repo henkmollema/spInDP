@@ -15,15 +15,8 @@ class ManualBehavior(Behavior):
         jX = self.remoteContext.jX
         jY = self.remoteContext.jY
         jZ = self.remoteContext.jZ
-                
-        cJX = float((jX - 512.0) / 512.0)
-        cJY = float((jY - 512.0) / 512.0)
-        cJZ = float(self.remoteContext.jZ)
-        
-        angle = math.atan2(cJY, cJX) * (180/math.pi) + 180
-        
-        magnitute = math.sqrt((cJX**2) + (cJY**2))
-        magnitute = self.restrict(magnitute, 0, 1)
+        jAngle = self.remoteContext.jAngle
+        jMagnitude = self.remoteContext.jMagnitude
         
         #print "Joystick = X: " + str(jX) + ", Y: " + str(jY) + ", Z: " + str(jZ) + " magnitude: " + str(magnitute) + " angle: " + str(angle)
    
@@ -34,18 +27,16 @@ class ManualBehavior(Behavior):
         #print "GYRO ANGLES: " + str(self.spider.sensorDataProvider.getAccelerometer()[0]) + ", " + str(self.spider.sensorDataProvider.getAccelerometer()[1]) + ", " + str(self.spider.sensorDataProvider.getAccelerometer()[2])
         #DEBUG
 
-        if(magnitute > 0.4):
-            magnitute *= 2
+        if(jMagnitude > 0.4):
+            speedModifier = jMagnitude * 2
 
-            if(cJZ == 0): #strafemode
-                time.sleep(max(self.spider.animationController.walk(direction = angle, frameNr = self.frameNr, speedMod = magnitute) - self.spider.updateSleepTime, 0))
+            if(jZ == 0): #strafemode
+                time.sleep(max(self.spider.animationController.walk(direction = jAngle, frameNr = self.frameNr, speedMod = jMagnitude) - self.spider.updateSleepTime, 0))
             else:
-                angle = self.restrict(angle, -30, 30)
-                time.sleep(max(self.spider.animationController.turn(direction = angle, frameNr = self.frameNr, speedMod = magnitute) - self.spider.updateSleepTime, 0))
-                
+                turnAngle = self.restrict(jAngle, -30, 30)
+                time.sleep(max(self.spider.animationController.turn(direction = turnAngle, frameNr = self.frameNr, speedMod = jMagnitude) - self.spider.updateSleepTime, 0))
                 
             self.frameNr += 1
-        
         return
         
     def restrict (self,val, minval, maxval):
