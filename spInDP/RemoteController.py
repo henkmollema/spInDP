@@ -1,5 +1,6 @@
 import bluetooth
 import threading
+import math
 from spInDP.RemoteContext import RemoteContext
 
 
@@ -47,11 +48,13 @@ class RemoteController(object):
 
             # Read joystick position
             xs = data.split(',')
-            self.context.jX = float(xs[0])
-            self.context.jY = float(xs[1])
+            self.context.jX = float((float(xs[0]) - 512.0) / 512.0)
+            self.context.jY = float((float(xs[1]) - 512.0) / 512.0)
             self.context.jZ = float(xs[2])
-            
-            print self.context.jX
+                 
+            self.context.jAngle = math.atan2(self.context.jY, self.context.jX) * (180/math.pi) + 180
+            magnitude = math.sqrt((self.context.jX**2) + (self.context.jY**2))
+            self.context.jMagnitude = min(magnitude, 1)
 
             # # Read the mode and action
             # mode = xs[3]

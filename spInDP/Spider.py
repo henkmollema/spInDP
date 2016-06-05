@@ -1,31 +1,35 @@
 import time
 from threading import Thread
+
 from spInDP.RemoteController import RemoteController
-from spInDP.ServoController import ServoController
-from spInDP.SequenceController import SequenceController
-from spInDP.ManualBehavior import ManualBehavior
-from spInDP.AutonomeBehavior import AutonomeBehavior
-from spInDP.BehaviorType import BehaviorType
-from spInDP.WebServer import WebServer
 from spInDP.VisionController import VisionController
-from spInDP.FindBalloonBehavior import FindBalloonBehavior
-from spInDP.AnimationController import AnimationController
 from spInDP.SensorDataProvider import SensorDataProvider
 
+from spInDP.ServoController import ServoController
+from spInDP.SequenceController import SequenceController
+from spInDP.AnimationController import AnimationController
+
+from spInDP.BehaviorType import BehaviorType
+from spInDP.ManualBehavior import ManualBehavior
+from spInDP.AutonomeBehavior import AutonomeBehavior
+from spInDP.FindBalloonBehavior import FindBalloonBehavior
+from spInDP.ImmediateBehavior import ImmediateBehavior
+
+from spInDP.WebServer import WebServer
 
 class Spider(object):
     """Encapsulates the interaction with the spider."""
-
+    
     stopLoop = False
 
     def __init__(self):
-        self.remoteController = RemoteController(self)
         self.servoController = ServoController()
         self.sensorDataProvider = SensorDataProvider()
         self.sequenceController = SequenceController(self)
         self.animationController = AnimationController(self)
         self.visioncontroller = VisionController()
         self.webserver = WebServer(self)
+        self.remoteController = RemoteController(self)
 
         self.behavior = ManualBehavior(self)
         self.updatethread = None
@@ -71,6 +75,9 @@ class Spider(object):
         elif behaviorType == BehaviorType.AutonomeDestroyBalloon:
             print("Switched to find balloon behavior.")
             self.behavior = FindBalloonBehavior(self)
+        elif behaviorType == BehaviorType.ImmediateBehaviour:
+            print("Switched to immediate behavior.")
+            self.behavior = ImmediateBehavior(self)
 
         # Start the loop again
         self.stopLoop = False
