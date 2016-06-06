@@ -174,30 +174,22 @@ class AnimationController:
     def walk(self, direction, frameNr, speedMod = 1, keepLeveled = False):
         totalTime = 0
 
-
-
-
         cosDirection = math.cos(int(direction)*math.pi/180)
         sinDirection = math.sin(int(direction)*math.pi/180)
         stepRangeVert = cosDirection * 14
         stepRangeHor = sinDirection * 8
 
-
-
         zGround = 5 #When not using keepLeveled
         zAir = 2 #When not using keepLeveled
         if(keepLeveled):
-
-
             zGround = 7
             zAir = 5
 
             #Start measuring so we can intergrate the gyro values
             #make sure the spider is leveled when calling this
-            self.spider.sensorDataProvider.startMeasuring()
-            cAccelY = float(self.spider.sensorDataProvider.getSmoothAccelerometer()[1])
-            if abs(cAccelY * (180 / math.pi)) < 3:
-                cAccelY = 0
+            cAccelY = float(self.spider.sensorDataProvider.getSmoothAccelerometer()[1] * math.pi / 180)
+            #if abs(cAccelY * (180 / math.pi)) < 3:
+            #    cAccelY = 0
 
             self.realYAngle = self.yAdjustment + cAccelY
             self.yAdjustment += cAccelY

@@ -51,7 +51,7 @@ class WebServer:
         return webserverinstance.format_response(webserverinstance.gen_cam_vision(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
     @staticmethod
-    @app.route("/app/servodata")
+    @app.route("/app/getdata")
     def api_servodata():
         return webserverinstance.format_response(webserverinstance.spider.servoController.getServoDataJSON())
 

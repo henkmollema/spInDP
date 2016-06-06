@@ -41,17 +41,17 @@ class SensorDataProvider(object):
         def __init__(self):
             # Now wake the 6050 up as it starts in sleep mode
             #TODO: Check if the device will go to sleep mode automatically, this will cause problems
-            self.bus.write_byte_data(self.address, self.power_mgmt_1, 0)
-            self.startMeasuring()
+            print "Init sensordataprovider"
             
         def stopMeasuring(self):
             self.shouldMeasure = False
         
         def startMeasuring(self):
             if(not self.shouldMeasure):
-            
+                self.bus.write_byte_data(self.address, self.power_mgmt_1, 0)
                 self.shouldMeasure = True
                 self.lastUpdate = time.time()
+                
                 t = threading.Thread(target=self.measureCycle)
                 t.start()
         
@@ -61,8 +61,8 @@ class SensorDataProvider(object):
                 accelVal = self.getAccelerometer()
                 gyroVal = self.getGyro()
                 
-                yDeg = self.get_y_rotation(accelVal[0],accelVal[1],accelVal[2])
-                gyroY = float(gyroVal[1])
+                yDeg = self.get_x_rotation(accelVal[0],accelVal[1],accelVal[2])
+                gyroY = float(gyroVal[0])
                 #print "yDeg: " + str(yDeg)              
                 
                 """
@@ -70,14 +70,17 @@ class SensorDataProvider(object):
                 and accelBias(0.02) parts from accelerometer data to compensate for drift
                 """
                 
-               
-                
+                    
                 deltaT = float(time.time() - self.lastUpdate)
-                self.smoothAccelY = float(0.98*float(self.smoothAccelY + gyroY*deltaT) + 0.02*yDeg)
-                #print "compY: " + str(self.smoothAccelY)
-
-
+                if(abs(gyroY*deltaT) < 0.05):
+                    gyroY = 0
+                self.smoothAccelY = float(0.7*float(self.smoothAccelY + gyroY*deltaT) - 0.3*yDeg)
+                #self.smoothAccelY = float(self.smoothAccelY + gyroY*deltaT)
+                
+                #self.smoothAccelY = float(self.smoothAccelY + gyroY*deltaT)
+                print "gyroY: " + str(self.smoothAccelY) + " delta: " + str(yDeg)
                 self.lastUpdate = time.time()
+                time.sleep(0.0016) #Update at 60hz
                 
                 
         def getSmoothAccelerometer(self):
