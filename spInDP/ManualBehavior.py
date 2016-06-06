@@ -6,10 +6,15 @@ import time
 class ManualBehavior(Behavior):
     """Provides manual behavior of a spider."""
     frameNr = 0
+    turnMode = False
+    lastZ = 0
 
     def __init__(self, spider):
         super(ManualBehavior, self).__init__(spider)
         self.remoteContext = spider.remoteController.context
+        
+        
+        #self.spider.sensorDataProvider.startMeasuring()
 
     def update(self):
         jX = self.remoteContext.jX
@@ -18,23 +23,33 @@ class ManualBehavior(Behavior):
         jAngle = self.remoteContext.jAngle
         jMagnitude = self.remoteContext.jMagnitude
         
+        if(self.lastZ != jZ):
+            self.lastZ = jZ
+            if(jZ == 1):
+                self.turnMode = not self.turnMode
+                print "Switch turnmode " + str(self.turnMode)
+        
         #print "Joystick = X: " + str(jX) + ", Y: " + str(jY) + ", Z: " + str(jZ) + " magnitude: " + str(magnitute) + " angle: " + str(angle)
    
         #DEBUG
         #print "GYRO Y: " + str(((float(self.spider.sensorDataProvider.getAccelerometer()[1]) / 1000.0) / 16.0) * 90.0)
-        #time.sleep(self.spider.animationController.walk(direction = 0, frameNr = 0, speedMod = 0.5, keepLeveled = True))
+        #time.sleep(self.spider.animationController.walk(direction = 0, frameNr = 0, speedMod = 1, keepLeveled = True))
         #self.frameNr += 1
         #print "GYRO ANGLES: " + str(self.spider.sensorDataProvider.getAccelerometer()[0]) + ", " + str(self.spider.sensorDataProvider.getAccelerometer()[1]) + ", " + str(self.spider.sensorDataProvider.getAccelerometer()[2])
         #DEBUG
-        self.spider.sensorDataProvider.startMeasuring()
+        
 
         if(jMagnitude > 0.4):
             speedModifier = jMagnitude * 2
 
-            if(jZ == 0): #strafemode
+            if(not self.turnMode): #strafemode
                 time.sleep(max(self.spider.animationController.walk(direction = jAngle, frameNr = self.frameNr, speedMod = jMagnitude) - self.spider.updateSleepTime, 0))
             else:
-                turnAngle = self.restrict(jAngle, -30, 30)
+                if jAngle > 0:
+                    turnAngle = 1
+                else:
+                    jAngle = -1
+                    
                 time.sleep(max(self.spider.animationController.turn(direction = turnAngle, frameNr = self.frameNr, speedMod = jMagnitude) - self.spider.updateSleepTime, 0))
                 
             self.frameNr += 1

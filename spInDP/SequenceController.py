@@ -283,7 +283,7 @@ class SequenceController(object):
     first = True if we need to get initial positions from servo
     """
     first = True
-    def coordsToLegMovement(self, x, y, z, legID, speed):    
+    def coordsToLegMovement(self, x, y, z, legID, speed, immediateMode = False):    
         lIK = math.sqrt((self.d + self.lc + x)**2 + y**2)
         dIK = lIK - self.lc
         bIK = math.sqrt((self.e + z)**2 + dIK**2)
@@ -340,25 +340,32 @@ class SequenceController(object):
 
         if (maxDelta == 0):
             return None
+            
+        #If we are not in immediate mode, don't calculate delta's
+        if(not immediateMode): 
+            if (maxDelta == deltaCoxa):
+                # print("max delta is coxa")
+                retVal.coxaSpeed = speed
+                retVal.femurSpeed = int(round(speed * (deltaFemur / maxDelta), 0))
+                retVal.tibiaSpeed = int(round(speed * (deltaTibia / maxDelta), 0))
+            elif (maxDelta == deltaFemur):
+                # print("max delta is femur")
+                retVal.coxaSpeed = int(round(speed * (deltaCoxa / maxDelta), 0))
+                retVal.femurSpeed = speed
+                retVal.tibiaSpeed = int(round(speed * (deltaTibia / maxDelta), 0))
+            elif (maxDelta == deltaTibia):
+                # print("max delta is tibia")
+                retVal.coxaSpeed = int(round(speed * (deltaCoxa / maxDelta), 0))
+                retVal.femurSpeed = int(round(speed * (deltaFemur / maxDelta), 0))
+                retVal.tibiaSpeed = speed
 
-        if (maxDelta == deltaCoxa):
-            # print("max delta is coxa")
+            maxExecTime = maxDelta / (self.anglePerSecond * (speed / 1023.0))
+            retVal.maxExecTime = maxExecTime
+        else:
             retVal.coxaSpeed = speed
-            retVal.femurSpeed = int(round(speed * (deltaFemur / maxDelta), 0))
-            retVal.tibiaSpeed = int(round(speed * (deltaTibia / maxDelta), 0))
-        elif (maxDelta == deltaFemur):
-            # print("max delta is femur")
-            retVal.coxaSpeed = int(round(speed * (deltaCoxa / maxDelta), 0))
             retVal.femurSpeed = speed
-            retVal.tibiaSpeed = int(round(speed * (deltaTibia / maxDelta), 0))
-        elif (maxDelta == deltaTibia):
-            # print("max delta is tibia")
-            retVal.coxaSpeed = int(round(speed * (deltaCoxa / maxDelta), 0))
-            retVal.femurSpeed = int(round(speed * (deltaFemur / maxDelta), 0))
             retVal.tibiaSpeed = speed
-
-        maxExecTime = maxDelta / (self.anglePerSecond * (speed / 1023.0))
-        retVal.maxExecTime = maxExecTime
+            
 
         retVal.coxa = angleCoxa
         retVal.femur = angleFemur
@@ -392,7 +399,7 @@ class SequenceController(object):
         
     def legQueueIsEmpty(self):
         for x in range(1,7):
-            if (len(self.legQueue[x]) > 0):
+            if (not self.legQueue[x].empty()):
                 return False
         return True
         

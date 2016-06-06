@@ -20,22 +20,27 @@ class SequenceFrame(object):
             self.maxMaxExecTime = max(times)
 
         scaledMoves = {}
+        
         for k in self.movements:
             if self.movements[k] is not None:
-                mov = self.movements[k]
-                scaleFactor = mov.maxExecTime / self.maxMaxExecTime
+                if(self.maxMaxExecTime != 0):
+                    mov = self.movements[k]
+                    scaleFactor = mov.maxExecTime / self.maxMaxExecTime
 
-                newMov = LegMovement()
-                newMov.coxa = mov.coxa
-                newMov.tibia = mov.tibia
-                newMov.femur = mov.femur
+                    newMov = LegMovement()
+                    newMov.coxa = mov.coxa
+                    newMov.tibia = mov.tibia
+                    newMov.femur = mov.femur
 
-                newMov.coxaSpeed = mov.coxaSpeed * scaleFactor
-                newMov.tibiaSpeed = mov.tibiaSpeed * scaleFactor
-                newMov.femurSpeed = mov.femurSpeed * scaleFactor
+                    newMov.coxaSpeed = mov.coxaSpeed * scaleFactor
+                    newMov.tibiaSpeed = mov.tibiaSpeed * scaleFactor
+                    newMov.femurSpeed = mov.femurSpeed * scaleFactor
 
-                # newMov.maxExecTime = mov.maxExecTime * scaleFactor
-                newMov.maxExecTime = self.maxMaxExecTime
+                    # newMov.maxExecTime = mov.maxExecTime * scaleFactor
+                    newMov.maxExecTime = self.maxMaxExecTime
 
-                scaledMoves[k] = newMov
+                    scaledMoves[k] = newMov
+                else:
+                    scaledMoves[k] = self.movements[k]
+                    
         return scaledMoves
