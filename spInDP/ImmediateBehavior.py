@@ -31,8 +31,8 @@ class ImmediateBehavior(AutonomeBehavior):
             newIKCoordinates = self.basePose[x]
             
             if(self.remoteContext.jMagnitude > 0.1):
-                yAngle = self.remoteContext.jY * 20 
-                xAngle = self.remoteContext.jX * 20 
+                yAngle = self.remoteContext.jY * 10 
+                xAngle = self.remoteContext.jX * 10 
             else:
                 yAngle = 0
                 xAngle = 0

@@ -26,6 +26,7 @@ class ManualBehavior(Behavior):
         #self.frameNr += 1
         #print "GYRO ANGLES: " + str(self.spider.sensorDataProvider.getAccelerometer()[0]) + ", " + str(self.spider.sensorDataProvider.getAccelerometer()[1]) + ", " + str(self.spider.sensorDataProvider.getAccelerometer()[2])
         #DEBUG
+        self.spider.sensorDataProvider.startMeasuring()
 
         if(jMagnitude > 0.4):
             speedModifier = jMagnitude * 2

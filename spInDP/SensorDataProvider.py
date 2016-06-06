@@ -31,11 +31,11 @@ class SensorDataProvider(object):
         measureInterval = 0.1 #increase this if reading fails
         shouldMeasure = False
         
-        smoothAccelX = 0
-        smoothAccelY = 0
-        smoothAccelZ = 0
+        smoothAccelX = 0.0
+        smoothAccelY = 0.0
+        smoothAccelZ = 0.0
         
-        lastUpdate = 0;
+        lastUpdate = 0.0;
         
 
         def __init__(self):
@@ -62,16 +62,19 @@ class SensorDataProvider(object):
                 gyroVal = self.getGyro()
                 
                 yDeg = self.get_y_rotation(accelVal[0],accelVal[1],accelVal[2])
-                gyroY = gyroVal[1]
+                gyroY = float(gyroVal[1])
                 #print "yDeg: " + str(yDeg)              
                 
                 """
                 Complementary filter, we take gyroBias(0.98) parts from the gyro data and multiply it by delta T in seconds
                 and accelBias(0.02) parts from accelerometer data to compensate for drift
                 """
-                deltaT = time.time() - self.lastUpdate
-                self.smoothAccelY = 0.98*(self.smoothAccelY + gyroY*deltaT) + 0.02*accelVal
-                print "compY: " + self.smoothAccelY
+                
+               
+                
+                deltaT = float(time.time() - self.lastUpdate)
+                self.smoothAccelY = float(0.98*float(self.smoothAccelY + gyroY*deltaT) + 0.02*yDeg)
+                #print "compY: " + str(self.smoothAccelY)
 
 
                 self.lastUpdate = time.time()
