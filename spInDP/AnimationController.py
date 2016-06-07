@@ -3,7 +3,9 @@ from spInDP.LegMovement import LegMovement
 from spInDP.SequenceFrame import SequenceFrame
 
 class AnimationController:
-    
+    """"Provides dynamic animations"""
+
+    #Coordinates for the legs when walking normally
     legWideMid = {
         1: [-7, -8],
         2: [-7, -8],
@@ -13,11 +15,12 @@ class AnimationController:
         6: [-7, 0]
     }
 
+    #Coordinates for the legs when walking narrowly
     legNarrowMid = {
         1: [-5, -1],
         2: [-5, -1],
-        3: [-5, 0],
-        4: [-5, 1],
+        3: [-5, 0], #Dont change the Y axis
+        4: [-5, 1], #Don't change the Y axis
         5: [-5, 1],
         6: [-5, 0]
     }
@@ -27,16 +30,24 @@ class AnimationController:
     turnInfo = None
     turnWalkInfo = None
 
-    sideLegDistanceFromCenter = 10.45
-    cornerLegDistanceFromCenter = 13.845
-    stockLegLength = 16.347
+    sideLegDistanceFromCenter = 10.45 #From the middle of the body to the turning point of the coxa of a sideleg
+    cornerLegDistanceFromCenter = 13.845 #From the middle of the body to the turning point of the coxa of a cornerleg
+    stockLegLength = 16.347 #the topdown length of the leg at coords 0,0,0
     stockCornerCoxaAngle = 119.5 #angle in the body middle with a line from leg-3-coxa to leg-1-coxa going through the middle
-    topCoxaYDistanceFromCenter = cornerLegDistanceFromCenter * math.cos((stockCornerCoxaAngle - 90) * math.pi / 180)
-    leg3ToLeg1Distance = math.sqrt(cornerLegDistanceFromCenter**2 + sideLegDistanceFromCenter**2 - 2 * cornerLegDistanceFromCenter * sideLegDistanceFromCenter * math.cos(stockCornerCoxaAngle * math.pi / 180))
-    midToLeg3ToLeg1Angle = math.acos((leg3ToLeg1Distance**2 + sideLegDistanceFromCenter**2 - cornerLegDistanceFromCenter**2) / (2*leg3ToLeg1Distance*sideLegDistanceFromCenter)) / math.pi * 180
+
+    #Distance from the coxa to the middle of the body without the X axis (a vertical line from top to middle)
+    coxaYDistanceFromCenter = cornerLegDistanceFromCenter * math.cos((stockCornerCoxaAngle - 90) * math.pi / 180)
+    #Distance between coxa turnpoints
+    leg3ToLeg1Distance = math.sqrt(cornerLegDistanceFromCenter**2 + sideLegDistanceFromCenter**2 - 2 *
+                                   cornerLegDistanceFromCenter * sideLegDistanceFromCenter *
+                                   math.cos(stockCornerCoxaAngle * math.pi / 180))
+    #Angle of the line from 'Body mid' > leg3 coxa > leg1 coxa at leg3 coxa
+    midToLeg3ToLeg1Angle = math.acos((leg3ToLeg1Distance**2 + sideLegDistanceFromCenter**2 -
+                                        cornerLegDistanceFromCenter**2) / (2*leg3ToLeg1Distance *
+                                        sideLegDistanceFromCenter)) / math.pi * 180
 
     seqCtrl = None
-    yAdjustment = 0
+    yAdjustment = 0 #Y rotation for the current adjustment. (used in keeping the body upright)
     
     bodytoSensorMid = 0  # from mid body to mid coxas X-axis
     bodytoSensor = 12.05 # from mid body to back and front coxas X-axis
@@ -185,8 +196,8 @@ class AnimationController:
 
         return self.endFrame()
 
-    #Work in progress. Dont use!
     def turnWalk(self, turnDirection, walkDirection, frameNr, speedMod = 1):
+        """Work in progress. Dont use yet. -Erwin"""
         raise("Not yet implemented")
 
         if turnDirection < -1 or turnDirection > 1:
@@ -284,6 +295,7 @@ class AnimationController:
     realYAngle = 0
     yAdjustment = 0
     def walk(self, direction, frameNr, speedMod = 1, keepLeveled = False):
+        """Combination of walking and strafing, wherein the direction is an angle in degrees to which the body should move"""
         totalTime = 0
 
         cosDirection = math.cos(int(direction)*math.pi/180)
