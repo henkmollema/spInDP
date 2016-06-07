@@ -6,33 +6,34 @@ import math
 class FindBalloonBehavior(AutonomeBehavior):
     """Provides autonome behavior for destroying a red balloon."""
 
-    centerDeviation = 100
-    blobSizeArrive = 200
-    frameNr = 0
+    CENTER_DEVIATION = 100
+    BLOB_SIZE = 200
+    _frameNr = 0
+    _stabPosition = False
 
     def __init__(self, spider):
-        super(FindBalloonBehavior, self).__init__(spider)
+        """Initializes a new instance of the FindBalloonBehavior class."""
 
-    stabPosition = False
+        super(FindBalloonBehavior, self).__init__(spider)
 
     def update(self):
         balloonFound, coords, size = self.spider.visioncontroller.FindBalloon()
 
-        if(balloonFound):
-            if(size >= self.blobSizeArrive):
+        if balloonFound:
+            if size >= FindBalloonBehavior.BLOB_SIZE:
                 # When the balloon blob is big enough, stab it
                 print("Steek 'm in z'n rug!")
 
-                if (not self.stabPosition):
+                if not self._stabPosition:
                     self.spider.sequenceController.executePreStabLeft()
-                    self.stabPosition = True
+                    self._stabPosition = True
 
                 self.spider.sequenceController.executeStabLeft()
             else:
-                #if (self.stabPosition):
+                # if (self.stabPosition):
                 #    print ("Execute post stab");
                 #    self.spider.sequenceController.executePostStabLeft()
-            
+
                 x = coords[0]
                 y = coords[1]
                 a = 240
@@ -41,19 +42,15 @@ class FindBalloonBehavior(AutonomeBehavior):
                 # Angle to balloon in degrees
                 angle = math.atan(b / a) * (180 / math.pi)
                 angle *= 1.5
-                
 
                 # Walk towards balloon
-                execTime = self.spider.animationController.walk(angle, frameNr=self.frameNr, speedMod=1.5)
+                execTime = self.spider.animationController.walk(angle, frameNr=self._frameNr, speedMod=1.5)
                 time.sleep(execTime)
-                self.stabPosition = False
-                self.frameNr += 1
-        #else:
-            #print "Balloon not found"
-            #execTime = self.spider.animationController.turn(20, frameNr=self.frameNr, speedMod=1)
-            #time.sleep(execTime)
-            #self.stabPosition = False
-            #self.frameNr += 1
-
-            
-           
+                self._stabPosition = False
+                self._frameNr += 1
+                # else:
+                # print "Balloon not found"
+                # execTime = self.spider.animationController.turn(20, frameNr=self.frameNr, speedMod=1)
+                # time.sleep(execTime)
+                # self.stabPosition = False
+                # self.frameNr += 1

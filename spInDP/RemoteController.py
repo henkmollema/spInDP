@@ -12,13 +12,16 @@ class RemoteController(object):
     _spider = None
     _sock = None
     _updateLoop = None
-    
+
     _oldMode = ""
     _oldAction = ""
 
     def __init__(self, spider):
+        """Initializes a new instance of the RemoteController class."""
+
         self._spider = spider
         self.context = RemoteContext()
+
         try:
             print("Initializing Bluetooth connection")
             self._sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
@@ -26,10 +29,12 @@ class RemoteController(object):
         except BaseException as e:
             print("Initializing bluetooth failed: " + str(e))
 
-        self._updateLoop = threading.Thread(target=self.updateContextLoop)
+        self._updateLoop = threading.Thread(target=self._updateContextLoop)
         self._updateLoop.start()
 
-    def updateContextLoop(self):
+    def _updateContextLoop(self):
+        """The update logic."""
+
         msg = ""
         while not self.stop:
             try:
@@ -37,7 +42,7 @@ class RemoteController(object):
             except BaseException as e:
                 print("Error receiving bluetooth data: " + str(e))
                 break
-            
+
             # New line characaters is the end of the message
             msgEnd = msg.find('\n')
 
@@ -54,9 +59,9 @@ class RemoteController(object):
             self.context.jX = float((float(xs[0]) - 512.0) / 512.0)
             self.context.jY = float((float(xs[1]) - 512.0) / 512.0)
             self.context.jZ = float(xs[2])
-                 
-            self.context.jAngle = math.atan2(self.context.jY, self.context.jX) * (180/math.pi) + 180
-            magnitude = math.sqrt((self.context.jX**2) + (self.context.jY**2))
+
+            self.context.jAngle = math.atan2(self.context.jY, self.context.jX) * (180 / math.pi) + 180
+            magnitude = math.sqrt((self.context.jX ** 2) + (self.context.jY ** 2))
             self.context.jMagnitude = min(magnitude, 1)
 
             # Read the mode and action
@@ -65,8 +70,8 @@ class RemoteController(object):
 
             mode = mode.lower().strip()
             action = action.lower().strip()
-            
-            if (mode != self._oldMode or action != self._oldAction):                
+
+            if (mode != self._oldMode or action != self._oldAction):
                 if mode == "limbo":
                     # Enable compact crab walk when 'start' is passed
                     enableCompactCrabWalk = action == "start"

@@ -394,7 +394,7 @@ class SequenceController(object):
                 self.servoController.move((x - 1) * 3 + 2, scaledMovements[x].femur, scaledMovements[x].femurSpeed)
                 self.servoController.move((x - 1) * 3 + 3, scaledMovements[x].tibia, scaledMovements[x].tibiaSpeed)
         else:
-            print "setFrame() failed, legQueues not empty"
+            print("setFrame() failed, legQueues not empty")
         
         
     def legQueueIsEmpty(self):
