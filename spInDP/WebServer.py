@@ -51,9 +51,22 @@ class WebServer:
         return webserverinstance.format_response(webserverinstance.gen_cam_vision(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
     @staticmethod
-    @app.route("/app/getdata")
+    @app.route("/app/servodata")
     def api_servodata():
         return webserverinstance.format_response(webserverinstance.spider.servoController.getServoDataJSON())
+        
+    @staticmethod
+    @app.route("/app/getsystemdata")
+    def api_servodata():
+        retVal = {}
+        retVal['cpu'] = {"core1": 0, "core2": 0, "core3": 0, "core4": 0, "time": time.time()} 
+        retVal['battery'] = (webserverinstance.spider.servoController.getVoltage(1) - 9.2) / (2.8)
+        tiltVals = getAccelerometer()
+        retVal['tilt'] = {'x': tiltVals[0], 'y': tiltVals[1], 'z': tiltVals[2]}
+
+        jsonString = json.dumps(retVal, separators=(',', ':'))
+
+        return webserverinstance.format_response(jsonString)
 
     @staticmethod
     @app.route("/app/graphdata")
