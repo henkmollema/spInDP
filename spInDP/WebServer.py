@@ -57,11 +57,11 @@ class WebServer:
         
     @staticmethod
     @app.route("/app/getsystemdata")
-    def api_servodata():
+    def api_systemdata():
         retVal = {}
         retVal['cpu'] = {"core1": 0, "core2": 0, "core3": 0, "core4": 0, "time": time.time()} 
         retVal['battery'] = (webserverinstance.spider.servoController.getVoltage(1) - 9.2) / (2.8)
-        tiltVals = getAccelerometer()
+        tiltVals = webserverinstance.spider.sensorDataProvider.getAccelerometer()
         retVal['tilt'] = {'x': tiltVals[0], 'y': tiltVals[1], 'z': tiltVals[2]}
 
         jsonString = json.dumps(retVal, separators=(',', ':'))
