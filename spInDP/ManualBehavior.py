@@ -46,7 +46,7 @@ class ManualBehavior(Behavior):
             if not self.turnMode:  # strafemode
                 time.sleep(max(self.spider.animationController.walk(
                     direction=jAngle, frameNr=self.frameNr,
-                    speedMod=speedModifier) - self.spider.updateSleepTime,
+                    speedMod=speedModifier) - self.spider.UPDATE_SLEEP_TIME,
                                0))
             else:
                 if jAngle > 0:
@@ -56,7 +56,7 @@ class ManualBehavior(Behavior):
 
                 time.sleep(max(self.spider.animationController.turn(
                     direction=turnAngle, frameNr=self.frameNr,
-                    speedMod=speedModifier) - self.spider.updateSleepTime,
+                    speedMod=speedModifier) - self.spider.UPDATE_SLEEP_TIME,
                                0))
 
             self.frameNr += 1
