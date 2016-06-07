@@ -64,7 +64,7 @@ class RemoteController(object):
             if mode == "limbo":
                 print("limbo action: " + action)
                 # Enable compact crab walk when 'start' is passed
-                self._spider.animationController.setWideCrabWalk(action == "start")
+                self._spider.animationController.setWideWalking(action == "start")
 
             elif mode == "sprint":
                 if action == "start":
@@ -73,7 +73,7 @@ class RemoteController(object):
                     print("Stop sprint mode")
 
                 print ("Sprint not implemented, using walk.")
-                self._spider.animationController.setWideCrabWalk(False)
+                self._spider.animationController.setWideWalking(False)
 
             elif mode == "grind":
                 if action == "start":
@@ -82,7 +82,7 @@ class RemoteController(object):
                     print("Stop grind mode")
 
                 print("Grind mode not enable, using walk.")
-                self._spider.animationController.setWideCrabWalk(False)
+                self._spider.animationController.setWideWalking(False)
 
             elif mode == "spider-gap":
                 if action == "walk":
@@ -95,7 +95,7 @@ class RemoteController(object):
                     print ("Glas aanficken")
 
                 print("Grind mode not enable, using walk.")
-                self._spider.animationController.setWideCrabWalk(False)
+                self._spider.animationController.setWideWalking(False)
 
             elif mode == "destroy-balloon":
                 if action == "start":
@@ -110,7 +110,7 @@ class RemoteController(object):
                     print("Stop fury road")
 
                 print("Grind mode not enable, using walk.")
-                self._spider.animationController.setWideCrabWalk(False)
+                self._spider.animationController.setWideWalking(False)
 
             elif mode == "paringsdans":
                 if action == "start":
