@@ -57,7 +57,7 @@ class WebServer:
         
     @staticmethod
     @app.route("/app/getsystemdata")
-    def api_systemdata():
+    def api_getsystemdata():
         retVal = {}
         retVal['cpu'] = {"core1": 0, "core2": 0, "core3": 0, "core4": 0, "time": time.time()} 
         retVal['battery'] = (webserverinstance.spider.servoController.getVoltage(1) - 9.2) / (2.8)
