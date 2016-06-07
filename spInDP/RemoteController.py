@@ -12,6 +12,9 @@ class RemoteController(object):
     _spider = None
     _sock = None
     _updateLoop = None
+    
+    _oldMode = ""
+    _oldAction = ""
 
     def __init__(self, spider):
         self._spider = spider
@@ -59,69 +62,76 @@ class RemoteController(object):
             # Read the mode and action
             mode = xs[3]
             action = xs[4]
+            mode = mode.lower().strip()
+            action = action.lower().strip()
+            
+            if (mode != self._oldMode or action != self._oldAction):                
+                if mode == "limbo":
+                    # Enable compact crab walk when 'start' is passed
+                    enableCompactCrabWalk = action == "start"
+                    print ("Enable compact crab walk: " + str(enableCompactCrabWalk))
+                    self._spider.animationController.setWideCrabWalk(not enableCompactCrabWalk)
 
-            mode = mode.lower()
-            if mode == "limbo":
-                print("limbo action: " + action)
-                # Enable compact crab walk when 'start' is passed
-                self._spider.animationController.setWideCrabWalk(action == "start")
+                elif mode == "sprint":
+                    if action == "start":
+                        print ("Start sprint mode")
+                    else:
+                        print("Stop sprint mode")
 
-            elif mode == "sprint":
-                if action == "start":
-                    print ("Start sprint mode")
-                else:
-                    print("Stop sprint mode")
+                    print ("Sprint not implemented, using walk.")
+                    self._spider.animationController.setWideCrabWalk(False)
 
-                print ("Sprint not implemented, using walk.")
-                self._spider.animationController.setWideCrabWalk(False)
+                elif mode == "grind":
+                    if action == "start":
+                        print ("Start grind mode")
+                    else:
+                        print("Stop grind mode")
 
-            elif mode == "grind":
-                if action == "start":
-                    print ("Start grind mode")
-                else:
-                    print("Stop grind mode")
+                    print("Grind mode not enable, using walk.")
+                    self._spider.animationController.setWideCrabWalk(False)
 
-                print("Grind mode not enable, using walk.")
-                self._spider.animationController.setWideCrabWalk(False)
+                elif mode == "spider-gap":
+                    if action == "walk":
+                        print ("Regular walk")
+                    elif "action" == "body-horizontal":
+                        print ("Keeping body horizontal")
+                    elif "gap":
+                        print ("Cross spider gap")
+                    elif "touch-glass":
+                        print ("Glas aanficken")
 
-            elif mode == "spider-gap":
-                if action == "walk":
-                    print ("Regular walk")
-                elif "action" == "body-horizontal":
-                    print ("Keeping body horizontal")
-                elif "gap":
-                    print ("Cross spider gap")
-                elif "touch-glass":
-                    print ("Glas aanficken")
+                    print("Grind mode not enable, using walk.")
+                    self._spider.animationController.setWideCrabWalk(False)
 
-                print("Grind mode not enable, using walk.")
-                self._spider.animationController.setWideCrabWalk(False)
+                elif mode == "destroy-balloon":
+                    if action == "start":
+                        self._spider.switchBehavior("destoyballoon")
+                    else:
+                        self._spider.switchBehavior("manual")
 
-            elif mode == "destroy-balloon":
-                if action == "start":
-                    self._spider.switchBehavior("destoyballoon")
-                else:
-                    self._spider.switchBehavior("manual")
+                elif mode == "fury-road":
+                    if action == "start":
+                        print ("Start fury road")
+                    else:
+                        print("Stop fury road")
 
-            elif mode == "fury-road":
-                if action == "start":
-                    print ("Start fury road")
-                else:
-                    print("Stop fury road")
+                    print("Grind mode not enable, using walk.")
+                    self._spider.animationController.setWideCrabWalk(False)
 
-                print("Grind mode not enable, using walk.")
-                self._spider.animationController.setWideCrabWalk(False)
+                elif mode == "paringsdans":
+                    if action == "start":
+                        print("Start paringsdans mode")
+                    elif action == "stop":
+                        print ("Stop paringsdans mode")
+                    elif action == "up":
+                        print ("Moving spider up")
+                    elif action == "down":
+                        print ("Moving spider down")
 
-            elif mode == "paringsdans":
-                if action == "start":
-                    print("Start paringsdans mode")
-                elif action == "stop":
-                    print ("Stop paringsdans mode")
-                elif action == "up":
-                    print ("Moving spider up")
-                elif action == "down":
-                    print ("Moving spider down")
-
+                # Save current action and messages
+                self._oldMode = mode
+                self._oldAction = action
+            
             #Continue with next message
             msg = msg[msgEnd + 1:]
 
