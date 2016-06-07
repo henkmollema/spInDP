@@ -4,7 +4,7 @@ import time
 
 
 class ManualBehavior(Behavior):
-    """Provides manual behavior of a spider."""
+    """Provides manual behavior of a spider using the RemoteContext."""
     frameNr = 0
     turnMode = False
     lastZ = 0
@@ -27,7 +27,7 @@ class ManualBehavior(Behavior):
             self.lastZ = jZ
             if(jZ == 1):
                 self.turnMode = not self.turnMode
-                print "Switch turnmode " + str(self.turnMode)
+                print ("Switch turnmode " + str(self.turnMode))
         
         #print "Joystick = X: " + str(jX) + ", Y: " + str(jY) + ", Z: " + str(jZ) + " magnitude: " + str(magnitute) + " angle: " + str(angle)
    
