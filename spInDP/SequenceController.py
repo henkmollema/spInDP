@@ -8,7 +8,7 @@ from spInDP.SequenceFrame import SequenceFrame
 
 
 class SequenceController(object):
-    """Parses and executes sequences using servos."""
+    """Parses and executes sequence files, also contains the IK calculation"""
 
     # Based on physical dimensions of scarJo
     a = 11.0  # Femur length (cm)
@@ -19,12 +19,10 @@ class SequenceController(object):
     b = math.sqrt(e**2 + d**2)  # diagonal (cm)
     radToDeg = (180 / math.pi)
 
-    # optimal rpm is 114 without load at max speed
-    anglePerSecond = (114.0 * 360.0 / 60.0)
-    coxaOffset = 45
+    anglePerSecond = (114.0 * 360.0 / 60.0) #Optimal rpm is 114 without load at max speed, used to estimate the time it takes to execute an action
+    coxaOffset = 45 #Used to offset the coxas from their base position.
 
-    threadMap = {}
-    sequenceFrame = None
+    """Maps servosIDs to their current position in degree"""
     servoAngleMap = {
         1: 0.0, 2: 0.0, 3: 0.0,
         4: 0.0, 5: 0.0, 6: 0.0,
@@ -33,11 +31,16 @@ class SequenceController(object):
         13: 0.0, 14: 0.0, 15: 0.0,
         16: 0.0, 17: 0.0, 18: 0.0
     }
+    """Maps legIDs to their LegThread"""
+    threadMap = {}
+
+    sequenceFrame = None #Buffer to hold the frame we are building
 
     def __init__(self, spider):
+        """Constructor, initializes the leg threads and legqueues"""
         self.spider = spider
         self.servoController = spider.servoController
-        self.legQueue = {}
+        self.legQueue = {} #Holds the LegMovement objects to be executed by the legs, key is legID
         self.threadMap = {}
         self.stopped = False
 
@@ -48,54 +51,21 @@ class SequenceController(object):
             self.threadMap[x].start()
 
     def stop(self):
+        """Stops the LegThreads after the queues are empty"""
         self.stopped = True
 
         for key in self.threadMap:
             self.threadMap[key].join()
 
-    def executeWalk(self, speedModifier):
-        return self.parseSequence("sequences/walk-frame.txt", repeat=1, speedModifier=speedModifier)
-        
-    def executeStepForward(self):
-        return self.parseSequence("sequences/walk-v3.txt", repeat=1, speedModifier=1)
-        
-    def executeStepBackwards(self):
-        return self.parseSequence("sequences/walk-v3-backwards.txt", repeat=1, speedModifier=1)
-        
-    def executeStepLeft(self):
-        return self.parseSequence("sequences/crab-walk.txt", repeat=1, speedModifier=-1)
-        
-    def executeStepRight(self):
-        return self.parseSequence("sequences/crab-walk.txt", repeat=1, speedModifier=1)
-        
-    def executePreStabLeft(self):
-        return self.parseSequence("sequences/pre-stab-left.txt", repeat=1, speedModifier=1)
-        
-    def executeStabLeft(self):
-        return self.parseSequence("sequences/stab-left.txt", repeat=1, speedModifier=1)
-        
-    def executePostStabLeft(self):
-        return self.parseSequence("sequences/post-stab-left.txt", repeat=1, speedModifier=1)
-        
-    def executePreStabRight(self):
-        self.parseSequence("sequences/pre-stab-right.txt", repeat=1, speedModifier=1)
-        
-    def executeStabRight(self):
-        self.parseSequence("sequences/stab-right.txt", repeat=1, speedModifier=1)
-        
-    def executePostStabRight(self):
-        self.parseSequence("sequences/post-stab-right.txt", repeat=1, speedModifier=1)
-
-    def executeStartup(self):
-        return self.parseSequence("sequences/startup.txt")
 
     def getLegCoords(self, legID):
         return self.threadMap[legID].cCoordinates;
 
-    #Returns the time it takes to execute this sequence in seconds
-    def parseSequence(self, filePath, validate=False, speedModifier=1, repeat=1):
-        #print("Parsing sequence at: " + filePath + " repeating for "  + str(repeat))
 
+    def parseSequence(self, filePath, validate=False, speedModifier=1, repeat=1):
+        """Sequence file parser, returns the time it takes to execute this sequence in seconds"""
+
+        #print("Parsing sequence at: " + filePath + " repeating for "  + str(repeat))
         with open(filePath, 'r') as f:
             lines = f.readlines()
 
@@ -128,6 +98,7 @@ class SequenceController(object):
         return totalTime
         
     def interpretLine(self, line, lineNr, speedModifier=1):
+        """Parses a single line of a sequence file and executes the command"""
         if(lineNr == 1 or line.lstrip().startswith("#") or len(line.strip()) == 0):
             return 0
 
@@ -148,14 +119,6 @@ class SequenceController(object):
                 raise NameError("No argument given for delay at line: " + str(lineNr))
 
             seconds = float(words[1]) / 1000
-            #for x in range(1, 7):
-                ## Create an 'empty movement
-               # mov = LegMovement()
-               # mov.empty = True
-               # mov.maxExecTime = seconds
-                ##Put an empty legmovement with delay as exectime in the leg queue
-               # self.legQueue[x].put(mov)
-               # return seconds 
             time.sleep(seconds)
 
         # Wait for all lengs to complete their queued movements
@@ -278,12 +241,21 @@ class SequenceController(object):
             raise NameError("No valid command found on line: " + str(lineNr))
             
         return 0
-    """
-    Returns a LegMovement Object.
-    first = True if we need to get initial positions from servo
-    """
-    first = True
-    def coordsToLegMovement(self, x, y, z, legID, speed, immediateMode = False):    
+
+
+    first = True #first = True if we need to get initial positions from servo
+    def coordsToLegMovement(self, x, y, z, legID, speed, immediateMode = False):
+        """
+        Given X Y Z Coordinates this method
+        creates and returns a LegMovement object, containing the angles
+        and speeds at which the servos need to move.
+
+        It will try to correct the speeds of the servo's
+        so they will start and stop moving at the same time
+
+        immediateMode: The speeds won't be corrected
+        """
+
         lIK = math.sqrt((self.d + self.lc + x)**2 + y**2)
         dIK = lIK - self.lc
         bIK = math.sqrt((self.e + z)**2 + dIK**2)
@@ -341,7 +313,7 @@ class SequenceController(object):
         if (maxDelta == 0):
             return None
             
-        #If we are not in immediate mode, don't calculate delta's
+        #If we are in immediate mode, don't calculate delta's
         if(not immediateMode): 
             if (maxDelta == deltaCoxa):
                 # print("max delta is coxa")
@@ -373,8 +345,14 @@ class SequenceController(object):
 
         retVal.IKCoordinates = [x,y,z]
         return retVal
-        
+
+
     def addFrameToQueue(self, frame):
+        """
+            Add the movements in a SequenceFrame to the legQueues
+            So they will be executed when it's their turn
+        """
+
         scaledMovements = frame.getScaledMovements()
         for x in range(1, 7):
             mov = scaledMovements.get(x, None)
@@ -387,6 +365,11 @@ class SequenceController(object):
             self.legQueue[x].put(mov)
             
     def setFrame(self, frame):
+        """
+            Immediately sends the servos to the LegMovements
+            in a given SequenceFrame
+        """
+
         if(self.legQueueIsEmpty()):
             scaledMovements = frame.getScaledMovements()
             for x in scaledMovements:
@@ -398,6 +381,9 @@ class SequenceController(object):
         
         
     def legQueueIsEmpty(self):
+        """
+            Returns true if no LegMovements are on the LegQueues
+        """
         for x in range(1,7):
             if (not self.legQueue[x].empty()):
                 return False

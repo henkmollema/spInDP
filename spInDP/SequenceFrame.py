@@ -2,13 +2,26 @@ from spInDP.LegMovement import LegMovement
 
 
 class SequenceFrame(object):
+    """
+        Holds one LegMovement objects for each leg
+        The SequenceFrames are used to make sure
+        all the legs start and stop moving at the same time.
+    """
+
     movements = {}
     maxMaxExecTime = 0.0
 
     def setMovement(self, legID, LegMovement):
+        """Set a LegMovement in this sequenceframe"""
         self.movements[legID] = LegMovement
 
     def getScaledMovements(self):
+        """
+            Scales the servo speeds in the LegMovements in this SequenceFrame
+            so that all movements start and stop at the same time
+
+            retuns a new list of scaled LegMovements
+        """
         times = []
         for k in self.movements:
             if self.movements[k] is not None:
