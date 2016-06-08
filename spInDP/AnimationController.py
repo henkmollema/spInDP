@@ -4,6 +4,10 @@ from spInDP.SequenceFrame import SequenceFrame
 
 class AnimationController:
     """"Provides dynamic animations"""
+    #Leg z coordinates
+    legAirHigh = -2
+    legAir = 2
+    legGround = 5
 
     #Coordinates for the legs when walking normally
     legWideMid = {
@@ -36,6 +40,7 @@ class AnimationController:
     }
 
     wideWalking = True
+    highWalking = False
 
     turnInfo = None
     turnWalkInfo = None
@@ -106,6 +111,9 @@ class AnimationController:
     def setWideWalking(self, value):
         """Adjust midpoint of each leg, mainly to fit through 'het poortje'"""
         self.wideWalking = value
+    def setHighWalking(self, value):
+        """Adjust the height of the legs when they are airborne"""
+        self.highWalking = value
 
     def startFrame(self):
         self.sequenceFrame = SequenceFrame()
@@ -133,14 +141,19 @@ class AnimationController:
         legMid = {}
         zGround = 0
         zAir = 0
+        if self.wideWalking and self.highWalking:
+            legMid = self.legWideMid
+            zGround = self.legGround
+            zAir = self.legAirHigh
+
         if self.wideWalking:
             legMid = self.legWideMid
-            zGround = 5
-            zAir = 2
+            zGround = self.legGround
+            zAir = self.legAir
         else:
             legMid = self.legNarrowMid
-            zGround = 3
-            zAir = 1
+            zGround = self.legGround - 2
+            zAir = self.legAir - 1
 
         if self.turnInfo is None:
             self.turnInfo = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}}
@@ -167,7 +180,7 @@ class AnimationController:
                 self.turnInfo[x]["xMidCompensator"] = xMidCompensator
                 self.turnInfo[x]["yMidCompensator"] = yMidCompensator
 
-                print("Leg " + str(x) + " totalDistance: " + str(totalDistance))
+                #print("Leg " + str(x) + " totalDistance: " + str(totalDistance))
 
         leg36FrameNr = (frameNr - 2) % 6
         leg25FrameNr = frameNr
@@ -316,18 +329,24 @@ class AnimationController:
         stepRangeHor = 0.0
         zGround = 0 #When not using keepLeveled
         zAir = 0 #When not using keepLeveled
-        if self.wideWalking:
+        if self.highWalking and self.wideWalking:
             legMid = self.legWideMid
-            stepRangeVert = cosDirection * 14
-            stepRangeHor = sinDirection * 8
-            zGround = 5
-            zAir = 2
+            stepRangeVert = cosDirection * 14 #14 is stepsize for vertical walking
+            stepRangeHor = sinDirection * 8 #8 is stepsize for horizontal walking
+            zGround = self.legGround
+            zAir = self.legAirHigh
+        elif self.wideWalking:
+            legMid = self.legWideMid
+            stepRangeVert = cosDirection * 14 #14 is stepsize for vertical walking
+            stepRangeHor = sinDirection * 8 #8 is stepsize for horizontal walking
+            zGround = self.legGround
+            zAir = self.legAirHigh
         else:
             legMid = self.legNarrowMid
-            stepRangeVert = cosDirection * 7
-            stepRangeHor = sinDirection * 7
-            zGround = 3
-            zAir = 1
+            stepRangeVert = cosDirection * 7 #7 is stepsize for vertical walking
+            stepRangeHor = sinDirection * 7 #7 is stepsize for horizontal walking
+            zGround = self.legGround - 2
+            zAir = self.legAirHigh
 
         if(keepLeveled):
             zGround = 7
