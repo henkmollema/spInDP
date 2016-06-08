@@ -1,6 +1,7 @@
 import time
 import json
 import glob
+import psutil
 from flask import Flask, render_template, Response
 
 webserverinstance = None
@@ -59,9 +60,12 @@ class WebServer:
     @app.route("/app/getsystemdata")
     def api_getsystemdata():
         retVal = {}
-        retVal['cpu'] = {"core1": 0, "core2": 0, "core3": 0, "core4": 0, "time": time.time()} 
-        retVal['battery'] = (webserverinstance.spider.servoController.getVoltage(1) - 9.2) / (2.8)
+        cpuData = psutil.cpu_percent(interval=1, percpu=True)
         tiltVals = webserverinstance.spider.sensorDataProvider.getAccelerometer()
+        batteryPercentage = round((webserverinstance.spider.servoController.getVoltage(1) - 9.2) / (2.8), 2) #based on voltage read on servo
+
+        retVal['cpu'] = {"core1": cpuData[0], "core2": cpuData[1], "core3": cpuData[2], "core4": cpuData[3], "time": time.time()}
+        retVal['battery'] = batteryPercentage
         retVal['tilt'] = {'x': tiltVals[0], 'y': tiltVals[1], 'z': tiltVals[2]}
 
         jsonString = json.dumps(retVal, separators=(',', ':'))

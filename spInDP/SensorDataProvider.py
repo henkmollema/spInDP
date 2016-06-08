@@ -41,21 +41,21 @@ class SensorDataProvider(object):
 
     def __init__(self):
         """Initializes the SensorDataProvider."""
-
         # Now wake the 6050 up as it starts in sleep mode
         # TODO: Check if the device will go to sleep mode automatically, this will cause problems
+        self._bus.write_byte_data(SensorDataProvider.BUS_ADDRESS, SensorDataProvider.POWER_MGMT_1, 0)
         print ("Init sensordataprovider")
 
     def stopMeasuring(self):
         """Stop measuring the sensors."""
-
+        
         self._shouldMeasure = False
 
     def startMeasuring(self):
         """Starts measuring the sensors."""
 
         if (not self._shouldMeasure):
-            self._bus.write_byte_data(SensorDataProvider.BUS_ADDRESS, SensorDataProvider.POWER_MGMT_1, 0)
+            
             self._shouldMeasure = True
             self._lastUpdate = time.time()
 

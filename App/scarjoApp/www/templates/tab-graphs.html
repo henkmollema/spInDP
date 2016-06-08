@@ -1,4 +1,4 @@
-<ion-view view-title="Chats">
+<ion-view view-title="System Data">
   <ion-content>
     <ion-list>
 
@@ -8,7 +8,7 @@
 				<i class='ion-battery-half'></i> Battery
 			</div>
 			<div class="item item-text-wrap">
-				<canvas id="lineBattery" class="chart chart-line" data="data" labels="labels" legend="true" series="series" options="{showTooltips: false}"></canvas>
+				<canvas id="lineBattery" class="chart chart-line" chart-data="batteryData" chart-labels='batteryLabels' chart-legend="true" chart-series="batterySeries" chart-options="graphOptions"></canvas>
 			</div>
 		</div>
       </ion-item>
@@ -19,7 +19,7 @@
 				<i class='ion-flame'></i> CPU Gebruik
 			</div>
 			<div class="item item-text-wrap">
-				<canvas id="lineCPU" class="chart chart-line" data="data" labels="labels" legend="true" series="series" options="{showTooltips: false}"></canvas>
+				<canvas height="200"  id="lineCPU" class="chart chart-line" chart-data="cpuData" chart-labels='cpuLabels' chart-legend="true" chart-series="cpuSeries" chart-options="graphOptions"></canvas>
 			</div>
 		</div>
       </ion-item>
@@ -30,7 +30,7 @@
 				<i class='ion-podium'></i> Hellingshoek
 			</div>
 			<div class="item item-text-wrap">
-				<canvas id="lineAngle" class="chart chart-line" data="data" labels="labels" legend="true" series="series" options="{showTooltips: false}"></canvas>
+				<canvas height="200" id="lineAngle" class="chart chart-line" chart-data="tiltData" chart-legend="true" chart-series="tiltSeries" chart-labels='tiltLabels' chart-options="graphOptions" ></canvas>
 			</div>
 		</div>
       </ion-item>

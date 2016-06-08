@@ -7,3 +7,7 @@ class RemoteContext(object):
     jZ = 0
     jMagnitude = 0
     jAngle = 0
+
+    accelX = 0
+    accelY = 0
+    accelZ = 0

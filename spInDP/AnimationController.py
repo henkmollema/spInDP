@@ -50,6 +50,7 @@ class AnimationController:
     """
     def safeTransitionTo(self, destination, speed):
         cLegCoords = {}
+        retVal = 0
 
         for x in range(1,7):
             cLegCoords[x].IKCoordinates = self.spider.sequenceController.getLegCoords(x)
@@ -69,17 +70,19 @@ class AnimationController:
         for legID in cElevatedLegs:
                 if cElevatedLegs[legID].IKCoordinates[2] > highestDestZ:
                     self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(0, 0, highestDestZ, legID, speed)
-        self.endFrame()
+        retVal += self.endFrame()
 
         #after that, one by one, elevate the legs a little and send them to their destination
         for legID in range(1,7):
             destCoords = destGroundedLegs[legID].IKCoordinates
             self.startFrame()
             self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(destCoords[0], destCoords[1], elevatedZ, legID, speed)
-            self.endFrame()
+            retVal += self.endFrame()
             self.startFrame()
             self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(destCoords[0], destCoords[1], destCoords[2], legID, speed)
-            self.endFrame()
+            retVal += self.endFrame()
+
+        return retVal
 
 
     def setWideWalking(self, value):
@@ -89,14 +92,25 @@ class AnimationController:
     def startFrame(self):
         self.sequenceFrame = SequenceFrame()
 
-    def endFrame(self):
+    def endFrame(self, safeTransition = False):
         """Adds the frame to the queue and returns the time the execution will take"""
         #Add the new frame to the leg queues
-        self.seqCtrl.addFrameToQueue(self.sequenceFrame)
+        if(not safeTransition):
+            self.seqCtrl.addFrameToQueue(self.sequenceFrame)
 
-        ret = self.sequenceFrame.maxMaxExecTime
-        self.sequenceFrame.movements = {} #Clear the frame
-        self.sequenceFrame = None
+            ret = self.sequenceFrame.maxMaxExecTime
+            self.sequenceFrame.movements = {}  # Clear the frame
+            self.sequenceFrame = None
+        else:
+            tmpMovements = list(self.sequenceFrame.movements)
+            tmpFrame = SequenceFrame()
+            tmpFrame.movements = tmpMovements
+
+            self.sequenceFrame.movements = {}  # Clear the frame
+            self.sequenceFrame = None
+
+            ret = self.safeTransitionTo(tmpFrame)
+
         return ret
 
     def turn(self, direction, frameNr, speedMod = 1):
