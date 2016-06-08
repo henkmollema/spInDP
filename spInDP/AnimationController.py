@@ -233,8 +233,6 @@ class AnimationController:
 
         if turnDirection < -1 or turnDirection > 1:
             raise ("\"turnDirection\" has to be between -1 and 1 for turnWalking")
-        if walkDirection < -1 or walkDirection > 1:
-            raise ("\"walkDirection\" has to be between -1 and 1 for turnWalking")
 
         frameNr = frameNr % 6
         stepSize = 5
@@ -272,7 +270,7 @@ class AnimationController:
                 totalDistance = math.sqrt(legDistanceFromCenter**2 + legLength**2 - 2 * legDistanceFromCenter * legLength * math.cos(actualCoxaAngle * math.pi / 180))
 
                 beta1 = math.asin((legLength * math.sin(actualCoxaAngle*math.pi/180))/totalDistance)/math.pi*180
-                beta2 = cornerCoxaAngle-90
+                beta2 = actualCoxaAngle-90
                 betaSum = beta1+beta2
 
                 xMidCompensator = totalDistance*math.cos(betaSum*math.pi/180) - totalDistance
