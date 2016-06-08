@@ -20,7 +20,7 @@ class TouchBehavior(Behavior):
         jMagnitude = self.remoteContext.jMagnitude
 
         if(jMagnitude > 0.4):
-            time.sleep(max(self.animationController.method))
+            #time.sleep(max(self.animationController.method))
             self.frameNr += 1
 
         return

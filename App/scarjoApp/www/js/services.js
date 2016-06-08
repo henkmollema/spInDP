@@ -20,12 +20,24 @@ angular.module('starter.services', [])
 })
 
 .factory('ServoDataService', function($http) {
+  var systemData = [];
+
+  return {
+    get: function(callback) {
+		return $http.get(API_HOST+"app/servodata").then(function(response){
+				callback(response.data);
+			});
+      return systemData;
+    }
+  };
+})
+.factory('SystemDataService', function($http) {
   // Some fake testing data
   var spiderData = [];
 
   return {
     get: function(callback) {
-		return $http.get(API_HOST+"app/servodata").then(function(response){
+		return $http.get(API_HOST+"app/getsystemdata").then(function(response){
 				callback(response.data);
 			});
       return spiderData;

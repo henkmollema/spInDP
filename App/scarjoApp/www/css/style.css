@@ -3,13 +3,18 @@
 .fullwidthImage{
 	width:100%;
 	height: auto;
+	margin: 0 auto 0 auto;
 	
 }
 
 .cameraframe{
-	width: 100%;
-	height: 100%;
+	width: 640px;
+	height: 480px;
+	
+	margin: 0 auto;
+	display:block;
 }
+
 
 .spiderImage{
 	position:relative;
