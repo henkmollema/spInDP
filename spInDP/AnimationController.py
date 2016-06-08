@@ -69,7 +69,7 @@ class AnimationController:
     """
         destination is a sequenceframe
     """
-    def safeTransitionTo(self, destination, speed):
+    def safeTransitionTo(self, destination, speed = 200):
         cLegCoords = {}
         retVal = 0
 
