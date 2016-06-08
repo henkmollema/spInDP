@@ -358,8 +358,9 @@ class AnimationController:
             #if abs(cAccelY * (180 / math.pi)) < 3:
             #    cAccelY = 0
 
-            self.realYAngle = self.yAdjustment + cAccelY
-            self.yAdjustment += cAccelY
+
+            self.realYAngle = self.spider.remoteController.context.accelY
+
         else:
             #Stop measuring accel
             self.spider.sensorDataProvider.stopMeasuring()
