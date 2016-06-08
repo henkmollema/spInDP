@@ -6,6 +6,7 @@ from spInDP.BehaviorType import BehaviorType
 from spInDP.FindBalloonBehavior import FindBalloonBehavior
 from spInDP.ImmediateBehavior import ImmediateBehavior
 from spInDP.ManualBehavior import ManualBehavior
+from spInDP.PushBehavior import PushBehavior
 from spInDP.RemoteController import RemoteController
 from spInDP.SensorDataProvider import SensorDataProvider
 from spInDP.SequenceController import SequenceController
@@ -92,6 +93,9 @@ class Spider(object):
         elif behaviorType == BehaviorType.ImmediateBehaviour:
             print("Switched to immediate behavior.")
             self._behavior = ImmediateBehavior(self)
+        elif behaviorType == BehaviorType.PushBehavior:
+            print("Switched to push behavior.")
+            self._behavior = PushBehavior(self)
 
         # Start the loop again
         self._stopLoop = False

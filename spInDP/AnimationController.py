@@ -25,6 +25,16 @@ class AnimationController:
         6: [-5, 0]
     }
 
+    #Coordinates for the legs when walking over the spidergap
+    legSpiderGap = {
+        1: [-4, -8],
+        2: [-4, -8],
+        3: [0, 0],
+        4: [-4, 8],
+        5: [-4, 8],
+        6: [0, 0]
+    }
+
     wideWalking = True
 
     turnInfo = None
@@ -453,4 +463,60 @@ class AnimationController:
             self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(legMid[4][0] - (-stepRangeHor / 4), legMid[4][1] - (stepRangeVert / 4), zGround4, 4, speedMod * 100)
             totalTime += self.endFrame()
         
+        return totalTime
+
+    def push(self, frameNr, speedMod=1):
+        """The movement for crossing the spider gap"""
+        totalTime = 0
+        speed = 100
+
+        zGround = 1  # When not using keepLeveled
+        zUp = -2
+        zMid = 0
+        yIn = -8
+
+        frameNr = frameNr % 4
+        if frameNr == 0:
+            self.startFrame()
+            self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[3][0], self.legSpiderGap[3][1], zMid, 3, speedMod * speed)
+            self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[6][0], self.legSpiderGap[6][1], zMid, 6, speedMod * speed)
+            self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[1][0], self.legSpiderGap[1][1], zGround, 1, speedMod * speed)
+            self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[2][0], self.legSpiderGap[2][1], zGround, 2, speedMod * speed)
+            self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[4][0], self.legSpiderGap[4][1], zGround, 4, speedMod * speed)
+            self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[5][0], self.legSpiderGap[5][1], zGround, 5, speedMod * speed)
+            totalTime += self.endFrame()
+        elif frameNr == 1:
+            self.startFrame()
+            self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[3][0], self.legSpiderGap[3][1], 0, 3, speedMod * speed)
+            self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[6][0], self.legSpiderGap[6][1], 0, 6, speedMod * speed)
+            self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[1][0], self.legSpiderGap[1][1] - yIn, zGround, 1, speedMod * speed)
+            self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[2][0], self.legSpiderGap[2][1] - yIn, zGround, 2, speedMod * speed)
+            self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[4][0], self.legSpiderGap[4][1] - yIn, zGround, 4, speedMod * speed)
+            self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[5][0], self.legSpiderGap[5][1] - yIn, zGround, 5, speedMod * speed)
+            #self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[4][0], self.legSpiderGap[4][1], zUp, 4, speedMod * speed)
+            #self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[5][0], self.legSpiderGap[5][1], zUp, 5, speedMod * speed)
+            totalTime += self.endFrame()
+        elif frameNr == 2:
+            self.startFrame()
+            self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[3][0], self.legSpiderGap[3][1], 0, 3, speedMod * speed)
+            self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[6][0], self.legSpiderGap[6][1], 0, 6, speedMod * speed)
+            self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[1][0], self.legSpiderGap[1][1] - yIn, zUp, 1, speedMod * speed)
+            self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[2][0], self.legSpiderGap[2][1] - yIn, zUp, 2, speedMod * speed)
+            self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[4][0], self.legSpiderGap[4][1] - yIn, zUp, 4, speedMod * speed)
+            self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[5][0], self.legSpiderGap[5][1] - yIn, zUp, 5, speedMod * speed)
+            #self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[4][0], self.legSpiderGap[4][1] - yIn, zUp, 4, speedMod * speed)
+            #self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[5][0], self.legSpiderGap[5][1] - yIn, zUp, 5, speedMod * speed)
+            totalTime += self.endFrame()
+        elif frameNr == 3:
+            self.startFrame()
+            self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[3][0], self.legSpiderGap[3][0], 0, 3, speedMod * speed)
+            self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[6][0], self.legSpiderGap[6][0], 0, 6, speedMod * speed)
+            self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[1][0], self.legSpiderGap[1][0], zUp, 1, speedMod * speed)
+            self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[2][0], self.legSpiderGap[2][0], zUp, 2, speedMod * speed)
+            self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[4][0], self.legSpiderGap[4][0], zUp, 4, speedMod * speed)
+            self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[5][0], self.legSpiderGap[5][0], zUp, 5, speedMod * speed)
+            #self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[4][0], self.legSpiderGap[4][0] - yIn, zUp, 4, speedMod * speed)
+            #self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(self.legSpiderGap[5][0], self.legSpiderGap[5][0] - yIn, zUp, 5, speedMod * speed)
+            totalTime += self.endFrame()
+
         return totalTime

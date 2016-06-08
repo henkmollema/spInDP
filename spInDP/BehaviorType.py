@@ -5,3 +5,4 @@ class BehaviorType(object):
     Autonome = "Autonome"
     AutonomeDestroyBalloon = "DestroyBalloon"
     ImmediateBehaviour = "Immediate"
+    PushBehavior = "SpiderGap"
