@@ -8,6 +8,7 @@ import numpy as np
 from fractions import Fraction
 
 class VisionController:
+    """Main class for the vision, which is meant to be used from a Spider instance"""
     __camera = None
     __vision = None
     
@@ -24,11 +25,13 @@ class VisionController:
         return frame
         
     def GetImageVision(self):
+        """Get image from the vision part which contains threshold and is available as a JPEG"""
         foundBlob, frame, coords, size = self.__vision.getValues()
         #print("coords: " + str(coords) + " size: " + str(size))
         return cv2.imencode('.jpeg', frame)[1].tostring()
 
 class Camera(object):
+    """Camera object for the VisionController. Is made so frames can be send multiple times"""
     thread = None  # background thread that reads frames from camera
     frame = None  # current frame is stored here by background thread
     last_access = 0  # time of last client access to the camera
@@ -93,6 +96,7 @@ class Camera(object):
         self.thread = None
         
 class Vision:
+    """Vision does all the thresholding and returns information about the largest blob aswell as a thresholded image"""
     visionController = None
     thread = None 
     __resolution = None
@@ -127,6 +131,7 @@ class Vision:
         return self.foundBlob, self.image, self.coords, self.size
         
     def thresholdRange(self, img, min, max):
+        """Makes it possible to give a range when thresholding instead of a min or max"""
         ret,img1 = cv2.threshold(img, min, 1, cv2.THRESH_BINARY)
         ret,img2 = cv2.threshold(img, max, 1, cv2.THRESH_BINARY_INV)
         if max >= min:

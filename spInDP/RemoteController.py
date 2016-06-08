@@ -2,6 +2,7 @@ import bluetooth
 import threading
 import math
 from spInDP.RemoteContext import RemoteContext
+from spInDP.BehaviorType import BehaviorType
 
 
 class RemoteController(object):
@@ -71,12 +72,11 @@ class RemoteController(object):
             mode = mode.lower().strip()
             action = action.lower().strip()
 
-            if (mode != self._oldMode or action != self._oldAction):
+            if mode != self._oldMode or action != self._oldAction:
                 if mode == "limbo":
-                    # Enable compact crab walk when 'start' is passed
-                    enableCompactCrabWalk = action == "start"
-                    print ("Enable compact crab walk: " + str(enableCompactCrabWalk))
-                    self._spider.animationController.setWideWalking(not enableCompactCrabWalk)
+                    wideWalk = action == "stop"
+                    print ("Enable wide walk: " + str(wideWalk))
+                    self._spider.animationController.setWideWalking(wideWalk)
 
                 elif mode == "sprint":
                     if action == "start":
@@ -87,11 +87,11 @@ class RemoteController(object):
                     print ("Sprint not implemented, using walk.")
                     self._spider.animationController.setWideWalking(False)
 
-                elif mode == "grind":
+                elif mode == "gravel":
                     if action == "start":
-                        print ("Start grind mode")
+                        print ("Start gravel mode")
                     else:
-                        print("Stop grind mode")
+                        print("Stop gravel mode")
 
                     print("Grind mode not enable, using walk.")
                     self._spider.animationController.setWideWalking(False)
@@ -99,11 +99,11 @@ class RemoteController(object):
                 elif mode == "spider-gap":
                     if action == "walk":
                         print ("Regular walk")
-                    elif "action" == "body-horizontal":
+                    elif action == "horizontal":
                         print ("Keeping body horizontal")
-                    elif "gap":
+                    elif action == "cross":
                         print ("Cross spider gap")
-                    elif "touch-glass":
+                    elif action == "touch":
                         print ("Glas aanficken")
 
                     print("Grind mode not enable, using walk.")
@@ -111,9 +111,9 @@ class RemoteController(object):
 
                 elif mode == "destroy-balloon":
                     if action == "start":
-                        self._spider.switchBehavior("destoyballoon")
+                        self._spider.switchBehavior(BehaviorType.AutonomeDestroyBalloon)
                     else:
-                        self._spider.switchBehavior("manual")
+                        self._spider.switchBehavior(BehaviorType.Manual)
 
                 elif mode == "fury-road":
                     if action == "start":
@@ -124,11 +124,11 @@ class RemoteController(object):
                     print("Grind mode not enable, using walk.")
                     self._spider.animationController.setWideWalking(False)
 
-                elif mode == "paringsdans":
+                elif mode == "mating":
                     if action == "start":
-                        print("Start paringsdans mode")
+                        print("Start mating mode")
                     elif action == "stop":
-                        print ("Stop paringsdans mode")
+                        print ("Stop mating mode")
                     elif action == "up":
                         print ("Moving spider up")
                     elif action == "down":
@@ -138,7 +138,7 @@ class RemoteController(object):
                 self._oldMode = mode
                 self._oldAction = action
 
-            #Continue with next message
+            # Continue with next message
             msg = msg[msgEnd + 1:]
 
         print("Closing socket")
