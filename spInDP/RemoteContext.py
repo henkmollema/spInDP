@@ -8,6 +8,6 @@ class RemoteContext(object):
     jMagnitude = 0
     jAngle = 0
 
-    accelX = 0
-    accelY = 0
-    accelZ = 0
+    aX = 0
+    aY = 0
+    #aZ = 0
