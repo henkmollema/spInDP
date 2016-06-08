@@ -13,6 +13,7 @@ from spInDP.SequenceController import SequenceController
 from spInDP.ServoController import ServoController
 from spInDP.VisionController import VisionController
 from spInDP.WebServer import WebServer
+from flask import request
 
 
 class Spider(object):
@@ -101,12 +102,21 @@ class Spider(object):
         self._stopLoop = False
         self._startUpdateLoopThread()
 
+    def _shutdownWebserver(self):
+        print("Shutdown webserver")
+        func = request.environ.get('werkzeug.server.shutdown')
+        if func is None:
+            raise RuntimeError('Not running with the Werkzeug Server')
+        func()
+
     def stop(self):
         """Stops the spider and all its components."""
 
         self._stopLoop = True
         if self._updateThread is not None:
             self._updateThread.join()
+
+        self._shutdownWebserver()
 
         self.sequenceController.stop()
         self.remoteController.stop = True

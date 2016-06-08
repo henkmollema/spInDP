@@ -61,13 +61,16 @@ class RemoteController(object):
             self.context.jY = float((float(xs[1]) - 512.0) / 512.0)
             self.context.jZ = float(xs[2])
 
+            self.context.aX = float(xs[3])
+            self.context.aY = float(xs[4])
+
             self.context.jAngle = math.atan2(self.context.jY, self.context.jX) * (180 / math.pi) + 180
             magnitude = math.sqrt((self.context.jX ** 2) + (self.context.jY ** 2))
             self.context.jMagnitude = min(magnitude, 1)
 
             # Read the mode and action
-            mode = xs[3]
-            action = xs[4]
+            mode = xs[5]
+            action = xs[6]
 
             mode = mode.lower().strip()
             action = action.lower().strip()
