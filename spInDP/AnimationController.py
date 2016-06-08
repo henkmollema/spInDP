@@ -50,16 +50,10 @@ class AnimationController:
     stockLegLength = 16.347 #the topdown length of the leg at coords 0,0,0
     stockCornerCoxaAngle = 119.5 #angle in the body middle with a line from leg-3-coxa to leg-1-coxa going through the middle
 
-    #Distance from the coxa to the middle of the body without the X axis (a vertical line from top to middle)
-    coxaYDistanceFromCenter = cornerLegDistanceFromCenter * math.cos((stockCornerCoxaAngle - 90) * math.pi / 180)
-    #Distance between coxa turnpoints
-    leg3ToLeg1Distance = math.sqrt(cornerLegDistanceFromCenter**2 + sideLegDistanceFromCenter**2 - 2 *
-                                   cornerLegDistanceFromCenter * sideLegDistanceFromCenter *
-                                   math.cos(stockCornerCoxaAngle * math.pi / 180))
-    #Angle of the line from 'Body mid' > leg3 coxa > leg1 coxa at leg3 coxa
-    midToLeg3ToLeg1Angle = math.acos((leg3ToLeg1Distance**2 + sideLegDistanceFromCenter**2 -
-                                        cornerLegDistanceFromCenter**2) / (2*leg3ToLeg1Distance *
-                                        sideLegDistanceFromCenter)) / math.pi * 180
+    cornerCoxaYDistanceFromCenter = 12.05 #Distance from the coxa of one of the corner legs to the middle of the body without the X axis (a vertical line from top to middle)
+    cornerCoxaXDistanceFromCenter = 6.818 #Distance from the coxa of one of the cornes legs to the middle of the body without the Y axis (a horizontal line from left to middle)
+    leg3ToLeg1Distance = 21.056 #Distance between coxa turnpoints
+    midToLeg3ToLeg1Angle = 34.91 #Angle of the line from 'Body mid' > leg3 coxa > leg1 coxa at leg3 coxa
 
     seqCtrl = None
     yAdjustment = 0 #Y rotation for the current adjustment. (used in keeping the body upright)
