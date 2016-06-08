@@ -213,7 +213,7 @@ class AnimationController:
 
         return self.endFrame()
 
-    def turnWalk(self, turnDirection, walkDirection, frameNr, speedMod = 1):
+    def turnWalk(self, turnDirection, frameNr, speedMod = 1):
         """Work in progress. Dont use yet. -Erwin"""
         raise("Not yet implemented")
 
@@ -223,10 +223,7 @@ class AnimationController:
             raise ("\"walkDirection\" has to be between -1 and 1 for turnWalking")
 
         frameNr = frameNr % 6
-
         stepSize = 5
-        if turnDirection == -1:
-            stepSize = stepSize * -1
 
         legMid = {}
         if self.wideWalking:
@@ -234,33 +231,33 @@ class AnimationController:
         else:
             legMid = self.legNarrowMid
 
-        zGround = 5
-        zAir = 2
+        zGround = self.legGround
+        zAir = self.legAir
 
-        midXOffset = turnDirection * 100
+        midXOffset = -50
 
         if self.turnWalkInfo is None:
             self.turnWalkInfo = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}}
             for x in range(1, 7):
-                sideLegDistanceFromCenter = 0.0
-                if x == 6: #left
-                    sideLegDistanceFromCenter = 10.45 + midXOffset
-                elif x == 3: #right
-                    sideLegDistanceFromCenter = 10.45 - midXOffset
+                legDistanceFromCenter = 0.0
+                if x == 6: #left mid
+                    legDistanceFromCenter = 10.45 + midXOffset
+                elif x == 3: #right mid
+                    legDistanceFromCenter = 10.45 - midXOffset
+                elif x == 1 or x == 5: #left corners
+                    legDistanceFromCenter = math.sqrt((self.cornerCoxaXDistanceFromCenter + midXOffset)**2 + self.cornerCoxaYDistanceFromCenter**2)
+                elif x == 2 or x == 4: #right corners
+                    legDistanceFromCenter = math.sqrt((self.cornerCoxaXDistanceFromCenter - midXOffset)**2 + self.cornerCoxaYDistanceFromCenter**2)
 
-                cornerLegDistanceFromCenter = 0.0
-                if x == 1 or x == 5:
-                    cornerLegDistanceFromCenter = math.sqrt(self.leg3ToLeg1Distance**2 + (self.sideLegDistanceFromCenter - midXOffset)**2 - 2 * self.leg3ToLeg1Distance * (self.sideLegDistanceFromCenter - midXOffset) * math.cos(self.midToLeg3ToLeg1Angle * math.pi / 180))
-                elif x == 2 or x == 4:
-                    cornerLegDistanceFromCenter = math.sqrt(self.leg3ToLeg1Distance**2 + (self.sideLegDistanceFromCenter - midXOffset)**2 - 2 * self.leg3ToLeg1Distance * (self.sideLegDistanceFromCenter + midXOffset) * math.cos(self.midToLeg3ToLeg1Angle * math.pi / 180))
+                legLength = math.sqrt((self.stockLegLength + legMid[x][0])**2 + legMid[x][1]**2)
+                positionDifference = math.sqrt(legMid[x][0]**2 + legMid[x][1]**2)
+                extraCoxaAngle = math.acos((legLength**2 + self.stockLegLength**2 - positionDifference**2) / (2 * legLength * self.stockLegLength)) / math.pi * 180
+                coxaAngle = 90 - math.acos(self.cornerCoxaYDistanceFromCenter / legDistanceFromCenter) / math.pi * 180
+                actualCoxaAngle = coxaAngle + extraCoxaAngle
 
-                cornerCoxaAngle = math.asin((self.leg3ToLeg1Distance * math.sin(self.midToLeg3ToLeg1Angle * math.pi / 180)) / cornerLegDistanceFromCenter) / math.pi * 180
+                totalDistance = math.sqrt(legDistanceFromCenter**2 + legLength**2 - 2 * legDistanceFromCenter * legLength * math.cos(actualCoxaAngle * math.pi / 180))
 
-                actualLegLength = math.sqrt((self.stockLegLength + legMid[x][0]) ** 2 + legMid[x][1] ** 2)
-                actualCoxaAngle = cornerCoxaAngle - math.asin(legMid[1][1]/actualLegLength)/math.pi*180
-                totalDistance = math.sqrt(cornerLegDistanceFromCenter**2 + actualLegLength**2 - 2*cornerLegDistanceFromCenter*actualLegLength*math.cos(actualCoxaAngle*math.pi/180))
-
-                beta1 = math.asin((actualLegLength * math.sin(actualCoxaAngle*math.pi/180))/totalDistance)/math.pi*180
+                beta1 = math.asin((legLength * math.sin(actualCoxaAngle*math.pi/180))/totalDistance)/math.pi*180
                 beta2 = cornerCoxaAngle-90
                 betaSum = beta1+beta2
 
