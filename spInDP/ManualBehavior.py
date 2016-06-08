@@ -49,7 +49,7 @@ class ManualBehavior(Behavior):
                     speedMod=speedModifier) - self.spider.updateSleepTime,
                                0))
             else:
-                if jAngle > 0:
+                if jX > 0:
                     turnAngle = 1
                 else:
                     turnAngle = -1

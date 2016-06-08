@@ -41,7 +41,7 @@ public class MouseOrbitImproved : MonoBehaviour
 
     void LateUpdate()
     {
-        if (target && Input.GetMouseButton(1))
+        if ((target && Input.GetMouseButton(1)) || (target && Input.touchCount == 2))
         {
             x += Input.GetAxis("Mouse X") * xSpeed * distance * 0.02f;
             y -= Input.GetAxis("Mouse Y") * ySpeed * 0.02f;
@@ -61,8 +61,8 @@ public class MouseOrbitImproved : MonoBehaviour
             Vector3 position = rotation * negDistance + target.position;
 
             transform.rotation = rotation;
-            transform.position = position;
-            transform.localPosition += offset;
+            transform.position = position - offset;
+            //transform.localPosition += offset;
         }
     }
 

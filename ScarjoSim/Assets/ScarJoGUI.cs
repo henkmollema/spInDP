@@ -43,18 +43,38 @@ public class ScarJoGUI : MonoBehaviour {
         executeButtontext.text = "Execute Sequence";
         editButtontext.text = "EditMode";
 
+        string defaultSequenceText = "";
+        defaultSequenceText += "Sequence new-sequence" + Environment.NewLine;
+        defaultSequenceText += "framebegin" + Environment.NewLine;
+        defaultSequenceText += "l:1 0,0,0 100" + Environment.NewLine;
+        defaultSequenceText += "l:2 0,0,0 100" + Environment.NewLine;
+        defaultSequenceText += "l:3 0,0,0 100" + Environment.NewLine;
+        defaultSequenceText += "l:4 0,0,0 100" + Environment.NewLine;
+        defaultSequenceText += "l:5 0,0,0 100" + Environment.NewLine;
+        defaultSequenceText += "l:6 0,0,0 100" + Environment.NewLine;
+        defaultSequenceText += "frameend" + Environment.NewLine;
+        
 
-        if (!File.Exists("tmpseq.txt"))
+
+        /*if (!File.Exists("tmpseq.txt"))
         {
             File.Create("tmpseq.txt");
         }
         selectedSequence = "tmpseq.txt";
-        selectFile(selectedSequence);
+        selectFile(selectedSequence);*/
+
+        sequenceEditor.text = defaultSequenceText;
+        
     }
-	
+
+    bool first = true;
 	// Update is called once per frame
 	void Update () {
-	
+	    if(first)
+        {
+            this.playSelectedSequence();
+            first = false;
+        }
 	}
 
     public void toggleLabels(bool val)
@@ -118,7 +138,7 @@ public class ScarJoGUI : MonoBehaviour {
 
     public void insertState()
     {
-		sequenceEditor.text += "framebegin" + Environment.NewLine;
+		sequenceEditor.text += Environment.NewLine + "framebegin" + Environment.NewLine;
         foreach (SpiderLeg leg in spider.legs)
         {
             sequenceEditor.text += leg.getSequenceString(100);

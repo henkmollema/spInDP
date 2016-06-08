@@ -331,7 +331,7 @@ public class EditorCamera : MonoBehaviour
 		{
 			ray = GetComponent<Camera>().ScreenPointToRay( Input.mousePosition );
 			currMouse = ray.GetPoint(distance);
-			trans.Rotate( Vector3.Scale( trans.InverseTransformDirection(currMouse - initialMouse), dragDirection)*360, Space.Self );
+			trans.Rotate( Vector3.Scale( trans.InverseTransformDirection(currMouse - initialMouse) / 5, dragDirection)*360, Space.Self );
 			initialMouse = currMouse;
 			yield return 0;
 		}// end while
