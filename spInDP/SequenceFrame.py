@@ -29,7 +29,7 @@ class SequenceFrame(object):
         """
 
         #If no maxMaxExecTime was already given, scale the movements to the longest movement
-        if(self.maxMaxExecTime == -1.0):
+        if(self.maxMaxExecTime < 0):
             times = []
             for k in self.movements:
                 if self.movements[k] is not None:

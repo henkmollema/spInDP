@@ -5,7 +5,7 @@ import threading
 class LegThread(threading.Thread):
     """Provides a thread for handling leg movements."""
 
-    _cCoordinates = [0, 0, 0]
+    cCoordinates = [0, 0, 0]
 
     def __init__(self, legId, sequenceController, group=None, target=None, args=(), kwargs=None, verbose=None):
         """Initializes a new instance of the LegThread class."""
@@ -34,7 +34,7 @@ class LegThread(threading.Thread):
 
                 # Sleep this thread for maxexectime seconds (until the move has been completed)
                 time.sleep(legMovement.maxExecTime if legMovement.maxExecTime > 0 else 0.005)
-                self._cCoordinates = legMovement.IKCoordinates
+                self.cCoordinates = legMovement.IKCoordinates
                 # except:
                 # print ("error on leg " + str(self.legId))
             finally:

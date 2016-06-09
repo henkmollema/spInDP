@@ -59,7 +59,7 @@ class SequenceController(object):
 
 
     def getLegCoords(self, legID):
-        return self.threadMap[legID].cCoordinates;
+        return self.threadMap[legID].cCoordinates
 
 
     def parseSequence(self, filePath, validate=False, speedModifier=1, repeat=1):
@@ -313,7 +313,6 @@ class SequenceController(object):
 
         retVal = LegMovement()
         maxDelta = max(deltaCoxa, deltaFemur, deltaTibia)
-        retVal.IKCoordinates = {x,y,z}
 
         if (maxDelta == 0):
             return None

@@ -33,9 +33,9 @@ class ImmediateBehavior(AutonomeBehavior):
 
         yAngle = 0
         xAngle = 0
-        if (self._remoteContext.jMagnitude > 0.1):
-            yAngle = self._remoteContext.jX * 15 * math.pi / 180
-            xAngle = self._remoteContext.jY * 15 * math.pi / 180
+
+        yAngle = self._remoteContext.aY * 30 * math.pi / 180
+        xAngle = self._remoteContext.aX * 30 * math.pi / 180
 
         for x in range(1, 7):
             newIKCoordinates = list(self._basePose[x - 1])  # copy the basePose
@@ -71,7 +71,7 @@ class ImmediateBehavior(AutonomeBehavior):
             self._currentPose[x - 1] = newIKCoordinates
 
         # Set the servos to the currentpose with speed 150
-        newFrame = self.poseToSequenceFrame(self._currentPose, 200)
+        newFrame = self.poseToSequenceFrame(self._currentPose, 75)
         self.spider.sequenceController.setFrame(newFrame)
 
     def poseToSequenceFrame(self, pose, speed):
