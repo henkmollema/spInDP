@@ -108,7 +108,7 @@ class RemoteController(object):
                     print("Grind mode not implemented, using walk.")
                     self._spider.animationController.setWideWalking(True)
 
-                elif mode == "destroy-balloon":
+                elif mode == "vision":
                     if action == "start":
                         self._spider.switchBehavior(BehaviorType.AutonomeDestroyBalloon)
                     else:
