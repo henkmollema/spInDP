@@ -5,7 +5,7 @@ from spInDP.SequenceFrame import SequenceFrame
 class AnimationController:
     """"Provides dynamic animations"""
     #Leg z coordinates
-    legAirHigh = -2
+    legAirHigh = 0
     legAir = 2
     legGround = 5
 
@@ -343,13 +343,13 @@ class AnimationController:
             stepRangeVert = cosDirection * 14 #14 is stepsize for vertical walking
             stepRangeHor = sinDirection * 8 #8 is stepsize for horizontal walking
             zGround = self.legGround
-            zAir = self.legAirHigh
+            zAir = self.legAir
         else:
             legMid = self.legNarrowMid
             stepRangeVert = cosDirection * 7 #7 is stepsize for vertical walking
             stepRangeHor = sinDirection * 7 #7 is stepsize for horizontal walking
             zGround = self.legGround - 2
-            zAir = self.legAirHigh
+            zAir = self.legAir
 
         if(keepLeveled):
             zGround = 7
