@@ -9,7 +9,11 @@ class SequenceFrame(object):
     """
 
     movements = {}
-    maxMaxExecTime = 0.0
+    maxMaxExecTime = -1.0
+
+
+    def __init__(self, miliseconds = -1.0):
+        self.maxMaxExecTime = miliseconds / 1000
 
     def setMovement(self, legID, LegMovement):
         """Set a LegMovement in this sequenceframe"""
@@ -19,18 +23,23 @@ class SequenceFrame(object):
         """
             Scales the servo speeds in the LegMovements in this SequenceFrame
             so that all movements start and stop at the same time
+            The argument 'seconds' can be used to scale the frame-time to a number of seconds
 
             retuns a new list of scaled LegMovements
         """
-        times = []
-        for k in self.movements:
-            if self.movements[k] is not None:
-                times.append(self.movements[k].maxExecTime)
 
-        if (len(times) == 0):
-            self.maxMaxExecTime = 0
-        else:
-            self.maxMaxExecTime = max(times)
+        #If no maxMaxExecTime was already given, scale the movements to the longest movement
+        if(self.maxMaxExecTime == -1.0):
+            times = []
+            for k in self.movements:
+                if self.movements[k] is not None:
+                    times.append(self.movements[k].maxExecTime)
+
+            if (len(times) == 0):
+                self.maxMaxExecTime = 0
+            else:
+                self.maxMaxExecTime = max(times)
+
 
         scaledMoves = {}
         

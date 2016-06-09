@@ -90,6 +90,7 @@ public class SpiderController : MonoBehaviour
         
         string[] lines = filecontent.Split('\n');
         Dictionary<int, SpiderLeg.LegMovement> tmpFrame = null;
+        int tmpFrameMillis = -1;
 
         for (int i = 0; i < repeat; i++)
         {
@@ -131,7 +132,13 @@ public class SpiderController : MonoBehaviour
 
                 if (words[0].ToLower().Equals("framebegin"))
                 {
+                    if(words.Length > 1)
+                    {
+                        tmpFrameMillis = int.Parse(words[1]);
+                    }
+
                     tmpFrame = new Dictionary<int, SpiderLeg.LegMovement>();
+                    
                 }
                 else
                 if (words[0].ToLower().Equals("frameend"))
@@ -139,7 +146,8 @@ public class SpiderController : MonoBehaviour
                     if(tmpFrame == null)
                         continue;
 
-                    SpiderLeg.SequenceFrame sf = SpiderLeg.newSequenceFrame(tmpFrame);
+                    SpiderLeg.SequenceFrame sf = SpiderLeg.newSequenceFrame(tmpFrame, tmpFrameMillis);
+                    tmpFrameMillis = -1;
 
                     for (int x = 1; x < 7; x++)
                     {
@@ -381,8 +389,8 @@ public class SpiderController : MonoBehaviour
         lm.tibia = angleTibia;
         lm.tibiaSpeed = tibiaSpeed;
         
-            float timePerAngle = (float)(100 * 360.0 / 60.0) * (speed / 1023f);
-            lm.maxExecTime = maxDelta / timePerAngle;
+        float timePerAngle = (float)(100 * 360.0 / 60.0) * (speed / 1023f);
+        lm.maxExecTime = maxDelta / timePerAngle;
 
 
         return lm;

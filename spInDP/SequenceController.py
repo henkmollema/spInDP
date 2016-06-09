@@ -157,7 +157,12 @@ class SequenceController(object):
                 "sequences/" + seq.rstrip() + ".txt", repeat=repeat)
 
         elif (command == "framebegin"):
-            self.sequenceFrame = SequenceFrame()
+            if(len(words) > 1):
+                miliseconds = float(words[1])
+                self.sequenceFrame = SequenceFrame(miliseconds)
+            else:
+                self.sequenceFrame = SequenceFrame()
+
 
         elif (command == "frameend"):
             if (self.sequenceFrame is None):
