@@ -5,7 +5,7 @@ from spInDP.SequenceFrame import SequenceFrame
 class AnimationController:
     """"Provides dynamic animations"""
     #Leg z coordinates
-    legAirHigh = -2
+    legAirHigh = 1
     legAir = 2
     legGround = 5
 
@@ -111,6 +111,8 @@ class AnimationController:
     def setHighWalking(self, value):
         """Adjust the height of the legs when they are airborne"""
         self.highWalking = value
+        if(value):
+            self.setWideWalking(True)
 
     def startFrame(self):
         self.sequenceFrame = SequenceFrame()
