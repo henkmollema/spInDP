@@ -7,6 +7,7 @@ from spInDP.FindBalloonBehavior import FindBalloonBehavior
 from spInDP.ImmediateBehavior import ImmediateBehavior
 from spInDP.ManualBehavior import ManualBehavior
 from spInDP.PushBehavior import PushBehavior
+from spInDP.FollowBalloonBehavior import FollowBalloonBehavior
 from spInDP.RemoteController import RemoteController
 from spInDP.SensorDataProvider import SensorDataProvider
 from spInDP.SequenceController import SequenceController
@@ -89,8 +90,11 @@ class Spider(object):
             print("Switched to manual behavior")
             self._behavior = ManualBehavior(self)
         elif behaviorType == BehaviorType.AutonomeDestroyBalloon:
-            print("Switched to find balloon behavior.")
+            print("Switched to destroy balloon behavior.")
             self._behavior = FindBalloonBehavior(self)
+        elif behaviorType == BehaviorType.AutonomeFollowBalloon:
+            print("Switched to follow balloon behavior.")
+            self._behavior = FollowBalloonBehavior(self)
         elif behaviorType == BehaviorType.ImmediateBehaviour:
             print("Switched to immediate behavior.")
             self._behavior = ImmediateBehavior(self)

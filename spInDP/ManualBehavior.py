@@ -34,7 +34,7 @@ class ManualBehavior(Behavior):
 
         # DEBUG
         # print "GYRO Y: " + str(((float(self.spider.sensorDataProvider.getAccelerometer()[1]) / 1000.0) / 16.0) * 90.0)
-        # time.sleep(self.spider.animationController.walk(direction = 0, frameNr = 0, speedMod = 1, keepLeveled = True))
+        #time.sleep(self.spider.animationController.walk(direction = 0, frameNr = 0, speedMod = 1, keepLeveled = True))
         # self.frameNr += 1
         # print "GYRO ANGLES: " + str(self.spider.sensorDataProvider.getAccelerometer()[0]) + ", " + str(self.spider.sensorDataProvider.getAccelerometer()[1]) + ", " + str(self.spider.sensorDataProvider.getAccelerometer()[2])
         # DEBUG
@@ -49,7 +49,7 @@ class ManualBehavior(Behavior):
                     speedMod=speedModifier) - self.spider.UPDATE_SLEEP_TIME,
                                0))
             else:
-                if jX > 0:
+                if jY > 0:
                     turnAngle = 1
                 else:
                     turnAngle = -1

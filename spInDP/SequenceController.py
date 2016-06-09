@@ -59,7 +59,7 @@ class SequenceController(object):
 
 
     def getLegCoords(self, legID):
-        return self.threadMap[legID].cCoordinates;
+        return self.threadMap[legID].cCoordinates
 
 
     def parseSequence(self, filePath, validate=False, speedModifier=1, repeat=1):
@@ -157,7 +157,12 @@ class SequenceController(object):
                 "sequences/" + seq.rstrip() + ".txt", repeat=repeat)
 
         elif (command == "framebegin"):
-            self.sequenceFrame = SequenceFrame()
+            if(len(words) > 1):
+                miliseconds = float(words[1])
+                self.sequenceFrame = SequenceFrame(miliseconds)
+            else:
+                self.sequenceFrame = SequenceFrame()
+
 
         elif (command == "frameend"):
             if (self.sequenceFrame is None):
@@ -308,7 +313,6 @@ class SequenceController(object):
 
         retVal = LegMovement()
         maxDelta = max(deltaCoxa, deltaFemur, deltaTibia)
-        retVal.IKCoordinates = {x,y,z}
 
         if (maxDelta == 0):
             return None

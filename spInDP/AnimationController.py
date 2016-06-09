@@ -5,7 +5,7 @@ from spInDP.SequenceFrame import SequenceFrame
 class AnimationController:
     """"Provides dynamic animations"""
     #Leg z coordinates
-    legAirHigh = 1
+    legAirHigh = 0
     legAir = 2
     legGround = 5
 

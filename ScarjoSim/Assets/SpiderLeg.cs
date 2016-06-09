@@ -306,15 +306,23 @@ public class SpiderLeg : MonoBehaviour
 		public float maxMaxExecTime;
 	}
 	
-	public static SequenceFrame newSequenceFrame(Dictionary<int, LegMovement> movements)
+	public static SequenceFrame newSequenceFrame(Dictionary<int, LegMovement> movements, int miliseconds = -1)
 	{
 		SequenceFrame retVal = new SequenceFrame();
-		float maxTime = 0f;
-		foreach(KeyValuePair<int, LegMovement> k in movements)
-		{
-			maxTime = Mathf.Max(maxTime, k.Value.maxExecTime);
-		}
-		retVal.maxMaxExecTime = maxTime;
+        if(miliseconds == -1)
+        {
+            float maxTime = 0f;
+            foreach (KeyValuePair<int, LegMovement> k in movements)
+            {
+                maxTime = Mathf.Max(maxTime, k.Value.maxExecTime);
+            }
+            retVal.maxMaxExecTime = maxTime;
+        }
+        else
+        {
+            retVal.maxMaxExecTime = miliseconds / 1000f;
+        }
+		
 		
 		Dictionary<int, LegMovement> scaledMoves = new Dictionary<int, LegMovement>();
 		foreach (KeyValuePair<int, LegMovement> mov in movements)
