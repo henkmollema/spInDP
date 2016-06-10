@@ -61,8 +61,13 @@ class RemoteController(object):
             self.context.jY = float((float(xs[1]) - 512.0) / 512.0)
             self.context.jZ = float(xs[2])
 
-            self.context.aX = float(xs[3])
-            self.context.aY = float(xs[4])
+            axStr = xs[3]
+            ayStr = xs[4]
+
+            # Only read AX/AY when it's sent with Bluetooth
+            if axStr != "" and ayStr != "":
+                self.context.aX = float(axStr)
+                self.context.aY = float(ayStr)
 
             self.context.jAngle = math.atan2(self.context.jY, self.context.jX) * (180 / math.pi) + 180
             magnitude = math.sqrt((self.context.jX ** 2) + (self.context.jY ** 2))
@@ -76,7 +81,13 @@ class RemoteController(object):
             action = action.lower().strip()
 
             if mode != self._oldMode or action != self._oldAction:
-                if mode == "limbo":
+                if mode == "":
+                    if action == "":
+                        print("Reset spider status")
+                        self._spider.switchBehavior(BehaviorType.Manual)
+                        self._spider.animationController.setWideWalking(True)
+
+                elif mode == "limbo":
                     wideWalk = action == "stop"
                     print ("Enable wide walk: " + str(wideWalk))
                     self._spider.animationController.setWideWalking(wideWalk)
