@@ -4,29 +4,27 @@ from spInDP.AnimationController import AnimationController
 
 
 class PushBehavior(Behavior):
-
-    frameNr = 0
+    
+    frameNr = 1
     lastZ = 0
     animationController = None
+    remoteContext = None
 
     def __init__(self, spider):
-        print("Initializing spider gap.")
+        print("Initializing push (spider gap) behavior.")
         super(PushBehavior, self).__init__(spider)
-        self.remoteContext = spider.remoteController.context
-        self.animationController = AnimationController(spider)
 
     def update(self):
-        for x in range(1, 6):
-            execTime = self.animationController.push(self.frameNr, 1)
-            time.sleep(execTime)
-            self.frameNr += 1
-
-    def update2(self):
-        jMagnitude = self.remoteContext.jMagnitude
-
-        if (jMagnitude > 0.4):
+        jMagnitude = self.spider.remoteController.context.jMagnitude
+        angleModifier = 1
+        if(jMagnitude > 0.4):
+            print("jMagnituge = ", jMagnitude)
             speedModifier = jMagnitude * 2
 
-            time.sleep(max(self.animationController.push(frameNr = self.frameNr, speedMod = speedModifier)))
+            time.sleep(self.animationController.push(frameNr=self.frameNr, speedMod=speedModifier))
+
+            #self.animationController.push(frameNr=self.frameNr, speedMod=speedModifier)
             self.frameNr += 1
+            print("hohihohohihohi")
+
         return

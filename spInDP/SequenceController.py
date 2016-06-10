@@ -16,11 +16,12 @@ class SequenceController(object):
     e = 5.60  # height (cm)
     d = 12.24  # Horz. afstand van c tot a (cm)
     lc = 4.107  # Lengte coxa (cm)
-    b = math.sqrt(e**2 + d**2)  # diagonal (cm)
+    b = math.sqrt(e ** 2 + d ** 2)  # diagonal (cm)
     radToDeg = (180 / math.pi)
 
-    anglePerSecond = (114.0 * 360.0 / 60.0) #Optimal rpm is 114 without load at max speed, used to estimate the time it takes to execute an action
-    coxaOffset = 45 #Used to offset the coxas from their base position.
+    anglePerSecond = (
+    114.0 * 360.0 / 60.0)  # Optimal rpm is 114 without load at max speed, used to estimate the time it takes to execute an action
+    coxaOffset = 45  # Used to offset the coxas from their base position.
 
     """Maps servosIDs to their current position in degree"""
     servoAngleMap = {
@@ -34,13 +35,13 @@ class SequenceController(object):
     """Maps legIDs to their LegThread"""
     threadMap = {}
 
-    sequenceFrame = None #Buffer to hold the frame we are building
+    sequenceFrame = None  # Buffer to hold the frame we are building
 
     def __init__(self, spider):
         """Constructor, initializes the leg threads and legqueues"""
         self.spider = spider
         self.servoController = spider.servoController
-        self.legQueue = {} #Holds the LegMovement objects to be executed by the legs, key is legID
+        self.legQueue = {}  # Holds the LegMovement objects to be executed by the legs, key is legID
         self.threadMap = {}
         self.stopped = False
 
@@ -57,26 +58,24 @@ class SequenceController(object):
         for key in self.threadMap:
             self.threadMap[key].join()
 
-
     def getLegCoords(self, legID):
         return self.threadMap[legID].cCoordinates
-
 
     def parseSequence(self, filePath, validate=False, speedModifier=1, repeat=1):
         """Sequence file parser, returns the time it takes to execute this sequence in seconds"""
 
-        #print("Parsing sequence at: " + filePath + " repeating for "  + str(repeat))
+        # print("Parsing sequence at: " + filePath + " repeating for "  + str(repeat))
         with open(filePath, 'r') as f:
             lines = f.readlines()
 
         totalTime = 0
-        
+
         words = lines[0].split(' ')
         if (words[0].lower() != "sequence"):
-            raise(
+            raise (
                 "Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
         else:
-            if(len(words) > 3):
+            if (len(words) > 3):
                 self.coxaOffset = int(words[3])
             else:
                 self.coxaOffset = 45
@@ -84,7 +83,7 @@ class SequenceController(object):
         for x in range(0, repeat):
             lineNr = 0
 
-            if(speedModifier < 0):
+            if (speedModifier < 0):
                 lineNr = len(lines)
                 for line in reversed(lines):
                     totalTime += self.interpretLine(line, lineNr, speedModifier)
@@ -94,17 +93,17 @@ class SequenceController(object):
                 for line in lines:
                     totalTime += self.interpretLine(line, lineNr, speedModifier)
                     lineNr += 1
-        
+
         return totalTime
-        
+
     def interpretLine(self, line, lineNr, speedModifier=1):
         """Parses a single line of a sequence file and executes the command"""
-        if(lineNr == 1 or line.lstrip().startswith("#") or len(line.strip()) == 0):
+        if (lineNr == 1 or line.lstrip().startswith("#") or len(line.strip()) == 0):
             return 0
 
         words = line.split(' ')
         command = words[0].lower().rstrip()
-        #print("exec command: " + command)
+        # print("exec command: " + command)
 
         # Reverse frames when in a backwards direction
         if (speedModifier < 0):
@@ -113,9 +112,8 @@ class SequenceController(object):
             elif (command == "frameend"):
                 command = "framebegin"
 
-
-        if(command == "delay"):
-            if(len(words) != 2):
+        if (command == "delay"):
+            if (len(words) != 2):
                 raise NameError("No argument given for delay at line: " + str(lineNr))
 
             seconds = float(words[1]) / 1000
@@ -157,7 +155,7 @@ class SequenceController(object):
                 "sequences/" + seq.rstrip() + ".txt", repeat=repeat)
 
         elif (command == "framebegin"):
-            if(len(words) > 1):
+            if (len(words) > 1):
                 miliseconds = float(words[1])
                 self.sequenceFrame = SequenceFrame(miliseconds)
             else:
@@ -168,36 +166,36 @@ class SequenceController(object):
             if (self.sequenceFrame is None):
                 return 0
 
-            #Put the movements in the frame on the leg queues
+            # Put the movements in the frame on the leg queues
             self.addFrameToQueue(self.sequenceFrame)
 
-            #We return the time it takes for this frame to execute
+            # We return the time it takes for this frame to execute
             ret = self.sequenceFrame.maxMaxExecTime
 
-            #Clear the frame so another one can be created on the next framebegin
+            # Clear the frame so another one can be created on the next framebegin
             self.sequenceFrame.movements.clear()
             self.sequenceFrame = None
-            
+
             return ret
 
         # Control legs
-        elif(words[0].lower().startswith('l:')):
-            if(len(words) < 2 or len(words) > 3):
+        elif (words[0].lower().startswith('l:')):
+            if (len(words) < 2 or len(words) > 3):
                 raise NameError("Wrong amount of arguments for servo control: " + str(
                     len(words)) + " at line: " + str(lineNr))
 
             legID = int(words[0].split(':')[1])
             coords = words[1].split(',')
-            if(len(coords) != 3):
+            if (len(coords) != 3):
                 raise NameError(
                     "Wrong amount of coords: " + str(len(coords)) + " (expected 3) at line: " + str(lineNr))
 
             speed = -1
-            if(len(words) == 3):
+            if (len(words) == 3):
                 speed = int(words[2])
 
             s = 200
-            if(speed > 0):
+            if (speed > 0):
                 s = speed
 
                 ikArgs = IKArguments()
@@ -215,12 +213,12 @@ class SequenceController(object):
                 if (self.sequenceFrame is None):
                     self.legQueue[legID].put(legMovement)
                 else:
-                    #Add the movement to the frame we're building
+                    # Add the movement to the frame we're building
                     self.sequenceFrame.setMovement(legID, legMovement)
 
         # Control individual servo
-        elif(words[0].lower().startswith('s:')):
-            if(len(words) < 2 or len(words) > 3):
+        elif (words[0].lower().startswith('s:')):
+            if (len(words) < 2 or len(words) > 3):
                 raise NameError("Wrong amount of arguments for servo control: " + str(
                     len(words)) + " at line: " + str(lineNr))
 
@@ -228,10 +226,10 @@ class SequenceController(object):
             destinationAngle = float(words[1])
 
             speed = -1
-            if(len(words) == 3):
+            if (len(words) == 3):
                 speed = int(words[2])
             s = 200
-            if(speed > 0):
+            if (speed > 0):
                 s = speed
                 self.servoController.move(servoID, int(destinationAngle), s * abs(speedModifier))
                 currAngle = self.servoAngleMap[servoID]
@@ -244,12 +242,12 @@ class SequenceController(object):
 
         else:
             raise NameError("No valid command found on line: " + str(lineNr))
-            
+
         return 0
 
+    first = True  # first = True if we need to get initial positions from servo
 
-    first = True #first = True if we need to get initial positions from servo
-    def coordsToLegMovement(self, x, y, z, legID, speed, immediateMode = False):
+    def coordsToLegMovement(self, x, y, z, legID, speed, immediateMode=False):
         """
         Given X Y Z Coordinates this method
         creates and returns a LegMovement object, containing the angles
@@ -261,9 +259,9 @@ class SequenceController(object):
         immediateMode: The speeds won't be corrected
         """
 
-        lIK = math.sqrt((self.d + self.lc + x)**2 + y**2)
+        lIK = math.sqrt((self.d + self.lc + x) ** 2 + y ** 2)
         dIK = lIK - self.lc
-        bIK = math.sqrt((self.e + z)**2 + dIK**2)
+        bIK = math.sqrt((self.e + z) ** 2 + dIK ** 2)
 
         coxaServoId = (legID - 1) * 3 + 1
         femurServoId = (legID - 1) * 3 + 2
@@ -274,7 +272,7 @@ class SequenceController(object):
         femurCurr = self.servoAngleMap[femurServoId]
         tibiaCurr = self.servoAngleMap[tibiaServoId]
 
-        #If the servomap is empty try to read the position directly from the servo
+        # If the servomap is empty try to read the position directly from the servo
         if (self.first is True):
             self.first = False
             coxaCurr = self.servoController.getPosition(coxaServoId)
@@ -282,9 +280,9 @@ class SequenceController(object):
             tibiaCurr = self.servoController.getPosition(tibiaServoId)
 
         betaIK = math.acos(
-            (self.a**2 + self.c**2 - bIK**2) / (2 * self.a * self.c))
+            (self.a ** 2 + self.c ** 2 - bIK ** 2) / (2 * self.a * self.c))
         gammaIK = math.acos(
-            (self.a**2 + bIK**2 - self.c**2) / (2 * self.a * bIK))
+            (self.a ** 2 + bIK ** 2 - self.c ** 2) / (2 * self.a * bIK))
         thetaIK = math.asin(y / lIK)
         tauIK = math.atan((self.e + z) / dIK)
 
@@ -296,17 +294,17 @@ class SequenceController(object):
             angleCoxa = -angleCoxa
             angleFemur = -angleFemur
             angleTibia = -angleTibia
-            
-        if(legID == 1 or legID == 4):
+
+        if (legID == 1 or legID == 4):
             angleCoxa += self.coxaOffset
-        if(legID == 2 or legID == 5):
+        if (legID == 2 or legID == 5):
             angleCoxa -= self.coxaOffset
 
         self.servoAngleMap[coxaServoId] = angleCoxa
         self.servoAngleMap[femurServoId] = angleFemur
         self.servoAngleMap[tibiaServoId] = angleTibia
 
-        #Create a LegMovement object
+        # Create a LegMovement object
         deltaCoxa = abs(angleCoxa - coxaCurr)
         deltaFemur = abs(angleFemur - femurCurr)
         deltaTibia = abs(angleTibia - tibiaCurr)
@@ -316,9 +314,9 @@ class SequenceController(object):
 
         if (maxDelta == 0):
             return None
-            
-        #If we are in immediate mode, don't calculate delta's
-        if(not immediateMode): 
+
+        # If we are in immediate mode, don't calculate delta's
+        if (not immediateMode):
             if (maxDelta == deltaCoxa):
                 # print("max delta is coxa")
                 retVal.coxaSpeed = speed
@@ -341,15 +339,13 @@ class SequenceController(object):
             retVal.coxaSpeed = speed
             retVal.femurSpeed = speed
             retVal.tibiaSpeed = speed
-            
 
         retVal.coxa = angleCoxa
         retVal.femur = angleFemur
         retVal.tibia = angleTibia
 
-        retVal.IKCoordinates = [x,y,z]
+        retVal.IKCoordinates = [x, y, z]
         return retVal
-
 
     def addFrameToQueue(self, frame):
         """
@@ -363,18 +359,18 @@ class SequenceController(object):
             # Create an 'empty movement
             if (mov is None):
                 mov = LegMovement()
-                mov.empty = True 
+                mov.empty = True
                 mov.maxExecTime = frame.maxMaxExecTime
-                
+
             self.legQueue[x].put(mov)
-            
+
     def setFrame(self, frame):
         """
             Immediately sends the servos to the LegMovements
             in a given SequenceFrame
         """
 
-        if(self.legQueueIsEmpty()):
+        if (self.legQueueIsEmpty()):
             scaledMovements = frame.getScaledMovements()
             for x in scaledMovements:
                 self.servoController.move((x - 1) * 3 + 1, scaledMovements[x].coxa, scaledMovements[x].coxaSpeed)
@@ -382,16 +378,12 @@ class SequenceController(object):
                 self.servoController.move((x - 1) * 3 + 3, scaledMovements[x].tibia, scaledMovements[x].tibiaSpeed)
         else:
             print("setFrame() failed, legQueues not empty")
-        
-        
+
     def legQueueIsEmpty(self):
         """
             Returns true if no LegMovements are on the LegQueues
         """
-        for x in range(1,7):
+        for x in range(1, 7):
             if (not self.legQueue[x].empty()):
                 return False
         return True
-        
-        
-
