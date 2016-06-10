@@ -373,11 +373,11 @@ class Ax12:
 
     def moveSpeed(self, id, position, speed):
         if(position < 0):
-            print ("Tried to move to " + str(position) + " corrected to: 0")
+            print ("Tried to move servo " + str(id) +" to " + str(position) + " corrected to: 0")
             position = 0
             
         if(position > 1023):
-            print ("Tried to move to " + str(position) + " corrected to: 1023")
+            print ("Tried to move servo " + str(id) +" to " + str(position) + " corrected to: 1023")
             position = 1023
         
     
