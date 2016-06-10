@@ -1,3 +1,6 @@
+import time
+from spInDP.Behavior import Behavior
+
 class TouchBehavior(Behavior):
 
     frameNr = 0
@@ -10,14 +13,10 @@ class TouchBehavior(Behavior):
     def __init__(self, spider):
         print("Initializing touch behavior.")
         super(TouchBehavior, self).__init__(spider)
-        self.remoteContext = spider.remoteController.context
-        self.animationController = AnimationController(spider)
-        self.sensorData = SensorDataProvider()
-        self.spider = spider
         self.initLeg()
 
     def update(self):
-        jMagnitude = self.remoteContext.jMagnitude
+        jMagnitude = self.spider.remoteController.context.jMagnitude
 
         if(jMagnitude > 0.4):
             #time.sleep(max(self.animationController.method))
@@ -39,7 +38,7 @@ class TouchBehavior(Behavior):
         #tibia = ~60 --> tibia = 0
 
     def measureSpinAngle(self):
-        sensorData = SensorDataProvider()
+        sensorData = self.spider.sensorDataProvider
         sensorData.startMeasuring()
         time.sleep(0.1)
         sensorData.stopMeasuring()

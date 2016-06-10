@@ -4,20 +4,18 @@ from spInDP.AnimationController import AnimationController
 
 
 class PushBehavior(Behavior):
-
+    
     frameNr = 1
     lastZ = 0
     animationController = None
     remoteContext = None
 
     def __init__(self, spider):
-        print("Initializing spider gap.")
+        print("Initializing push (spider gap) behavior.")
         super(PushBehavior, self).__init__(spider)
-        self.remoteContext = spider.remoteController.context
-        self.animationController = AnimationController(spider)
 
     def update(self):
-        jMagnitude = self.remoteContext.jMagnitude
+        jMagnitude = self.spider.remoteController.context.jMagnitude
         angleModifier = 1
         if(jMagnitude > 0.4):
             print("jMagnituge = ", jMagnitude)

@@ -84,11 +84,11 @@ class RemoteController(object):
                 elif mode == "sprint":
                     if action == "start":
                         print ("Start sprint mode")
+                        self._spider.switchBehavior(BehaviorType.Sprint)
                     else:
                         print("Stop sprint mode")
-
-                    print ("Sprint not implemented, using walk.")
-                    self._spider.animationController.setWideWalking(True)
+                        self._spider.switchBehavior(BehaviorType.Manual)
+                        self._spider.animationController.setWideWalking(True)
 
                 elif mode == "gravel":
                     highWalk = action == "start"
@@ -97,16 +97,20 @@ class RemoteController(object):
 
                 elif mode == "spider-gap":
                     if action == "walk":
+                        self._spider.switchBehavior(BehaviorType.Manual)
                         self._spider.animationController.setWideWalking(True)
+
                     elif action == "horizontal":
                         print ("Keeping body horizontal")
+                        self._spider.switchBehavior(BehaviorType.Manual)
+
                     elif action == "cross":
                         print ("Cross spider gap")
+                        self._spider.switchBehavior(BehaviorType.Push)
+
                     elif action == "touch":
                         print ("Glas aanficken")
-
-                    print("Grind mode not implemented, using walk.")
-                    self._spider.animationController.setWideWalking(True)
+                        self._spider.switchBehavior(BehaviorType.Manual)
 
                 elif mode == "vision":
                     if action == "start":
@@ -116,12 +120,11 @@ class RemoteController(object):
 
                 elif mode == "fury-road":
                     if action == "start":
-                        print ("Start fury road")
+                        print ("Start fury road - using follow balloon for now")
+                        self._spider.switchBehavior(BehaviorType.AutonomeFollowBalloon)
                     else:
-                        print("Stop fury road")
-
-                    print("Grind mode not implemented, using walk.")
-                    self._spider.animationController.setWideWalking(True)
+                        print("Stop fury road (follow balloon)")
+                        self._spider.switchBehavior(BehaviorType.Manual)
 
                 elif mode == "mating":
                     if action == "start":
@@ -134,6 +137,7 @@ class RemoteController(object):
                         print ("Moving spider down")
 
                     print("Mating not implemented, using walk.")
+                    self._spider.switchBehavior(BehaviorType.Manual)
                     self._spider.animationController.setWideWalking(True)
 
                 # Save current action and messages

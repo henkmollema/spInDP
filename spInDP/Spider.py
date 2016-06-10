@@ -1,20 +1,22 @@
 import time
 from threading import Thread
 
+from flask import request
+
 from spInDP.AnimationController import AnimationController
 from spInDP.BehaviorType import BehaviorType
 from spInDP.FindBalloonBehavior import FindBalloonBehavior
+from spInDP.FollowBalloonBehavior import FollowBalloonBehavior
 from spInDP.ImmediateBehavior import ImmediateBehavior
 from spInDP.ManualBehavior import ManualBehavior
 from spInDP.PushBehavior import PushBehavior
-from spInDP.FollowBalloonBehavior import FollowBalloonBehavior
 from spInDP.RemoteController import RemoteController
 from spInDP.SensorDataProvider import SensorDataProvider
 from spInDP.SequenceController import SequenceController
 from spInDP.ServoController import ServoController
+from spInDP.SprintBehavior import SprintBehavior
 from spInDP.VisionController import VisionController
 from spInDP.WebServer import WebServer
-from flask import request
 
 
 class Spider(object):
@@ -78,29 +80,36 @@ class Spider(object):
     def switchBehavior(self, behaviorType):
         """Switches the active behavior of the spider."""
 
-        print("SwitchBehavior invoked")
+        print("SwitchBehavior invoked: " + behaviorType)
 
         # Stop the update loop
         self._stopLoop = True
         self._updateThread.join()
-        print("Update loop stopped")
 
         # Switch to the desired behavior
         if behaviorType == BehaviorType.Manual:
             print("Switched to manual behavior")
             self._behavior = ManualBehavior(self)
+
         elif behaviorType == BehaviorType.AutonomeDestroyBalloon:
             print("Switched to destroy balloon behavior.")
             self._behavior = FindBalloonBehavior(self)
+
         elif behaviorType == BehaviorType.AutonomeFollowBalloon:
             print("Switched to follow balloon behavior.")
             self._behavior = FollowBalloonBehavior(self)
-        elif behaviorType == BehaviorType.ImmediateBehaviour:
+
+        elif behaviorType == BehaviorType.Immediate:
             print("Switched to immediate behavior.")
             self._behavior = ImmediateBehavior(self)
-        elif behaviorType == BehaviorType.PushBehavior:
+
+        elif behaviorType == BehaviorType.Push:
             print("Switched to push behavior.")
             self._behavior = PushBehavior(self)
+
+        elif behaviorType == BehaviorType.Sprint:
+            print("Switched to sprint behavior")
+            self._behavior = SprintBehavior(self)
 
         # Start the loop again
         self._stopLoop = False
