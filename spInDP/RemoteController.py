@@ -110,7 +110,7 @@ class RemoteController(object):
 
                     elif action == "touch":
                         print ("Glas aanficken")
-                        self._spider.switchBehavior(BehaviorType.Manual)
+                        self._spider.switchBehavior(BehaviorType.Touch)
 
                 elif mode == "vision":
                     if action == "start":

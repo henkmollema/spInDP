@@ -1,14 +1,13 @@
 import time
 from spInDP.Behavior import Behavior
 
-class TouchBehavior(Behavior):
 
+class TouchBehavior(Behavior):
     frameNr = 0
     animationController = None
     sensorData = None
     spiderAngle = 0
     yRotation = 0
-    spider = None
 
     def __init__(self, spider):
         print("Initializing touch behavior.")
@@ -18,8 +17,8 @@ class TouchBehavior(Behavior):
     def update(self):
         jMagnitude = self.spider.remoteController.context.jMagnitude
 
-        if(jMagnitude > 0.4):
-            #time.sleep(max(self.animationController.method))
+        if (jMagnitude > 0.4):
+            # time.sleep(max(self.animationController.method))
             self.frameNr += 1
 
         return
@@ -27,15 +26,15 @@ class TouchBehavior(Behavior):
     def initLeg(self):
         # femur
         self.spider.sequenceController.servoController.move(servo=2, angle=30, speed=100)
-        #coxa
+        # coxa
         self.spider.sequenceController.servoController.move(servo=1, angle=0, speed=100)
-        #femur
+        # femur
         self.spider.sequenceController.servoController.move(servo=2, angle=90, speed=100)
-        #tibia
+        # tibia
         self.spider.sequenceController.servoController.move(servo=3, angle=0, speed=100)
-        #coxa = 45 --> coxa = 90
-        #femur = ~60 --> femur = 90 maar is afhankelijk van de hoek
-        #tibia = ~60 --> tibia = 0
+        # coxa = 45 --> coxa = 90
+        # femur = ~60 --> femur = 90 maar is afhankelijk van de hoek
+        # tibia = ~60 --> tibia = 0
 
     def measureSpinAngle(self):
         sensorData = self.spider.sensorDataProvider
@@ -43,5 +42,5 @@ class TouchBehavior(Behavior):
         time.sleep(0.1)
         sensorData.stopMeasuring()
         x, y, z = sensorData.getSmoothAccelerometer()
-        print("x: ",  x, ", y: ", ", z: ", z)
+        print("x: ", x, ", y: ", ", z: ", z)
         self.yRotation = sensorData.getYRotation(x, y, z)

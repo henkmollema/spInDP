@@ -15,6 +15,7 @@ from spInDP.SensorDataProvider import SensorDataProvider
 from spInDP.SequenceController import SequenceController
 from spInDP.ServoController import ServoController
 from spInDP.SprintBehavior import SprintBehavior
+from spInDP.TouchBehavior import TouchBehavior
 from spInDP.VisionController import VisionController
 from spInDP.WebServer import WebServer
 
@@ -106,6 +107,10 @@ class Spider(object):
         elif behaviorType == BehaviorType.Push:
             print("Switched to push behavior.")
             self._behavior = PushBehavior(self)
+
+        elif behaviorType == BehaviorType.Touch:
+            print("Switched to touch behavior.")
+            self._behavior = TouchBehavior(self)
 
         elif behaviorType == BehaviorType.Sprint:
             print("Switched to sprint behavior")

@@ -7,4 +7,5 @@ class BehaviorType(object):
     AutonomeFollowBalloon = "FollowBalloon"
     Immediate = "Immediate"
     Push = "Push"
+    Touch = "Touch"
     Sprint = "Sprint"
