@@ -156,7 +156,7 @@ class Vision:
         if Vision.lineThread is None:
             Vision.lineThread = threading.Thread(target=self._lineThread)
             Vision.lineThread.start()
-            while self.lineResult is None:
+            while self.lineCoords is None:
                 time.sleep(0)
     def _lineThread(self):
         while time.time() - self.last_line_access < 5:
