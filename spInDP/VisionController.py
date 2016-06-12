@@ -17,7 +17,7 @@ class VisionController:
         self.__vision = Vision(self, self.__camera.resolution)
 
     def FindBalloon(self):
-        foundBlob, frame, coords, size = self.__vision.getValues()
+        foundBlob, frame, coords, size = self.__vision.getBalloonValues()
         return foundBlob, coords, size
     def getBalloonIsLeft(self):
         return self.__vision.getBalloonPos()
@@ -28,7 +28,7 @@ class VisionController:
         
     def GetImageVision(self):
         """Get image from the vision part which contains threshold and is available as a JPEG"""
-        foundBlob, frame, coords, size = self.__vision.getValues()
+        foundBlob, frame, coords, size = self.__vision.getBalloonValues()
         #print("coords: " + str(coords) + " size: " + str(size))
         return cv2.imencode('.jpeg', frame)[1].tostring()
 
@@ -116,12 +116,12 @@ class Vision:
         self.__resolution = resolution
     def initialize(self):
         if Vision.thread is None:
-            Vision.thread = threading.Thread(target=self._thread)
+            Vision.thread = threading.Thread(target=self._balloonThread)
             Vision.thread.start()
             while self.image is None:
                 time.sleep(0)
 
-    def _thread(self):
+    def _balloonThread(self):
         while time.time() - self.last_access < 5:
             frame = self.visionController.GetImage()
             frame = np.fromstring(frame, dtype=np.uint8)
@@ -135,7 +135,7 @@ class Vision:
                     self.redRightCount += 1
         Vision.thread = None
 
-    def getValues(self):
+    def getBalloonValues(self):
         Vision.last_access = time.time()
         self.initialize()
         return self.foundBlob, self.image, self.coords, self.size
