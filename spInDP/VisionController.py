@@ -19,6 +19,8 @@ class VisionController:
     def FindBalloon(self):
         foundBlob, frame, coords, size = self.__vision.getValues()
         return foundBlob, coords, size
+    def getBalloonIsLeft(self):
+        return self.__vision.getBalloonPos()
 
     def GetImage(self):
         frame = self.__camera.getFrame()
@@ -72,7 +74,7 @@ class Camera(object):
             
             #camera.start_preview()
             #time.sleep(1)
-			
+
             output = picamera.array.PiRGBArray(camera, size=self.resolution)
 
             #for frame in camera.capture_continuous(output, format="bgr", use_video_port=True):
@@ -101,11 +103,13 @@ class Vision:
     thread = None 
     __resolution = None
     last_access = 0
-        
+
     foundBlob = None
     image = None
     coords = None
     size = None
+    redleftCount = 0
+    redRightCount = 0
     
     def __init__(self, visionController, resolution):
         self.visionController = visionController
@@ -122,13 +126,24 @@ class Vision:
             frame = self.visionController.GetImage()
             frame = np.fromstring(frame, dtype=np.uint8)
             frame = cv2.imdecode(frame, 1)
-            self.foundBlob, self.image, self.coords, self.size = self.detect(frame)
+            self.foundBlob, self.image, self.coords, self.size = self.detectRed(frame)
+            foundBlueBlob, blueCoords = self.detectBlue(frame)
+            if foundBlueBlob:
+                if blueCoords[0] > self.coords[0]:
+                    self.redleftCount += 1
+                else:
+                    self.redRightCount += 1
         Vision.thread = None
 
     def getValues(self):
         Vision.last_access = time.time()
         self.initialize()
         return self.foundBlob, self.image, self.coords, self.size
+    def getBalloonPos(self):
+        Vision.last_access = time.time()
+        self.initialize()
+        isLeft = self.redleftCount > self.redRightCount
+        return isLeft
         
     def thresholdRange(self, img, min, max):
         """Makes it possible to give a range when thresholding instead of a min or max"""
@@ -140,7 +155,7 @@ class Vision:
             result = cv2.add(img1, img2)
         return result
 
-    def detect(self, image):
+    def detectRed(self, image):
         imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         h,s,v = cv2.split(imagehsv)
         h = self.thresholdRange(h, 170, 10)
@@ -185,6 +200,47 @@ class Vision:
 
         if foundBlob:
             image = cv2.drawKeypoints(imageBin, keypoints, np.array([]), (255,0,0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-		
+
         return foundBlob, image, coords, size
 
+    def detectBlue(self, image):
+        imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(imagehsv)
+        h = self.thresholdRange(h, 100, 125) #TODO
+        s = self.thresholdRange(s, 110, 250) #TODO
+        v = self.thresholdRange(v, 140, 255) #TODO
+        imageBin = h * s * v
+
+        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
+        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9)))
+
+        imageBin = imageBin * 255
+
+        params = cv2.SimpleBlobDetector_Params()
+        params.filterByColor = True
+        params.blobColor = 255
+        params.filterByCircularity = False
+        params.filterByArea = False
+        params.filterByCircularity = False
+        params.filterByConvexity = False
+        params.filterByInertia = False
+
+        detector = cv2.SimpleBlobDetector(params)
+        keypoints = detector.detect(imageBin)
+
+        foundBlob = False
+        coords = None
+        if keypoints:
+            i = 0
+            biggest = 0
+            for p in keypoints:
+                if (p.size > keypoints[biggest].size):
+                    biggest = i
+                i += 1
+            foundBlob = True
+            coords = keypoints[biggest].pt
+            coords = (coords[0] - (self.__resolution[0] / 2), coords[1] - (self.__resolution[1] / 2))
+        else:
+            coords = (-1, -1)
+
+        return foundBlob, coords
