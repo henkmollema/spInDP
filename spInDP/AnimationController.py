@@ -235,15 +235,15 @@ class AnimationController:
         if yDirection != -1 and yDirection != 1:
             raise ("\"yDirection\" has to be -1 or 1 for turnWalking")
 
-        frameNr = frameNr % 6
-
-        midXOffset = 0
-        if xDirection < 0:
-            midXOffset = -10000 - xDirection*10000
+        midXOffset = 0  # 0
+        if xDirection == 0:
+            midXOffset = 10000000
+        elif xDirection < 0:
+            midXOffset = -10000 - xDirection * 10000
         else:
-            midXOffset = 10000 - xDirection*10000
+            midXOffset = 10000 - xDirection * 10000
 
-        stepSizeCm = 5
+        stepSizeCm = 3.5
 
         legMid = {}
         if self.wideWalking:
@@ -319,6 +319,11 @@ class AnimationController:
 
         subCorner = math.acos((highestTotalDistance ** 2 + stepSizeCm ** 2 - highestTotalDistance ** 2) / (2 * highestTotalDistance * stepSizeCm)) / math.pi * 180
         stepSizeDegrees = 180 - (subCorner * 2)
+        if (yDirection == -1) ^ (xDirection < 0):
+            stepSizeDegrees *= -1
+            frameNr += 4 #TODO: Check if this is right. Should also be added to other animations
+
+        frameNr = frameNr % 6
 
         leg36FrameNr = (frameNr - 2) % 6
         leg25FrameNr = frameNr
