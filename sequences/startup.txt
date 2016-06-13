@@ -1,11 +1,20 @@
-Sequence startup
+Sequence startup offset 45
 
 print Moving the legs of the spider into the starting position
 framebegin
-l:1 0,0,0 100
-l:2 0,0,0 100
-l:3 0,0,0 100
-l:4 0,0,0 100
-l:5 0,0,0 100
-l:6 0,0,0 100
+l:1 -7,-8,-1 200
+l:2 -7,-8,-1 200
+l:3 -7,0,-1 200
+l:4 -7,8,-1 200
+l:5 -7,8,-1 200
+l:6 -7,0,-1 200
+frameend
+
+framebegin
+l:1 -7,-8,5 50
+l:2 -7,-8,5 50
+l:3 -7,0,5 50
+l:4 -7,8,5 50
+l:5 -7,8,5 50
+l:6 -7,0,5 50
 frameend
