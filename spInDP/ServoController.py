@@ -172,7 +172,7 @@ class ServoController(object):
 
     def move(self, servo, angle, speed=200):
         """Moves the specified servo to the specified angle using the specified speed."""
-
+        
         pos = int(degreesToDxlAngle(angle))
         self.ax12.moveSpeed(servo, pos, int(speed))
 

@@ -20,30 +20,39 @@ class TouchBehavior(Behavior):
 
         if (jMagnitude > 0.4):
             # time.sleep(max(self.animationController.method))
+            print(jMagnitude)
             self.frameNr += 1
-            currentAngle = self.spider.sequenceController.servoController.getPosition(servoID=4)
-            self.spider.sequenceController.servoController.move(servoID=4, angle=currentAngle + 1, speed=10*jMagnitude)
+            currentAngle = self.spider.sequenceController.servoController.getPosition(servo=1)
+            if jMagnitude > 0:
+                self.spider.sequenceController.servoController.move(servo=1, angle=currentAngle - 1, speed=50*jMagnitude)
+            else:
+                self.spider.sequenceController.servoController.move(servo=1, angle=currentAngle + 1, speed=50*jMagnitude)
 
         return
 
     def initLeg(self):
+        print("Init leg.")
         # femur
-        self.spider.sequenceController.servoController.move(servo=2, angle=30, speed=100)
+        self.spider.sequenceController.servoController.move(servo=2, angle=-30, speed=100)
+        time.sleep(0.8)
         # coxa
-        self.spider.sequenceController.servoController.move(servo=1, angle=0, speed=100)
-        # femur
-        self.spider.sequenceController.servoController.move(servo=2, angle=90 + self.yRotation, speed=100)
+        self.spider.sequenceController.servoController.move(servo=1, angle=-45, speed=100)
+        time.sleep(0.8)
         # tibia
         self.spider.sequenceController.servoController.move(servo=3, angle=0, speed=100)
-        # coxa = 45 --> coxa = 90
-        # femur = ~60 --> femur = 90 maar is afhankelijk van de hoek
-        # tibia = ~60 --> tibia = 0
+        time.sleep(0.8)
+        # femur
+        self.spider.sequenceController.servoController.move(servo=2, angle=-90 + self.yRotation, speed=100)
+        time.sleep(0.8)
 
     def measureSpinAngle(self):
         sensorData = self.spider.sensorDataProvider
         sensorData.startMeasuring()
         time.sleep(0.1)
         sensorData.stopMeasuring()
-        x, y, z = sensorData.getSmoothAccelerometer()
-        print("x: ", x, ", y: ", ", z: ", z)
-        self.yRotation = sensorData.getYRotation(x, y, z)
+        #x, y, z = sensorData.getAccelerometer()
+        x = sensorData.getAccelerometer()
+        #self.yRotation = sensorData.getYRotation(x, y, z)
+        #self.yRotation = x * 180
+        self.yRotation = 12
+        print("y: ", x, " yRottion: ", self.yRotation)
