@@ -543,19 +543,16 @@ class AnimationController:
         speed = speedMod * 100
         frontLegAngleModifier = 0
         backLegAngleModifier = 0
-        angleModifier = 1
-        zUp = -2
+        zUp = -3
         zDown = 1
         remoteContext = self.spider.remoteController.context
         angleController = remoteContext.aY
         if abs(angleController) > 0.2:
             if angleController > 0:
-                frontLegAngleModifier = angleController
-                backLegAngleModifier = 0
+                frontLegAngleModifier = angleController * -4
                 print("frontLegAngleModifier:", frontLegAngleModifier)
             else:
-                backLegAngleModifier = abs(angleController)
-                frontLegAngleModifier = 0
+                backLegAngleModifier = abs(angleController) * -4
                 print("backLegAngleModifier:", backLegAngleModifier)
 
 
@@ -614,13 +611,49 @@ class AnimationController:
                 2: [-7,0,zDown],
                 3: [0,0,zUp],
                 4: [-7,20,zDown],
-                5: [-7,20,],
+                5: [-7,20,zDown],
                 6: [0,0,zUp]
             }
         }
 
+        #leg cordinates 2
+        pushFrames2 = {
+            1: {
+                1: [-16, -20, 1],
+                2: [-16, -20, 1],
+                3: [0, 0, 0],
+                4: [-16, 20, 1],
+                5: [-16, 20, 1],
+                6: [0, 0, 0]
+            },
+            2: {
+                1: [-16, -12, 1],
+                2: [-16, -12, 1],
+                3: [0, 0, 0],
+                4: [-16, 12, 1],
+                5: [-16, 12, 1],
+                6: [0, 0, 0]
+            },
+            3: {
+                1: [-16, -12, -3],
+                2: [-16, -12, -3],
+                3: [0, 0, 0],
+                4: [-16, 12, 1],
+                5: [-16, 12, 1],
+                6: [0, 0, 0]
+            },
+            0: {
+                1: [-16, -20, 1],
+                2: [-16, -20, 1],
+                3: [0, 0, 0],
+                4: [-16, 20, 1],
+                5: [-16, 20, 1],
+                6: [0, 0, 0]
+            }
+        }
+
         frameNr = frameNr % len(pushFrames)
-        print("frame number", frameNr)
+        print("frameNr: ", frameNr)
         self.startFrame()
         self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][1][0], y=pushFrames[frameNr][1][1], z=pushFrames[frameNr][1][2] + frontLegAngleModifier, legID=1, speed=speed)
         self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][2][0], y=pushFrames[frameNr][2][1], z=pushFrames[frameNr][2][2] + frontLegAngleModifier, legID=2, speed=speed)
@@ -629,6 +662,5 @@ class AnimationController:
         self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][5][0], y=pushFrames[frameNr][5][1], z=pushFrames[frameNr][5][2] + backLegAngleModifier, legID=5, speed=speed)
         self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][6][0], y=pushFrames[frameNr][6][1], z=pushFrames[frameNr][6][2], legID=6, speed=speed)
         totalTime += self.endFrame()
-        print("frame ended")
 
         return totalTime
