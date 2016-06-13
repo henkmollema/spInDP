@@ -43,6 +43,7 @@ class AnimationController:
 
     wideWalking = True
     highWalking = False
+    zOffset     = 0
 
     turnInfo = None
     turnWalkInfo = None
@@ -389,32 +390,26 @@ class AnimationController:
             legMid = self.legWideMid
             stepRangeVert = cosDirection * 14 #14 is stepsize for vertical walking
             stepRangeHor = sinDirection * 8 #8 is stepsize for horizontal walking
-            zGround = self.legGround
-            zAir = self.legAirHigh
+            zGround = self.legGround + self.zOffset
+            zAir = self.legAirHigh + self.zOffset
         elif self.wideWalking:
             legMid = self.legWideMid
             stepRangeVert = cosDirection * 14 #14 is stepsize for vertical walking
             stepRangeHor = sinDirection * 8 #8 is stepsize for horizontal walking
-            zGround = self.legGround
-            zAir = self.legAir
+            zGround = self.legGround + self.zOffset
+            zAir = self.legAir + self.zOffset
         else:
             legMid = self.legNarrowMid
             stepRangeVert = cosDirection * 7 #7 is stepsize for vertical walking
             stepRangeHor = sinDirection * 7 #7 is stepsize for horizontal walking
-            zGround = self.legGround - 2
-            zAir = self.legAir
+            zGround = self.legGround - 2 + self.zOffset
+            zAir = self.legAir + self.zOffset
 
         if(keepLeveled):
-            zGround = 7
-            zAir = 5
+            zGround = 7 + self.zOffset
+            zAir = 5 + self.zOffset
 
-            #Start measuring so we can intergrate the gyro values
-            #make sure the spider is leveled when calling this
             cAccelY = float(self.spider.sensorDataProvider.getSmoothAccelerometer()[1] * math.pi / 180)
-            #if abs(cAccelY * (180 / math.pi)) < 3:
-            #    cAccelY = 0
-
-
             self.realYAngle = self.spider.remoteController.context.accelY
 
         else:

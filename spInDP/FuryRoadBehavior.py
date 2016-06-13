@@ -7,8 +7,6 @@ class FuryRoadBehavior(Behavior):
     """Provides behavior which walks the fury road by following a line."""
 
     frameNr = 0
-    shouldTurnLeft =
-
 
     def __init__(self, spider):
         """Initializes a new instance of the FuryRoadBehavior class."""
@@ -23,17 +21,19 @@ class FuryRoadBehavior(Behavior):
 
         if(leftOnLine and rightOnLine):
             #left and right on line, take a step forward
-            self.spider.animationController.turnWalk(xDirection=0, yDirection=1, frameNr = self.frameNr)
+            execTime = self.spider.animationController.turnWalk(xDirection=0, yDirection=1, frameNr = self.frameNr)
         elif(not leftOnLine and not rightOnLine):
             #left and right not on line, probably in a turn
             self.frameNr -= 1 #Don't advance the frameNr and do nothing
+            execTime = 0
         elif(leftOnLine):
             # only left is on line, turn right a little
-            self.spider.animationController.turnWalk(xDirection=0.35, yDirection=1, frameNr=self.frameNr)
+            execTime = self.spider.animationController.turnWalk(xDirection=0.35, yDirection=1, frameNr=self.frameNr)
         elif(rightOnLine):
             #only right is on line, turn left a little
-            self.spider.animationController.turnWalk(xDirection=-0.35, yDirection=1, frameNr=self.frameNr)
+            execTime = self.spider.animationController.turnWalk(xDirection=-0.35, yDirection=1, frameNr=self.frameNr)
 
+        time.sleep(execTime)
         self.frameNr += 1
 
         return
