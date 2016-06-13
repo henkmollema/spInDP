@@ -20,7 +20,7 @@ class VisionController:
         foundBlob, frame, coords, size = self.__vision.getBalloonValues()
         return foundBlob, coords, size
     def getBalloonIsLeft(self):
-        return self.__vision.getBalloonPos()
+        return self.__vision.getBalloonIsLeft()
 
     def GetImage(self):
         frame = self.__camera.getFrame()
@@ -130,6 +130,8 @@ class Vision:
             while self.image is None:
                 time.sleep(0)
     def _balloonThread(self):
+        self.redleftCount = 0
+        self.redRightCount = 0
         while time.time() - self.last_balloon_access < 5:
             frame = self.visionController.GetImage()
             frame = np.fromstring(frame, dtype=np.uint8)
@@ -146,11 +148,8 @@ class Vision:
         Vision.last_balloon_access = time.time()
         self.initializeBalloon()
         return self.foundRedBlob, self.image, self.coords, self.size
-    def getBalloonPos(self):
-        Vision.last_balloon_access = time.time()
-        self.initializeBalloon()
-        isLeft = self.redleftCount > self.redRightCount
-        return isLeft
+    def getBalloonIsLeft(self):
+        return self.redleftCount > self.redRightCount
 
     def initializeLine(self):
         if Vision.lineThread is None:
@@ -229,7 +228,6 @@ class Vision:
             image = cv2.drawKeypoints(imageBin, keypoints, np.array([]), (255,0,0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
         return foundBlob, image, coords, size
-
     def detectBlue(self, image):
         imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         h, s, v = cv2.split(imagehsv)
