@@ -252,7 +252,7 @@ class AnimationController:
         elif yDirection == 0:
             midXOffset = 0
         else:
-            midXOffset = 100 * yDirection * (1 / xDirection)
+            midXOffset = 100 * abs(yDirection) * (1 / xDirection)
 
         stepSizeCm = 3.5
 
