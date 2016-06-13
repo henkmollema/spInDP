@@ -55,19 +55,24 @@ class RemoteController(object):
             # Read all data until end of message index
             data = msg[:msgEnd]
 
-            # Read joystick position
-            xs = data.split(',')
-            self.context.jX = float((float(xs[0]) - 512.0) / 512.0)
-            self.context.jY = float((float(xs[1]) - 512.0) / 512.0)
-            self.context.jZ = float(xs[2])
+            try:
+                # Read joystick position
+                xs = data.split(',')
+                self.context.jX = float((float(xs[0]) - 512.0) / 512.0)
+                self.context.jY = float((float(xs[1]) - 512.0) / 512.0)
+                self.context.jZ = float(xs[2])
 
-            axStr = xs[3]
-            ayStr = xs[4]
+                axStr = xs[3]
+                ayStr = xs[4]
 
-            # Only read AX/AY when it's sent with Bluetooth
-            if axStr != "" and ayStr != "":
-                self.context.aX = float(axStr)
-                self.context.aY = float(ayStr)
+                # Only read AX/AY when it's sent with Bluetooth
+                if axStr != "" and ayStr != "":
+                    self.context.aX = float(axStr)
+                    self.context.aY = float(ayStr)
+            except:
+                # Skip error and continue with next message
+                msg = msg[msgEnd + 1:]
+                continue
 
             self.context.jAngle = math.atan2(self.context.jY, self.context.jX) * (180 / math.pi) + 180
             magnitude = math.sqrt((self.context.jX ** 2) + (self.context.jY ** 2))
@@ -125,8 +130,13 @@ class RemoteController(object):
 
                 elif mode == "vision":
                     if action == "start":
+                        print("Start autonome destroy balloon")
                         self._spider.switchBehavior(BehaviorType.AutonomeDestroyBalloon)
+                    elif action == "follow":
+                        print("Start autonome follow balloon")
+                        self._spider.switchBehavior(BehaviorType.AutonomeFollowBalloon)
                     else:
+                        print("Stop vision behavior")
                         self._spider.switchBehavior(BehaviorType.Manual)
 
                 elif mode == "fury-road":
