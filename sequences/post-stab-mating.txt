@@ -1,0 +1,29 @@
+Sequence post-stab-mating
+framebegin
+l:1 0,0,0 100
+l:2 0,0,0 100
+l:3 -3.6,-12.1,4.8 100
+l:4 0,0,0 100
+l:5 0,0,0 100
+l:6 -3.6,-12.1,4.8 100
+frameend
+
+Sequence post-stab-mating
+framebegin
+l:1 0,0,0 100
+l:2 0,0,0 100
+l:3 -3.6,-12.1,-5 100
+l:4 0,0,0 100
+l:5 0,0,0 100
+l:6 -3.6,-12.1,-5 100
+frameend
+
+Sequence post-stab-mating
+framebegin
+l:1 0,0,0 100
+l:2 0,0,0 100
+l:3 0,0,0 100
+l:4 0,0,0 100
+l:5 0,0,0 100
+l:6 0,0,0 100
+frameend

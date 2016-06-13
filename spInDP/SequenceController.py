@@ -390,9 +390,9 @@ class SequenceController(object):
         return True
 
     def legQueueSize(self):
-        max = 0
+        maxLen = 0
         for x in range(1, 7):
-            max = max(self.legQueue[x].qsize(), max)
+            maxLen = max(self.legQueue[x].qsize(), maxLen)
 
-        return max
+        return maxLen
 
