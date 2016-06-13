@@ -15,4 +15,4 @@ class ManualHorizontalBehavior(ManualBehavior):
         self.keepLeveled = True
 
     def update(self):
-        self._super.update(self)
+        self._super.update()
