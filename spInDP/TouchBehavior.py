@@ -12,6 +12,7 @@ class TouchBehavior(Behavior):
     def __init__(self, spider):
         print("Initializing touch behavior.")
         super(TouchBehavior, self).__init__(spider)
+        self.measureSpinAngle()
         self.initLeg()
 
     def update(self):
@@ -20,6 +21,8 @@ class TouchBehavior(Behavior):
         if (jMagnitude > 0.4):
             # time.sleep(max(self.animationController.method))
             self.frameNr += 1
+            currentAngle = self.spider.sequenceController.servoController.getPosition(servoID=4)
+            self.spider.sequenceController.servoController.move(servoID=4, angle=currentAngle + 1, speed=10*jMagnitude)
 
         return
 
@@ -29,7 +32,7 @@ class TouchBehavior(Behavior):
         # coxa
         self.spider.sequenceController.servoController.move(servo=1, angle=0, speed=100)
         # femur
-        self.spider.sequenceController.servoController.move(servo=2, angle=90, speed=100)
+        self.spider.sequenceController.servoController.move(servo=2, angle=90 + self.yRotation, speed=100)
         # tibia
         self.spider.sequenceController.servoController.move(servo=3, angle=0, speed=100)
         # coxa = 45 --> coxa = 90
