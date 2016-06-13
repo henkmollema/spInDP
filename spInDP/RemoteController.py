@@ -130,8 +130,13 @@ class RemoteController(object):
 
                 elif mode == "vision":
                     if action == "start":
+                        print("Start autonome destroy balloon")
                         self._spider.switchBehavior(BehaviorType.AutonomeDestroyBalloon)
+                    elif action == "follow":
+                        print("Start autonome follow balloon")
+                        self._spider.switchBehavior(BehaviorType.AutonomeFollowBalloon)
                     else:
+                        print("Stop vision behavior")
                         self._spider.switchBehavior(BehaviorType.Manual)
 
                 elif mode == "fury-road":
