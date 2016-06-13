@@ -232,16 +232,16 @@ class AnimationController:
     def turnWalk(self, xDirection, yDirection, frameNr, speedMod=1):
         if xDirection < -1 or xDirection > 1:
             raise ("\"xDirection\" has to be between -1 and 1 for turnWalking")
-        if yDirection != -1 and yDirection != 1:
-            raise ("\"yDirection\" has to be -1 or 1 for turnWalking")
+        if yDirection < -1 or yDirection > 1:
+            raise ("\"yDirection\" has to be between -1 and 1 for turnWalking")
 
-        midXOffset = 0  # 0
+        midXOffset = 0
         if xDirection == 0:
             midXOffset = 10000000
-        elif xDirection < 0:
-            midXOffset = -10000 - xDirection * 10000
+        elif yDirection == 0:
+            midXOffset = 0
         else:
-            midXOffset = 10000 - xDirection * 10000
+            midXOffset = 100 * yDirection * (1 / xDirection)
 
         stepSizeCm = 3.5
 
