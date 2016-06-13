@@ -1,13 +1,13 @@
-from spInDP.AutonomeBehavior import AutonomeBehavior
-import time
 import math
+import time
+
+from spInDP.AutonomeBehavior import AutonomeBehavior
 
 
 class FindBalloonBehavior(AutonomeBehavior):
     """Provides autonome behavior for destroying a red balloon."""
 
-    CENTER_DEVIATION = 100
-    BLOB_SIZE = 200
+    BLOB_SIZE = 175
     _frameNr = 0
     _stabPosition = False
 
@@ -20,22 +20,35 @@ class FindBalloonBehavior(AutonomeBehavior):
         balloonFound, coords, size = self.spider.visioncontroller.FindBalloon()
 
         if balloonFound:
+            # When the balloon blob is big enough, stab it
             if size >= FindBalloonBehavior.BLOB_SIZE:
-                # When the balloon blob is big enough, stab it
-                print("Steek 'm in z'n rug!")
 
+                # Determine whether the balloon is left or right
+                balloonIsLeft = self.spider.visioncontroller.getBalloonIsLeft()
+
+                # Bring the spider in position before stabbing
                 if not self._stabPosition:
-                    self.spider.sequenceController.executePreStabLeft()
+                    print ("Move the spider into stab position. Left: " + str(balloonIsLeft))
+
+                    if balloonIsLeft:
+                        time.sleep(self.spider.sequenceController.parseSequence('sequences/pre-stab-left.txt'))
+                    else:
+                        time.sleep(self.spider.sequenceController.parseSequence('sequences/pre-stab-right.txt'))
+
                     self._stabPosition = True
 
-                self.spider.sequenceController.executeStabLeft()
+                print("Steek 'm in z'n rug!")
+                if balloonIsLeft:
+                    time.sleep(self.spider.sequenceController.parseSequence('sequences/stab-left.txt'))
+                else:
+                    time.sleep(self.spider.sequenceController.parseSequence('sequences/stab-right.txt'))
             else:
-                # if (self.stabPosition):
-                #    print ("Execute post stab");
-                #    self.spider.sequenceController.executePostStabLeft()
+                if self._stabPosition:
+                    print ("Execute post stab")
+                    time.sleep(self.spider.sequenceController.parseSequence('sequences/post-stab.txt'))
 
                 x = coords[0]
-                y = coords[1]
+                # y = coords[1]
                 a = 240
                 b = x
 
@@ -44,13 +57,6 @@ class FindBalloonBehavior(AutonomeBehavior):
                 angle *= 1.5
 
                 # Walk towards balloon
-                execTime = self.spider.animationController.walk(angle, frameNr=self._frameNr, speedMod=1.5)
-                time.sleep(execTime)
+                time.sleep(self.spider.animationController.walk(angle, frameNr=self._frameNr, speedMod=1))
                 self._stabPosition = False
                 self._frameNr += 1
-                # else:
-                # print "Balloon not found"
-                # execTime = self.spider.animationController.turn(20, frameNr=self.frameNr, speedMod=1)
-                # time.sleep(execTime)
-                # self.stabPosition = False
-                # self.frameNr += 1
