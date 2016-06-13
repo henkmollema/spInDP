@@ -346,8 +346,8 @@ class SequenceController(object):
         retVal.coxa = angleCoxa
         retVal.femur = angleFemur
         retVal.tibia = angleTibia
-
         retVal.IKCoordinates = [x,y,z]
+        #print "COORDS: " + str(retVal.IKCoordinates) + " leg: " + str(legID)
         return retVal
 
 
@@ -367,6 +367,7 @@ class SequenceController(object):
                 mov.maxExecTime = frame.maxMaxExecTime
                 
             self.legQueue[x].put(mov)
+
             
     def setFrame(self, frame):
         """
@@ -392,6 +393,13 @@ class SequenceController(object):
             if (not self.legQueue[x].empty()):
                 return False
         return True
-        
+
+    def legQueueSize(self):
+        max = 0
+        for x in range(1, 7):
+            max = max(self.legQueue[x].qsize(), max)
+
+        return max
+
         
 

@@ -35,7 +35,7 @@ class FollowBalloonBehavior(AutonomeBehavior):
                 angle *= 1.5
 
                 # Walk towards balloon
-                execTime = self.spider.animationController.walk(angle, frameNr=self._frameNr, speedMod=1.5)
+                execTime = self.spider.animationController.walk(angle, frameNr=self._frameNr, speedMod=3)
                 time.sleep(execTime)
                 self._frameNr += 1
 
@@ -46,7 +46,7 @@ class FollowBalloonBehavior(AutonomeBehavior):
             turnDir = 1
             if(self._lastX < 0): turnDir = -1
 
-            execTime = self.spider.animationController.turn(1, frameNr=self._frameNr, speedMod=1)
+            execTime = self.spider.animationController.turn(turnDir, frameNr=self._frameNr, speedMod=2)
             time.sleep(execTime)
 
             self._frameNr += 1
