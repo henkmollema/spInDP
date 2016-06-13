@@ -39,8 +39,11 @@ class AnimationController:
         6: [0, 0]
     }
 
+    shouldSafeTransition = False
+
     wideWalking = True
     highWalking = False
+    zOffset     = 0
 
     turnInfo = None
     turnWalkInfo = None
@@ -66,38 +69,44 @@ class AnimationController:
         self.seqCtrl = spider.sequenceController
 
     """
-        destination is a sequenceframe
+        destination is a SequenceFrame object
     """
     def safeTransitionTo(self, destination, speed = 200):
-        cLegCoords = {}
+        cLegCoords = []
+        cDestCoords = []
         retVal = 0
 
+        self.shouldSafeTransition = False
+
         for x in range(1,7):
-            cLegCoords[x].IKCoordinates = self.spider.sequenceController.getLegCoords(x)
+            cLegCoords.append(self.spider.sequenceController.getLegCoords(x))
+            if(destination.movements.get(x, None) is not None):
+                cDestCoords.append(destination.movements[x].IKCoordinates)
 
-        zSortedLegCoords = sorted(cLegCoords, key=lambda legID: cLegCoords[legID].IKCoordinates[2])
-        cGroundedLegs = zSortedLegCoords[-3:] #Get 3 legs with highest z coordinate
-        cElevatedLegs    = zSortedLegCoords[:-3] #the other 3 legs
+            else:
+                cDestCoords.append(self.spider.sequenceController.getLegCoords(x))
 
-        zSortedDestCoords = sorted(destination.movements, key=lambda legID: destination.movements[legID].IKCoordinates[2])
-        destGroundedLegs = zSortedDestCoords[-3:]
-        destElevatedLegs = zSortedDestCoords[:-3]
-        highestDestZ = destGroundedLegs[2].IKCoordinates[2]
-        elevatedZ = highestDestZ - 2
+        #zSortedLegCoords = sorted(cLegCoords, key=lambda obj: obj[2])
+        zSortedDestCoords = sorted(cDestCoords, key=lambda obj: obj[2])
+        cGroundCoord  = zSortedDestCoords[5][2]
+        #cGroundCoord = max(cGroundCoord, zSortedDestCoords[5][2])
 
-        # if legs are elevated set them to 0,0,highestDestZ
+        # set all legs to cGroundCoord
         self.startFrame()
-        for legID in cElevatedLegs:
-                if cElevatedLegs[legID].IKCoordinates[2] > highestDestZ:
-                    self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(0, 0, highestDestZ, legID, speed)
+        for x in range(1, 7):
+            self.sequenceFrame.movements[x] = self.seqCtrl.coordsToLegMovement(cLegCoords[x-1][0], cLegCoords[x-1][1], cGroundCoord, x, speed)
         retVal += self.endFrame()
 
         #after that, one by one, elevate the legs a little and send them to their destination
         for legID in range(1,7):
-            destCoords = destGroundedLegs[legID].IKCoordinates
+            destCoords = cDestCoords[legID - 1]
+
+            #Elevate this leg
             self.startFrame()
-            self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(destCoords[0], destCoords[1], elevatedZ, legID, speed)
+            self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(cLegCoords[x-1][0], cLegCoords[x-1][1], cGroundCoord - 3, legID, speed)
             retVal += self.endFrame()
+
+            #Send this leg to the destination
             self.startFrame()
             self.sequenceFrame.movements[legID] = self.seqCtrl.coordsToLegMovement(destCoords[0], destCoords[1], destCoords[2], legID, speed)
             retVal += self.endFrame()
@@ -108,6 +117,8 @@ class AnimationController:
     def setWideWalking(self, value):
         """Adjust midpoint of each leg, mainly to fit through 'het poortje'"""
         self.wideWalking = value
+        self.shouldSafeTransition = True
+
     def setHighWalking(self, value):
         """Adjust the height of the legs when they are airborne"""
         self.highWalking = value
@@ -117,17 +128,17 @@ class AnimationController:
     def startFrame(self):
         self.sequenceFrame = SequenceFrame()
 
-    def endFrame(self, safeTransition = False):
+    def endFrame(self):
         """Adds the frame to the queue and returns the time the execution will take"""
         #Add the new frame to the leg queues
-        if(not safeTransition):
+        if(not self.shouldSafeTransition):
             self.seqCtrl.addFrameToQueue(self.sequenceFrame)
 
             ret = self.sequenceFrame.maxMaxExecTime
             self.sequenceFrame.movements = {}  # Clear the frame
             self.sequenceFrame = None
         else:
-            tmpMovements = list(self.sequenceFrame.movements)
+            tmpMovements = dict(self.sequenceFrame.movements)
             tmpFrame = SequenceFrame()
             tmpFrame.movements = tmpMovements
 
@@ -379,32 +390,26 @@ class AnimationController:
             legMid = self.legWideMid
             stepRangeVert = cosDirection * 14 #14 is stepsize for vertical walking
             stepRangeHor = sinDirection * 8 #8 is stepsize for horizontal walking
-            zGround = self.legGround
-            zAir = self.legAirHigh
+            zGround = self.legGround + self.zOffset
+            zAir = self.legAirHigh + self.zOffset
         elif self.wideWalking:
             legMid = self.legWideMid
             stepRangeVert = cosDirection * 14 #14 is stepsize for vertical walking
             stepRangeHor = sinDirection * 8 #8 is stepsize for horizontal walking
-            zGround = self.legGround
-            zAir = self.legAir
+            zGround = self.legGround + self.zOffset
+            zAir = self.legAir + self.zOffset
         else:
             legMid = self.legNarrowMid
             stepRangeVert = cosDirection * 7 #7 is stepsize for vertical walking
             stepRangeHor = sinDirection * 7 #7 is stepsize for horizontal walking
-            zGround = self.legGround - 2
-            zAir = self.legAir
+            zGround = self.legGround - 2 + self.zOffset
+            zAir = self.legAir + self.zOffset
 
         if(keepLeveled):
-            zGround = 7
-            zAir = 5
+            zGround = 7 + self.zOffset
+            zAir = 5 + self.zOffset
 
-            #Start measuring so we can intergrate the gyro values
-            #make sure the spider is leveled when calling this
             cAccelY = float(self.spider.sensorDataProvider.getSmoothAccelerometer()[1] * math.pi / 180)
-            #if abs(cAccelY * (180 / math.pi)) < 3:
-            #    cAccelY = 0
-
-
             self.realYAngle = self.spider.remoteController.context.accelY
 
         else:

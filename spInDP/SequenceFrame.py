@@ -60,6 +60,7 @@ class SequenceFrame(object):
 
                     # newMov.maxExecTime = mov.maxExecTime * scaleFactor
                     newMov.maxExecTime = self.maxMaxExecTime
+                    newMov.IKCoordinates = mov.IKCoordinates
 
                     scaledMoves[k] = newMov
                 else:

@@ -364,6 +364,7 @@ class SequenceController(object):
 
             self.legQueue[x].put(mov)
 
+
     def setFrame(self, frame):
         """
             Immediately sends the servos to the LegMovements
@@ -387,3 +388,11 @@ class SequenceController(object):
             if (not self.legQueue[x].empty()):
                 return False
         return True
+
+    def legQueueSize(self):
+        maxLen = 0
+        for x in range(1, 7):
+            maxLen = max(self.legQueue[x].qsize(), maxLen)
+
+        return maxLen
+

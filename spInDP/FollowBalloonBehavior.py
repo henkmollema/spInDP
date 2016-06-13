@@ -13,7 +13,6 @@ class FollowBalloonBehavior(AutonomeBehavior):
 
     def __init__(self, spider):
         """Initializes a new instance of the FindBalloonBehavior class."""
-
         super(FollowBalloonBehavior, self).__init__(spider)
 
     def update(self):
@@ -34,19 +33,27 @@ class FollowBalloonBehavior(AutonomeBehavior):
                 angle = math.atan(b / a) * (180 / math.pi)
                 angle *= 1.5
 
+                if(angle < 45):
                 # Walk towards balloon
-                execTime = self.spider.animationController.walk(angle, frameNr=self._frameNr, speedMod=1.5)
+                    execTime = self.spider.animationController.walk(angle, frameNr=self._frameNr, speedMod=3)
+                else:
+                    turnDir = 1
+                    if(x < 0):
+                        turnDir = -1
+                    execTime = self.spider.animationController.turn(turnDir, frameNr=self._frameNr, speedMod=2)
+
+
                 time.sleep(execTime)
                 self._frameNr += 1
 
                 self._lastX = x
 
         else:
-            print "Balloon not found"
+            print ("Balloon not found")
             turnDir = 1
             if(self._lastX < 0): turnDir = -1
 
-            execTime = self.spider.animationController.turn(1, frameNr=self._frameNr, speedMod=1)
+            execTime = self.spider.animationController.turn(turnDir, frameNr=self._frameNr, speedMod=2)
             time.sleep(execTime)
 
             self._frameNr += 1
