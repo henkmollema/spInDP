@@ -111,11 +111,11 @@ class WebServer:
             frameNr += 1
         return webserverinstance.format_response("Turn executed")
     @staticmethod
-    @app.route("/erwin/turnwalk/<direction>")
-    def api_erwin_turnwalk(direction):
+    @app.route("/erwin/turnwalk/<xdirection>/<ydirection>")
+    def api_erwin_turnwalk(xdirection, ydirection):
         frameNr = 0
         for x in range(1, 50):
-            execTime = webserverinstance.spider.animationController.turnWalk(int(direction), frameNr, 0.5)
+            execTime = webserverinstance.spider.animationController.turnWalk(float(xdirection), float(ydirection), frameNr, 0.5)
             time.sleep(execTime)
             frameNr += 1
         return webserverinstance.format_response("Turn executed")

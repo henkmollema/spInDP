@@ -61,8 +61,13 @@ class RemoteController(object):
             self.context.jY = float((float(xs[1]) - 512.0) / 512.0)
             self.context.jZ = float(xs[2])
 
-            self.context.aX = float(xs[3])
-            self.context.aY = float(xs[4])
+            axStr = xs[3]
+            ayStr = xs[4]
+
+            # Only read AX/AY when it's sent with Bluetooth
+            if axStr != "" and ayStr != "":
+                self.context.aX = float(axStr)
+                self.context.aY = float(ayStr)
 
             self.context.jAngle = math.atan2(self.context.jY, self.context.jX) * (180 / math.pi) + 180
             magnitude = math.sqrt((self.context.jX ** 2) + (self.context.jY ** 2))
@@ -76,7 +81,13 @@ class RemoteController(object):
             action = action.lower().strip()
 
             if mode != self._oldMode or action != self._oldAction:
-                if mode == "limbo":
+                if mode == "":
+                    if action == "":
+                        print("Reset spider status")
+                        self._spider.switchBehavior(BehaviorType.Manual)
+                        self._spider.animationController.setWideWalking(True)
+
+                elif mode == "limbo":
                     wideWalk = action == "stop"
                     print ("Enable wide walk: " + str(wideWalk))
                     self._spider.animationController.setWideWalking(wideWalk)
@@ -84,11 +95,11 @@ class RemoteController(object):
                 elif mode == "sprint":
                     if action == "start":
                         print ("Start sprint mode")
+                        self._spider.switchBehavior(BehaviorType.Sprint)
                     else:
                         print("Stop sprint mode")
-
-                    print ("Sprint not implemented, using walk.")
-                    self._spider.animationController.setWideWalking(True)
+                        self._spider.switchBehavior(BehaviorType.Manual)
+                        self._spider.animationController.setWideWalking(True)
 
                 elif mode == "gravel":
                     highWalk = action == "start"
@@ -97,16 +108,20 @@ class RemoteController(object):
 
                 elif mode == "spider-gap":
                     if action == "walk":
+                        self._spider.switchBehavior(BehaviorType.Manual)
                         self._spider.animationController.setWideWalking(True)
+
                     elif action == "horizontal":
                         print ("Keeping body horizontal")
+                        self._spider.switchBehavior(BehaviorType.Manual)
+
                     elif action == "cross":
                         print ("Cross spider gap")
+                        self._spider.switchBehavior(BehaviorType.Push)
+
                     elif action == "touch":
                         print ("Glas aanficken")
-
-                    print("Grind mode not implemented, using walk.")
-                    self._spider.animationController.setWideWalking(True)
+                        self._spider.switchBehavior(BehaviorType.Touch)
 
                 elif mode == "vision":
                     if action == "start":
@@ -116,12 +131,11 @@ class RemoteController(object):
 
                 elif mode == "fury-road":
                     if action == "start":
-                        print ("Start fury road")
+                        print ("Start fury road - using follow balloon for now")
+                        self._spider.switchBehavior(BehaviorType.AutonomeFollowBalloon)
                     else:
-                        print("Stop fury road")
-
-                    print("Grind mode not implemented, using walk.")
-                    self._spider.animationController.setWideWalking(True)
+                        print("Stop fury road (follow balloon)")
+                        self._spider.switchBehavior(BehaviorType.Manual)
 
                 elif mode == "mating":
                     if action == "start":
@@ -134,6 +148,7 @@ class RemoteController(object):
                         print ("Moving spider down")
 
                     print("Mating not implemented, using walk.")
+                    self._spider.switchBehavior(BehaviorType.Manual)
                     self._spider.animationController.setWideWalking(True)
 
                 # Save current action and messages
