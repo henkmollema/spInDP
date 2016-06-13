@@ -1,4 +1,4 @@
-Sequence stab-mating
+Sequence stab-mating offset 0
 
 framebegin
 l:1 8.3,0,-20 100
