@@ -7,6 +7,7 @@ from spInDP.AnimationController import AnimationController
 from spInDP.BehaviorType import BehaviorType
 from spInDP.FindBalloonBehavior import FindBalloonBehavior
 from spInDP.FollowBalloonBehavior import FollowBalloonBehavior
+from spInDP.FuryRoadBehavior import FuryRoadBehavior
 from spInDP.ImmediateBehavior import ImmediateBehavior
 from spInDP.ManualBehavior import ManualBehavior
 from spInDP.ManualHorizontalBehavior import ManualHorizontalBehavior
@@ -104,6 +105,10 @@ class Spider(object):
         elif behaviorType == BehaviorType.AutonomeFollowBalloon:
             print("Switched to follow balloon behavior.")
             self._behavior = FollowBalloonBehavior(self)
+
+        elif behaviorType == BehaviorType.AutonomeFuryRoad:
+            print("Switched to autonome fury road behavior")
+            self._behavior = FuryRoadBehavior(self)
 
         elif behaviorType == BehaviorType.Immediate:
             print("Switched to immediate behavior.")

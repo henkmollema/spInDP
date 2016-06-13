@@ -131,10 +131,10 @@ class RemoteController(object):
 
                 elif mode == "fury-road":
                     if action == "start":
-                        print ("Start fury road - using follow balloon for now")
-                        self._spider.switchBehavior(BehaviorType.AutonomeFollowBalloon)
+                        print ("Start fury road")
+                        self._spider.switchBehavior(BehaviorType.AutonomeFuryRoad)
                     else:
-                        print("Stop fury road (follow balloon)")
+                        print("Stop fury road")
                         self._spider.switchBehavior(BehaviorType.Manual)
 
                 elif mode == "mating":

@@ -6,6 +6,7 @@ class BehaviorType(object):
     Autonome = "Autonome"
     AutonomeDestroyBalloon = "DestroyBalloon"
     AutonomeFollowBalloon = "FollowBalloon"
+    AutonomeFuryRoad = "FuryRoad"
     Immediate = "Immediate"
     Push = "Push"
     Touch = "Touch"
