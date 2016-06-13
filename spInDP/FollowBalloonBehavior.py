@@ -42,7 +42,7 @@ class FollowBalloonBehavior(AutonomeBehavior):
                 self._lastX = x
 
         else:
-            print "Balloon not found"
+            print ("Balloon not found")
             turnDir = 1
             if(self._lastX < 0): turnDir = -1
 

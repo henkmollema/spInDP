@@ -113,7 +113,7 @@ class RemoteController(object):
 
                     elif action == "horizontal":
                         print ("Keeping body horizontal")
-                        self._spider.switchBehavior(BehaviorType.Manual)
+                        self._spider.switchBehavior(BehaviorType.ManualHorizontal)
 
                     elif action == "cross":
                         print ("Cross spider gap")
