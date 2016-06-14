@@ -1,4 +1,4 @@
-Sequence post-stab-mating
+Sequence post-stab-mating offset 0
 framebegin
 l:1 0,0,0 100
 l:2 0,0,0 100
@@ -8,7 +8,6 @@ l:5 0,0,0 100
 l:6 -3.6,-12.1,4.8 100
 frameend
 
-Sequence post-stab-mating
 framebegin
 l:1 0,0,0 100
 l:2 0,0,0 100
@@ -18,7 +17,6 @@ l:5 0,0,0 100
 l:6 -3.6,-12.1,-5 100
 frameend
 
-Sequence post-stab-mating
 framebegin
 l:1 0,0,0 100
 l:2 0,0,0 100
