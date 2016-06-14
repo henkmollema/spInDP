@@ -57,6 +57,6 @@ class FindBalloonBehavior(AutonomeBehavior):
                 angle *= 1.5
 
                 # Walk towards balloon
-                time.sleep(self.spider.animationController.walk(angle, frameNr=self._frameNr, speedMod=1))
+                time.sleep(self.spider.animationController.strafeWalk(angle, frameNr=self._frameNr, speedMod=1))
                 self._stabPosition = False
                 self._frameNr += 1

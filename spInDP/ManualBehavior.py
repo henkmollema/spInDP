@@ -19,7 +19,7 @@ class ManualBehavior(Behavior):
         # self.spider.sensorDataProvider.startMeasuring()
 
     def update(self):
-        #jX = self.remoteContext.jX
+        jX = self.remoteContext.jX
         jY = self.remoteContext.jY
         jZ = self.remoteContext.jZ
         jAngle = self.remoteContext.jAngle
@@ -45,23 +45,17 @@ class ManualBehavior(Behavior):
 
             if not self.turnMode:  # strafemode
                 if (self.spider.sequenceController.legQueueSize() < 2):
-                    execTime = self.spider.animationController.walk(direction=jAngle,
-                                                                    frameNr=self.frameNr,
-                                                                    speedMod=speedModifier,
-                                                                    keepLeveled=self.keepLeveled) - self.spider.UPDATE_SLEEP_TIME
+                    execTime = self.spider.animationController.strafeWalk(direction=jAngle,
+                                                                          frameNr=self.frameNr,
+                                                                          speedMod=speedModifier,
+                                                                          keepLeveled=self.keepLeveled) - self.spider.UPDATE_SLEEP_TIME
                     time.sleep(max(execTime, 0))
 
             else:  # Turn in-place mode
-                if jY > 0:
-                    turnAngle = 1
-                else:
-                    turnAngle = -1
-
                 if (self.spider.sequenceController.legQueueSize() < 2):
-                    execTime = self.spider.animationController.turn(direction=turnAngle,
+                    execTime = self.spider.animationController.turnWalk(xDirection=-jY, yDirection=-jX,
                                                                     frameNr=self.frameNr,
-                                                                    speedMod=speedModifier,
-                                                                    keepLeveled=self.keepLeveled) - self.spider.UPDATE_SLEEP_TIME
+                                                                    speedMod=speedModifier) - self.spider.UPDATE_SLEEP_TIME
                     time.sleep(max(execTime, 0))
 
             self.frameNr += 1
