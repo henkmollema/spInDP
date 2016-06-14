@@ -1,8 +1,11 @@
-import bluetooth
-import threading
 import math
-from spInDP.RemoteContext import RemoteContext
+import threading
+import time
+
+import bluetooth
+
 from spInDP.BehaviorType import BehaviorType
+from spInDP.RemoteContext import RemoteContext
 
 
 class RemoteController(object):
@@ -10,10 +13,10 @@ class RemoteController(object):
 
     stop = False
     context = None
-    _spider = None
-    _sock = None
-    _updateLoop = None
 
+    _spider = None
+    _socket = None
+    _updateLoop = None
     _oldMode = ""
     _oldAction = ""
 
@@ -23,23 +26,45 @@ class RemoteController(object):
         self._spider = spider
         self.context = RemoteContext()
 
-        try:
-            print("Initializing Bluetooth connection")
-            self._sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-            self._sock.connect(("20:16:03:30:80:85", 1))
-        except BaseException as e:
-            print("Initializing bluetooth failed: " + str(e))
+        print("Initializing Bluetooth connection")
+        self._socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+        self.tryConnect()
 
         self._updateLoop = threading.Thread(target=self._updateContextLoop)
         self._updateLoop.start()
 
+    def tryConnect(self):
+        """Attempts to connect the socket with the the Arduino using Bluetooth."""
+
+        tries = 0
+        maxTries = 5
+        ex = None
+
+        while tries <= maxTries:
+            try:
+                self._socket.connect(("20:16:03:30:80:85", 1))
+                break
+            except BaseException as e:
+                print("Bluetooth connection failed. Retrying...")
+                tries += 1
+                ex = e
+                time.sleep(0.3)
+                continue
+
+        if not self._socket.__isconnected():
+            print("Initializing bluetooth failed: " + str(ex))
+
     def _updateContextLoop(self):
-        """The update logic."""
+        """Starts an indefinitive loop to receive messages from the Bluetooth socket."""
 
         msg = ""
         while not self.stop:
+            if not self._socket.__isconnected():
+                # Reconnect if we lost connection
+                self.tryConnect()
+
             try:
-                msg += self._sock.recv(1024)
+                msg += self._socket.recv(1024)
             except BaseException as e:
                 print("Error receiving bluetooth data: " + str(e))
                 break
@@ -49,7 +74,7 @@ class RemoteController(object):
 
             if msgEnd == -1:
                 # We have not received a complete message yet,
-                # keep reading until we find a \NotImplemented
+                # keep reading until we find a \n
                 continue
 
             # Read all data until end of message index
@@ -169,4 +194,4 @@ class RemoteController(object):
             msg = msg[msgEnd + 1:]
 
         print("Closing socket")
-        self._sock.close()
+        self._socket.close()
