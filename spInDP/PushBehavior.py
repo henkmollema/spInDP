@@ -18,13 +18,11 @@ class PushBehavior(Behavior):
         jMagnitude = self.spider.remoteController.context.jMagnitude
         angleModifier = 1
         if(jMagnitude > 0.4):
-            print("jMagnituge = ", jMagnitude)
             speedModifier = jMagnitude * 2
-
-            time.sleep(self.animationController.push(frameNr=self.frameNr, speedMod=speedModifier))
-
-            #self.animationController.push(frameNr=self.frameNr, speedMod=speedModifier)
+            if self.spider.remoteController.context.jX > 0:
+                time.sleep(self.spider.animationController.push(frameNr=self.frameNr, speedMod=speedModifier, direction=1))
+            else:
+                time.sleep(self.spider.animationController.push(frameNr=self.frameNr, speedMod=speedModifier, direction=0))
             self.frameNr += 1
-            print("hohihohohihohi")
 
         return

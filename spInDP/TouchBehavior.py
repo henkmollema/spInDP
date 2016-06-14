@@ -17,15 +17,18 @@ class TouchBehavior(Behavior):
 
     def update(self):
         jMagnitude = self.spider.remoteController.context.jMagnitude
+        x = self.spider.remoteController.context.jX
 
         if (jMagnitude > 0.4):
             # time.sleep(max(self.animationController.method))
             print(jMagnitude)
             self.frameNr += 1
             currentAngle = self.spider.sequenceController.servoController.getPosition(servo=1)
-            if jMagnitude > 0:
+            if x > 0:
+                print("if")
                 self.spider.sequenceController.servoController.move(servo=1, angle=currentAngle - 1, speed=50*jMagnitude)
             else:
+                print("else")
                 self.spider.sequenceController.servoController.move(servo=1, angle=currentAngle + 1, speed=50*jMagnitude)
 
         return

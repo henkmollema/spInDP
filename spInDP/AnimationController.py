@@ -536,7 +536,7 @@ class AnimationController:
         
         return totalTime
 
-    def push(self, frameNr, speedMod = 1):
+    def push(self, frameNr, speedMod = 1, direction=1):
         totalTime = 0
         speed = speedMod * 100
         frontLegAngleModifier = 0
@@ -547,10 +547,12 @@ class AnimationController:
         angleController = remoteContext.aY
         if abs(angleController) > 0.2:
             if angleController > 0:
-                frontLegAngleModifier = angleController * -4
+                #frontLegAngleModifier = angleController * -4
+                frontLegAngleModifier = 1
                 print("frontLegAngleModifier:", frontLegAngleModifier)
             else:
-                backLegAngleModifier = abs(angleController) * -4
+                #backLegAngleModifier = abs(angleController) * -4
+                backLegAngleModifier = 1
                 print("backLegAngleModifier:", backLegAngleModifier)
 
 
@@ -649,16 +651,29 @@ class AnimationController:
                 6: [0, 0, 0]
             }
         }
+        if direction == 1:
+            frameNr = frameNr % len(pushFrames)
+        else:
+            frameNr = 7 - frameNr % len(pushFrames)
 
-        frameNr = frameNr % len(pushFrames)
         print("frameNr: ", frameNr)
         self.startFrame()
-        self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][1][0], y=pushFrames[frameNr][1][1], z=pushFrames[frameNr][1][2] + frontLegAngleModifier, legID=1, speed=speed)
-        self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][2][0], y=pushFrames[frameNr][2][1], z=pushFrames[frameNr][2][2] + frontLegAngleModifier, legID=2, speed=speed)
+        if frontLegAngleModifier == 1:
+            print("Frontleg")
+            self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(x=-7, y=-20, z=-4, legID=1, speed=speed)
+            self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(x=-7, y=-20, z=-4, legID=2, speed=speed)
+        else:
+            self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][1][0],y=pushFrames[frameNr][1][1],z=pushFrames[frameNr][1][2] + frontLegAngleModifier,legID=1, speed=speed)
+            self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][2][0],y=pushFrames[frameNr][2][1],z=pushFrames[frameNr][2][2] + frontLegAngleModifier,legID=2, speed=speed)
         self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][3][0], y=pushFrames[frameNr][3][1], z=pushFrames[frameNr][3][2], legID=3, speed=speed)
-        self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][4][0], y=pushFrames[frameNr][4][1], z=pushFrames[frameNr][4][2] + backLegAngleModifier, legID=4, speed=speed)
-        self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][5][0], y=pushFrames[frameNr][5][1], z=pushFrames[frameNr][5][2] + backLegAngleModifier, legID=5, speed=speed)
-        self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][6][0], y=pushFrames[frameNr][6][1], z=pushFrames[frameNr][6][2], legID=6, speed=speed)
+        self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][6][0],y=pushFrames[frameNr][6][1],z=pushFrames[frameNr][6][2], legID=6,speed=speed)
+        if backLegAngleModifier == 1:
+            print("Backleg")
+            self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(x=-7, y=20, z=-4, legID=5, speed=speed)
+            self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(x=-7, y=20, z=-4, legID=4, speed=speed)
+        else:
+            self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][5][0],y=pushFrames[frameNr][5][1],z=pushFrames[frameNr][5][2] + backLegAngleModifier, legID=5,speed=speed)
+            self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][4][0],y=pushFrames[frameNr][4][1],z=pushFrames[frameNr][4][2] + backLegAngleModifier, legID=4,speed=speed)
         totalTime += self.endFrame()
 
         return totalTime
