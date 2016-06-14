@@ -155,6 +155,11 @@ class AnimationController:
         if yDirection < -1 or yDirection > 1:
             raise ("\"yDirection\" has to be between -1 and 1 for turnWalking")
 
+        xDirection = round(xDirection, 2)
+        yDirection = round(yDirection, 2)
+
+        print("turnWalk called with values x:" + str(xDirection) + ", y:" + str(yDirection))
+
         midXOffset = 0
         if xDirection == 0:
             midXOffset = 10000000
@@ -245,7 +250,6 @@ class AnimationController:
         stepSizeDegrees = 180 - (subCorner * 2)
         if (yDirection == -1) ^ (xDirection < 0):
             stepSizeDegrees *= -1
-            frameNr += 4 #TODO: Check if this is right. Should also be added to other animations
 
         frameNr = frameNr % 6
 
@@ -448,6 +452,8 @@ class AnimationController:
             totalTime += self.endFrame()
         
         return totalTime
+
+
 
     def push(self, frameNr, speedMod = 1, direction=1):
         totalTime = 0
