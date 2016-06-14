@@ -17,21 +17,40 @@ class TouchBehavior(Behavior):
 
     def update(self):
         jMagnitude = self.spider.remoteController.context.jMagnitude
-        x = self.spider.remoteController.context.jX
+        xInput = self.spider.remoteController.context.jX
+        yInput = self.spider.remoteController.context.jY
 
         if (jMagnitude > 0.4):
-            # time.sleep(max(self.animationController.method))
             print(jMagnitude)
             self.frameNr += 1
             currentAngle = self.spider.sequenceController.servoController.getPosition(servo=1)
+            x, y = self.cap(xInput, yInput)
+            self.spider.sequenceController.servoController.move(servo=1, angle=currentAngle - x, speed=50 * jMagnitude)
+            self.spider.sequenceController.servoController.move(servo=2, angle=currentAngle - y, speed=50 * jMagnitude)
+            '''
             if x > 0:
                 print("if")
                 self.spider.sequenceController.servoController.move(servo=1, angle=currentAngle - 1, speed=50*jMagnitude)
+                if
             else:
                 print("else")
                 self.spider.sequenceController.servoController.move(servo=1, angle=currentAngle + 1, speed=50*jMagnitude)
+                '''
 
         return
+
+    def cap(self, x, y):
+        retX = 0
+        retY = 0
+        if x > 0:
+            retX = 1
+        else:
+            retX = -1
+        if y > 0.3:
+            retY = 1
+        elif y < 0.3:
+            retY = -1
+        return retX, retY
 
     def initLeg(self):
         print("Init leg.")
