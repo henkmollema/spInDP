@@ -1,4 +1,4 @@
-Sequence pre-stab-left
+Sequence pre-stab-left offset 0
 framebegin
 l:1 0,0,0 100
 l:2 0,0,0 100
