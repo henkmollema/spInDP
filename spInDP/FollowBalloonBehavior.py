@@ -35,7 +35,7 @@ class FollowBalloonBehavior(AutonomeBehavior):
 
                 if(angle < 45):
                 # Walk towards balloon
-                    execTime = self.spider.animationController.walk(angle, frameNr=self._frameNr, speedMod=3)
+                    execTime = self.spider.animationController.strafeWalk(angle, frameNr=self._frameNr, speedMod=3)
                 else:
                     turnDir = 1
                     if(x < 0):

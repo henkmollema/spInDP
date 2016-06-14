@@ -291,7 +291,7 @@ class AnimationController:
 
     realYAngle = 0
     yAdjustment = 0
-    def walk(self, direction, frameNr, speedMod = 1, keepLeveled = False):
+    def strafeWalk(self, direction, frameNr, speedMod = 1, keepLeveled = False):
         """Combination of walking and strafing, wherein the direction is an angle in degrees to which the body should move"""
         totalTime = 0
 

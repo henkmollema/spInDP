@@ -97,7 +97,7 @@ class WebServer:
     def api_erwin_walk(direction):
         frameNr = 0
         for x in range(1, 50):
-            execTime = webserverinstance.spider.animationController.walk(direction, frameNr, 1)
+            execTime = webserverinstance.spider.animationController.strafeWalk(direction, frameNr, 1)
             time.sleep(execTime)
             frameNr += 1
         return webserverinstance.format_response("Walk executed")
@@ -111,7 +111,6 @@ class WebServer:
             time.sleep(execTime)
             frameNr += 1
         return webserverinstance.format_response("Turn executed")
-
 
     @staticmethod
     @app.route("/behavior/<behaviortype>")
