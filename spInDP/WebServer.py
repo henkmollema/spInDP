@@ -101,15 +101,7 @@ class WebServer:
             time.sleep(execTime)
             frameNr += 1
         return webserverinstance.format_response("Walk executed")
-    @staticmethod
-    @app.route("/erwin/turn/<direction>")
-    def api_erwin_turn(direction):
-        frameNr = 0
-        for x in range(1, 50):
-            execTime = webserverinstance.spider.animationController.turn(int(direction), frameNr, 0.5)
-            time.sleep(execTime)
-            frameNr += 1
-        return webserverinstance.format_response("Turn executed")
+
     @staticmethod
     @app.route("/erwin/turnwalk/<xdirection>/<ydirection>/<count>/<speed>")
     def api_erwin_turnwalk(xdirection, ydirection, count, speed):
@@ -161,7 +153,6 @@ class WebServer:
     @staticmethod
     @app.route("/kinematics/")
     def api_kinematics():
-
         return render_template('kinnematics.html')
 
     @staticmethod
