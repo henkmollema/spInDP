@@ -19,6 +19,8 @@ from spInDP.ServoController import ServoController
 from spInDP.SprintBehavior import SprintBehavior
 from spInDP.TouchBehavior import TouchBehavior
 from spInDP.VisionController import VisionController
+from spInDP.EmotiveContext import EmotiveContext
+from spInDP.EmotiveBehavior import EmotiveBehavior
 from spInDP.WebServer import WebServer
 
 
@@ -39,6 +41,7 @@ class Spider(object):
         self.visioncontroller = VisionController()
         self.webserver = WebServer(self)
         self.remoteController = RemoteController(self)
+        self.emotiveContext = EmotiveContext()
 
         # Private fields
         self._behavior = ManualBehavior(self)
@@ -125,6 +128,10 @@ class Spider(object):
         elif behaviorType == BehaviorType.Sprint:
             print("Switched to sprint behavior")
             self._behavior = SprintBehavior(self)
+
+        elif behaviorType == BehaviorType.Emotive:
+            print("Switched to emotive behavior")
+            self._behavior = EmotiveBehavior(self)
 
         # Start the loop again
         self._stopLoop = False

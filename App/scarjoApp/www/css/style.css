@@ -7,6 +7,14 @@
 	
 }
 
+.error {
+	color: red !important;
+}
+
+.warning {
+	color: yellow;
+}
+
 .cameraframe{
 	width: 640px;
 	height: 480px;

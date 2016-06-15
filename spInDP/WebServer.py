@@ -189,3 +189,9 @@ class WebServer:
             data = jquery.readlines()
 
         return webserverinstance.format_response(data)
+
+    @staticmethod
+    @app.route("/emotive/<command>")
+    def api_emotive_command(command):
+        webserverinstance.spider.emotiveContext.currentCommand = command
+        return webserverinstance.format_response("emo: " + command)

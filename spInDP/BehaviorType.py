@@ -11,3 +11,4 @@ class BehaviorType(object):
     Push = "Push"
     Touch = "Touch"
     Sprint = "Sprint"
+    Emotive = "Emotive"
