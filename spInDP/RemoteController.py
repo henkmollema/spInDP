@@ -38,20 +38,22 @@ class RemoteController(object):
 
         tries = 0
         maxTries = 5
+        connected = False
         ex = None
 
         while tries <= maxTries:
             try:
                 self._socket.connect(("20:16:03:30:80:85", 1))
+                connected = True
                 break
             except BaseException as e:
-                print("Bluetooth connection failed. Retrying...")
+                print("Bluetooth connection failed. Retrying..." + str(e))
                 tries += 1
                 ex = e
-                time.sleep(0.3)
+                time.sleep(1.0)
                 continue
 
-        if not self._socket.__isconnected():
+        if not connected:
             print("Initializing bluetooth failed: " + str(ex))
 
     def _updateContextLoop(self):
@@ -59,15 +61,11 @@ class RemoteController(object):
 
         msg = ""
         while not self.stop:
-            if not self._socket.__isconnected():
-                # Reconnect if we lost connection
-                self.tryConnect()
-
             try:
                 msg += self._socket.recv(1024)
             except BaseException as e:
                 print("Error receiving bluetooth data: " + str(e))
-                break
+                continue
 
             # New line characaters is the end of the message
             msgEnd = msg.find('\n')
