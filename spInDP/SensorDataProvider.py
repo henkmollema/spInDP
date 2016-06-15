@@ -43,7 +43,7 @@ class SensorDataProvider(object):
         """Initializes the SensorDataProvider."""
         # Now wake the 6050 up as it starts in sleep mode
         # TODO: Check if the device will go to sleep mode automatically, this will cause problems
-        #self._bus.write_byte_data(SensorDataProvider.BUS_ADDRESS, SensorDataProvider.POWER_MGMT_1, 0)
+        self._bus.write_byte_data(SensorDataProvider.BUS_ADDRESS, SensorDataProvider.POWER_MGMT_1, 0)
         print ("Init sensordataprovider")
 
     def stopMeasuring(self):
@@ -88,7 +88,7 @@ class SensorDataProvider(object):
             # self.smoothAccelY = float(self.smoothAccelY + gyroY*deltaT)
             print ("gyroY: " + str(self._smoothAccelY) + " delta: " + str(yDeg))
             self._lastUpdate = time.time()
-            time.sleep(0.0016)  # Update at 60hz
+            time.sleep(0.0032)  # Update at 30hz
 
     def getSmoothAccelerometer(self):
         """Gets the smoothed accelerometer value."""

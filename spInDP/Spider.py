@@ -28,7 +28,7 @@ class Spider(object):
     """Encapsulates the interaction with the spider."""
 
     _stopLoop = False
-    UPDATE_SLEEP_TIME = 0.032
+    UPDATE_SLEEP_TIME = 0.008
 
     def __init__(self):
         """Initializes the spider."""

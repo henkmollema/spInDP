@@ -48,14 +48,14 @@ class ManualBehavior(Behavior):
                     execTime = self.spider.animationController.strafeWalk(direction=jAngle,
                                                                           frameNr=self.frameNr,
                                                                           speedMod=speedModifier,
-                                                                          keepLeveled=self.keepLeveled) - self.spider.UPDATE_SLEEP_TIME
+                                                                          keepLeveled=self.keepLeveled) #- self.spider.UPDATE_SLEEP_TIME
                     time.sleep(max(execTime, 0))
 
             else:  # Turn in-place mode
                 if (self.spider.sequenceController.legQueueSize() < 2):
                     execTime = self.spider.animationController.turnWalk(xDirection=-jY, yDirection=-jX,
                                                                     frameNr=self.frameNr,
-                                                                    speedMod=speedModifier) - self.spider.UPDATE_SLEEP_TIME
+                                                                    speedMod=speedModifier) #- self.spider.UPDATE_SLEEP_TIME
                     time.sleep(max(execTime, 0))
 
             self.frameNr += 1
