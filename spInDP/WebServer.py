@@ -110,7 +110,17 @@ class WebServer:
             execTime = webserverinstance.spider.animationController.turnWalk(float(xdirection), float(ydirection), frameNr, float(speed))
             time.sleep(execTime)
             frameNr += 1
-        return webserverinstance.format_response("Turn executed")
+        return webserverinstance.format_response("TurnWalk executed")
+
+    @staticmethod
+    @app.route("/erwin/turnrun/<xdirection>/<ydirection>/<count>/<speed>")
+    def api_erwin_turnrun(xdirection, ydirection, count, speed):
+        frameNr = 0
+        for x in range(0, 8 * int(count)):
+            execTime = webserverinstance.spider.animationController.turnRun(float(xdirection), float(ydirection), frameNr, float(speed))
+            time.sleep(execTime)
+            frameNr += 1
+        return webserverinstance.format_response("TurnRun executed")
 
     @staticmethod
     @app.route("/behavior/<behaviortype>")
@@ -171,7 +181,6 @@ class WebServer:
 
         legTorques = webserverinstance.spider.servoController.torqueStatus
         return webserverinstance.format_response(','.join(str(x) for x in legTorques))
-        
 
     @staticmethod
     @app.route("/jquery.min.js")
