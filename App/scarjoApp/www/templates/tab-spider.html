@@ -1,44 +1,23 @@
-<ion-view view-title="Spider View">
+<ion-view view-title="Scarjo Monitor">
   <ion-content class="padding">
-    <h2>Sacrjo Monitor</h2>
     <div class='spiderImage'>
 		<img class="fullwidthImage" src="img/spider_render.png"/>
 		<div class='' ng-repeat="servo in servodata">
 			<div class='servoBlock servo{{$index + 1}}' >
 				<b>Position:</b> {{servo.position}}
 				<br>
-				<b>Speed:</b> {{servo.speed}}
+				<b ng-class="{error: servo.load > 1100}" >Load:</b> {{servo.load}}
 				<br>
-				<b>Load:</b> {{servo.load}}
+				<b ng-class="{warning: servo.voltage < 10, error: servo.voltage < 9}" >Voltage:</b> {{servo.voltage}}
 				<br>
-				<b>Voltage:</b> {{servo.voltage}}
-				<br>
-				<b>Temp:</b> {{servo.temp}}
+				<b ng-class="{warning: servo.temp > 50, error: servo.temp > 60}">Temp:</b> {{servo.temp}}
 				<br>
 			</div>
 		</div>
 		
-		
-		<!--<div class='servoBlock servo2' >Hoi</div>
-		<div class='servoBlock servo3' >Hoi</div>
-		<div class='servoBlock servo4' >Hoi</div>
-		<div class='servoBlock servo5' >Hoi</div>
-		<div class='servoBlock servo6' >Hoi</div>
-		<div class='servoBlock servo7' >Hoi</div>
-		<div class='servoBlock servo8' >Hoi</div>
-		<div class='servoBlock servo9' >Hoi</div>
-		<div class='servoBlock servo10' >Hoi</div>
-		<div class='servoBlock servo11' >Hoi</div>
-		<div class='servoBlock servo12' >Hoi</div>
-		<div class='servoBlock servo13' >Hoi</div>
-		<div class='servoBlock servo14' >Hoi</div>
-		<div class='servoBlock servo15' >Hoi</div>
-		<div class='servoBlock servo16' >Hoi</div>
-		<div class='servoBlock servo17' >Hoi</div>
-		<div class='servoBlock servo18' >Hoi</div>-->
     </div>
 	
-	<ion-toggle ng-model="shouldUpdate.value" toggle-class="toggle-calm">Auto Update data</ion-toggle>
+	<ion-toggle ng-model="shouldUpdate.value" toggle-class="toggle-calm">Update data</ion-toggle>
     
   </ion-content>
 </ion-view>

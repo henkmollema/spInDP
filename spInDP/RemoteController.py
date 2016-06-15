@@ -26,32 +26,35 @@ class RemoteController(object):
         self._spider = spider
         self.context = RemoteContext()
 
-        print("Initializing Bluetooth connection")
-        self._socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-        self.tryConnect()
+        self._tryConnect()
 
         self._updateLoop = threading.Thread(target=self._updateContextLoop)
         self._updateLoop.start()
 
-    def tryConnect(self):
+    def _tryConnect(self):
         """Attempts to connect the socket with the the Arduino using Bluetooth."""
+
+        print("Initializing Bluetooth connection")
 
         tries = 0
         maxTries = 5
+        connected = False
         ex = None
 
         while tries <= maxTries:
             try:
+                self._socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
                 self._socket.connect(("20:16:03:30:80:85", 1))
+                connected = True
                 break
             except BaseException as e:
-                print("Bluetooth connection failed. Retrying...")
+                print("Bluetooth connection failed. Retrying..." + str(e))
                 tries += 1
                 ex = e
-                time.sleep(0.3)
+                time.sleep(1)
                 continue
 
-        if not self._socket.__isconnected():
+        if not connected:
             print("Initializing bluetooth failed: " + str(ex))
 
     def _updateContextLoop(self):
@@ -59,15 +62,11 @@ class RemoteController(object):
 
         msg = ""
         while not self.stop:
-            if not self._socket.__isconnected():
-                # Reconnect if we lost connection
-                self.tryConnect()
-
             try:
                 msg += self._socket.recv(1024)
             except BaseException as e:
                 print("Error receiving bluetooth data: " + str(e))
-                break
+                continue
 
             # New line characaters is the end of the message
             msgEnd = msg.find('\n')

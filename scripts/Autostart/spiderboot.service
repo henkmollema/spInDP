@@ -4,7 +4,7 @@ After=multi.user.target
 
 [Service]
 Type=idle
-ExecStart=/usr/bin/python3 /home/pi/file.py
+ExecStart=/usr/bin/python /home/pi/src/spInDP.py
 
 [Install]
 WantedBy=multi-user.target
