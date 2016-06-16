@@ -63,36 +63,41 @@ class SequenceController(object):
 
     def parseSequence(self, filePath, validate=False, speedModifier=1, repeat=1):
         """Sequence file parser, returns the time it takes to execute this sequence in seconds"""
-
-        # print("Parsing sequence at: " + filePath + " repeating for "  + str(repeat))
-        with open(filePath, 'r') as f:
-            lines = f.readlines()
-
+        oldOffset = self.coxaOffset
         totalTime = 0
 
-        words = lines[0].split(' ')
-        if (words[0].lower() != "sequence"):
-            raise (
-                "Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
-        else:
-            if (len(words) > 3):
-                self.coxaOffset = int(words[3])
-            else:
-                self.coxaOffset = 45
+        try:
+            # print("Parsing sequence at: " + filePath + " repeating for "  + str(repeat))
+            with open(filePath, 'r') as f:
+                lines = f.readlines()
 
-        for x in range(0, repeat):
-            lineNr = 0
-
-            if (speedModifier < 0):
-                lineNr = len(lines)
-                for line in reversed(lines):
-                    totalTime += self.interpretLine(line, lineNr, speedModifier)
-                    lineNr -= 1
+            words = lines[0].split(' ')
+            if (words[0].lower() != "sequence"):
+                print (
+                    "Sequencefile has an invalid header, it should start with 'Sequence <sequencename>'")
             else:
-                lineNr = 1
-                for line in lines:
-                    totalTime += self.interpretLine(line, lineNr, speedModifier)
-                    lineNr += 1
+                if (len(words) > 3):
+                    self.coxaOffset = int(words[3])
+                else:
+                    self.coxaOffset = 45
+
+            for x in range(0, repeat):
+                lineNr = 0
+
+                if (speedModifier < 0):
+                    lineNr = len(lines)
+                    for line in reversed(lines):
+                        totalTime += self.interpretLine(line, lineNr, speedModifier)
+                        lineNr -= 1
+                else:
+                    lineNr = 1
+                    for line in lines:
+                        totalTime += self.interpretLine(line, lineNr, speedModifier)
+                        lineNr += 1
+        except:
+            print "Exception while parsing: " + filePath
+
+        self.coxaOffset = oldOffset
 
         return totalTime
 
@@ -258,93 +263,96 @@ class SequenceController(object):
 
         immediateMode: The speeds won't be corrected
         """
+        try:
+            lIK = math.sqrt((self.d + self.lc + x) ** 2 + y ** 2)
+            dIK = lIK - self.lc
+            bIK = math.sqrt((self.e + z) ** 2 + dIK ** 2)
 
-        lIK = math.sqrt((self.d + self.lc + x) ** 2 + y ** 2)
-        dIK = lIK - self.lc
-        bIK = math.sqrt((self.e + z) ** 2 + dIK ** 2)
+            coxaServoId = (legID - 1) * 3 + 1
+            femurServoId = (legID - 1) * 3 + 2
+            tibiaServoId = (legID - 1) * 3 + 3
 
-        coxaServoId = (legID - 1) * 3 + 1
-        femurServoId = (legID - 1) * 3 + 2
-        tibiaServoId = (legID - 1) * 3 + 3
+            # get previous servo angles
+            coxaCurr = self.servoAngleMap[coxaServoId]
+            femurCurr = self.servoAngleMap[femurServoId]
+            tibiaCurr = self.servoAngleMap[tibiaServoId]
 
-        # get previous servo angles
-        coxaCurr = self.servoAngleMap[coxaServoId]
-        femurCurr = self.servoAngleMap[femurServoId]
-        tibiaCurr = self.servoAngleMap[tibiaServoId]
+            # If the servomap is empty try to read the position directly from the servo
+            if (self.first is True):
+                self.first = False
+                coxaCurr = self.servoController.getPosition(coxaServoId)
+                femurCurr = self.servoController.getPosition(femurServoId)
+                tibiaCurr = self.servoController.getPosition(tibiaServoId)
 
-        # If the servomap is empty try to read the position directly from the servo
-        if (self.first is True):
-            self.first = False
-            coxaCurr = self.servoController.getPosition(coxaServoId)
-            femurCurr = self.servoController.getPosition(femurServoId)
-            tibiaCurr = self.servoController.getPosition(tibiaServoId)
+            betaIK = math.acos(
+                (self.a ** 2 + self.c ** 2 - bIK ** 2) / (2 * self.a * self.c))
+            gammaIK = math.acos(
+                (self.a ** 2 + bIK ** 2 - self.c ** 2) / (2 * self.a * bIK))
+            thetaIK = math.asin(y / lIK)
+            tauIK = math.atan((self.e + z) / dIK)
 
-        betaIK = math.acos(
-            (self.a ** 2 + self.c ** 2 - bIK ** 2) / (2 * self.a * self.c))
-        gammaIK = math.acos(
-            (self.a ** 2 + bIK ** 2 - self.c ** 2) / (2 * self.a * bIK))
-        thetaIK = math.asin(y / lIK)
-        tauIK = math.atan((self.e + z) / dIK)
+            angleCoxa = thetaIK * self.radToDeg
+            angleFemur = -90 + ((gammaIK - tauIK) * self.radToDeg)
+            angleTibia = 180 - ((betaIK) * self.radToDeg)
 
-        angleCoxa = thetaIK * self.radToDeg
-        angleFemur = -90 + ((gammaIK - tauIK) * self.radToDeg)
-        angleTibia = 180 - ((betaIK) * self.radToDeg)
+            if (legID > 1 and legID < 5):
+                angleCoxa = -angleCoxa
+                angleFemur = -angleFemur
+                angleTibia = -angleTibia
 
-        if (legID > 1 and legID < 5):
-            angleCoxa = -angleCoxa
-            angleFemur = -angleFemur
-            angleTibia = -angleTibia
+            if (legID == 1 or legID == 4):
+                angleCoxa += self.coxaOffset
+            if (legID == 2 or legID == 5):
+                angleCoxa -= self.coxaOffset
 
-        if (legID == 1 or legID == 4):
-            angleCoxa += self.coxaOffset
-        if (legID == 2 or legID == 5):
-            angleCoxa -= self.coxaOffset
+            self.servoAngleMap[coxaServoId] = angleCoxa
+            self.servoAngleMap[femurServoId] = angleFemur
+            self.servoAngleMap[tibiaServoId] = angleTibia
 
-        self.servoAngleMap[coxaServoId] = angleCoxa
-        self.servoAngleMap[femurServoId] = angleFemur
-        self.servoAngleMap[tibiaServoId] = angleTibia
+            # Create a LegMovement object
+            deltaCoxa = abs(angleCoxa - coxaCurr)
+            deltaFemur = abs(angleFemur - femurCurr)
+            deltaTibia = abs(angleTibia - tibiaCurr)
 
-        # Create a LegMovement object
-        deltaCoxa = abs(angleCoxa - coxaCurr)
-        deltaFemur = abs(angleFemur - femurCurr)
-        deltaTibia = abs(angleTibia - tibiaCurr)
+            retVal = LegMovement()
+            maxDelta = max(deltaCoxa, deltaFemur, deltaTibia)
 
-        retVal = LegMovement()
-        maxDelta = max(deltaCoxa, deltaFemur, deltaTibia)
+            if (maxDelta == 0):
+                return None
 
-        if (maxDelta == 0):
-            return None
+            # If we are in immediate mode, don't calculate delta's
+            if (not immediateMode):
+                if (maxDelta == deltaCoxa):
+                    # print("max delta is coxa")
+                    retVal.coxaSpeed = speed
+                    retVal.femurSpeed = int(round(speed * (deltaFemur / maxDelta), 0))
+                    retVal.tibiaSpeed = int(round(speed * (deltaTibia / maxDelta), 0))
+                elif (maxDelta == deltaFemur):
+                    # print("max delta is femur")
+                    retVal.coxaSpeed = int(round(speed * (deltaCoxa / maxDelta), 0))
+                    retVal.femurSpeed = speed
+                    retVal.tibiaSpeed = int(round(speed * (deltaTibia / maxDelta), 0))
+                elif (maxDelta == deltaTibia):
+                    # print("max delta is tibia")
+                    retVal.coxaSpeed = int(round(speed * (deltaCoxa / maxDelta), 0))
+                    retVal.femurSpeed = int(round(speed * (deltaFemur / maxDelta), 0))
+                    retVal.tibiaSpeed = speed
 
-        # If we are in immediate mode, don't calculate delta's
-        if (not immediateMode):
-            if (maxDelta == deltaCoxa):
-                # print("max delta is coxa")
+                maxExecTime = maxDelta / (self.anglePerSecond * (speed / 1023.0))
+                retVal.maxExecTime = maxExecTime
+            else:
                 retVal.coxaSpeed = speed
-                retVal.femurSpeed = int(round(speed * (deltaFemur / maxDelta), 0))
-                retVal.tibiaSpeed = int(round(speed * (deltaTibia / maxDelta), 0))
-            elif (maxDelta == deltaFemur):
-                # print("max delta is femur")
-                retVal.coxaSpeed = int(round(speed * (deltaCoxa / maxDelta), 0))
                 retVal.femurSpeed = speed
-                retVal.tibiaSpeed = int(round(speed * (deltaTibia / maxDelta), 0))
-            elif (maxDelta == deltaTibia):
-                # print("max delta is tibia")
-                retVal.coxaSpeed = int(round(speed * (deltaCoxa / maxDelta), 0))
-                retVal.femurSpeed = int(round(speed * (deltaFemur / maxDelta), 0))
                 retVal.tibiaSpeed = speed
 
-            maxExecTime = maxDelta / (self.anglePerSecond * (speed / 1023.0))
-            retVal.maxExecTime = maxExecTime
-        else:
-            retVal.coxaSpeed = speed
-            retVal.femurSpeed = speed
-            retVal.tibiaSpeed = speed
+            retVal.coxa = angleCoxa
+            retVal.femur = angleFemur
+            retVal.tibia = angleTibia
 
-        retVal.coxa = angleCoxa
-        retVal.femur = angleFemur
-        retVal.tibia = angleTibia
+            retVal.IKCoordinates = [x, y, z]
+        except:
+            print("Exception in coordsToLegMovement()")
 
-        retVal.IKCoordinates = [x, y, z]
         return retVal
 
     def addFrameToQueue(self, frame):

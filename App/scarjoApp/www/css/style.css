@@ -1,5 +1,6 @@
 /* All custom CSS here */
 
+
 .fullwidthImage{
 	width:100%;
 	height: auto;
@@ -44,6 +45,8 @@
 	border-radius: 4px;
 	background: rgba(255,255,255,0.8);
 	padding: 2px;
+	line-height: 14px;
+	font-size: 14px;
 }
 
 .servo1{
