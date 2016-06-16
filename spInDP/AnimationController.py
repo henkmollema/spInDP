@@ -161,17 +161,17 @@ class AnimationController:
 
     def turnWalk(self, xDirection, yDirection, frameNr, speedMod=1):
         if xDirection < -1:
-            xDirection = -1
             print("xDirection in turnWalk can't be lower than -1. It was modified from " + str(xDirection) + " to -1")
+            xDirection = -1
         if xDirection > 1:
-            xDirection = 1
             print("xDirection in turnWalk can't be higher than 1. It was modified from " + str(xDirection) + " to 1")
+            xDirection = 1
         if yDirection < -1:
-            yDirection = -1
             print("yDirection in turnWalk can't be lower than -1. It was modified from " + str(yDirection) + " to -1")
+            yDirection = -1
         if yDirection > 1:
-            yDirection = 1
             print("yDirection in turnWalk can't be higher than 1. It was modified from " + str(yDirection) + " to 1")
+            yDirection = 1
 
         xDirection = round(xDirection, 2)
         yDirection = round(yDirection, 2)

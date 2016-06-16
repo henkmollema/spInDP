@@ -361,8 +361,8 @@ class SequenceController(object):
             retVal.tibia = angleTibia
 
             retVal.IKCoordinates = [x, y, z]
-        except:
-            print("Exception in coordsToLegMovement()")
+        except BaseException as ex:
+            print("Exception in coordsToLegMovement()" + str(ex))
 
         return retVal
 
