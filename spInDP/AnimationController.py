@@ -279,6 +279,7 @@ class AnimationController:
         #    stepSizeDegrees *= -1
         if (yDirection < 0) ^ (xDirection < 0):
             stepSizeDegrees *= -1
+            #frameNr += 4
 
         frameNr = frameNr % 6
 
