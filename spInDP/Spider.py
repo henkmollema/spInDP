@@ -1,10 +1,10 @@
 import time
 from threading import Thread
 
-from flask import request
-
 from spInDP.AnimationController import AnimationController
 from spInDP.BehaviorType import BehaviorType
+from spInDP.EmotiveBehavior import EmotiveBehavior
+from spInDP.EmotiveContext import EmotiveContext
 from spInDP.FindBalloonBehavior import FindBalloonBehavior
 from spInDP.FollowBalloonBehavior import FollowBalloonBehavior
 from spInDP.FuryRoadBehavior import FuryRoadBehavior
@@ -19,8 +19,6 @@ from spInDP.ServoController import ServoController
 from spInDP.SprintBehavior import SprintBehavior
 from spInDP.TouchBehavior import TouchBehavior
 from spInDP.VisionController import VisionController
-from spInDP.EmotiveContext import EmotiveContext
-from spInDP.EmotiveBehavior import EmotiveBehavior
 from spInDP.WebServer import WebServer
 
 
@@ -28,6 +26,7 @@ class Spider(object):
     """Encapsulates the interaction with the spider."""
 
     _stopLoop = False
+    _server = None
     UPDATE_SLEEP_TIME = 0.008
 
     def __init__(self):
@@ -52,9 +51,7 @@ class Spider(object):
         """Starts the spider."""
 
         print("Starting the spider...")
-
-        # todo: figure out how to start the spider without wrecking the legs
-        # self.sequenceController.executeStartup()
+        time.sleep(self.sequenceController.parseSequence('sequences/startup.txt'))
 
     def updateLoop(self):
         """The logic of the update loop of the spider."""
@@ -62,6 +59,8 @@ class Spider(object):
         while not self._stopLoop:
             self._behavior.update()
             time.sleep(Spider.UPDATE_SLEEP_TIME)
+
+        print("Stopped the update loop")
 
     def _startUpdateLoopThread(self):
         """Starts the update loop in a seperate thread."""
@@ -85,6 +84,9 @@ class Spider(object):
 
     def switchBehavior(self, behaviorType):
         """Switches the active behavior of the spider."""
+
+        if self._updateThread is None:
+            return
 
         print("SwitchBehavior invoked: " + behaviorType)
 
@@ -137,22 +139,12 @@ class Spider(object):
         self._stopLoop = False
         self._startUpdateLoopThread()
 
-    def _shutdownWebserver(self):
-        print("Shutdown webserver")
-        func = request.environ.get('werkzeug.server.shutdown')
-        if func is None:
-            raise RuntimeError('Not running with the Werkzeug Server')
-        func()
-
     def stop(self):
         """Stops the spider and all its components."""
 
+        self.remoteController.stop = True
         self._stopLoop = True
         if self._updateThread is not None:
             self._updateThread.join()
 
-        self._shutdownWebserver()
-
         self.sequenceController.stop()
-        self.remoteController.stop = True
-        print("Stopped the spider")

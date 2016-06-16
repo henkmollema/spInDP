@@ -20,7 +20,7 @@ class SequenceController(object):
     radToDeg = (180 / math.pi)
 
     anglePerSecond = (
-    114.0 * 360.0 / 60.0)  # Optimal rpm is 114 without load at max speed, used to estimate the time it takes to execute an action
+        114.0 * 360.0 / 60.0)  # Optimal rpm is 114 without load at max speed, used to estimate the time it takes to execute an action
     coxaOffset = 45  # Used to offset the coxas from their base position.
 
     """Maps servosIDs to their current position in degree"""
@@ -55,8 +55,19 @@ class SequenceController(object):
         """Stops the LegThreads after the queues are empty"""
         self.stopped = True
 
+        print ("Joining leg queues")
+        l = LegMovement()
+        l.empty = True
+        for q in self.legQueue:
+            # Put an empty leg movement on the queue to make sure it iterates the while loop again
+            self.legQueue[q].put(l)
+            self.legQueue[q].join()
+
+        print ("Joining leg threads")
         for key in self.threadMap:
             self.threadMap[key].join()
+
+        print ("Joined leg threads")
 
     def getLegCoords(self, legID):
         return self.threadMap[legID].cCoordinates
@@ -95,7 +106,7 @@ class SequenceController(object):
                         totalTime += self.interpretLine(line, lineNr, speedModifier)
                         lineNr += 1
         except:
-            print "Exception while parsing: " + filePath
+            print("Exception while parsing: " + filePath)
 
         self.coxaOffset = oldOffset
 
@@ -372,7 +383,6 @@ class SequenceController(object):
 
             self.legQueue[x].put(mov)
 
-
     def setFrame(self, frame):
         """
             Immediately sends the servos to the LegMovements
@@ -403,4 +413,3 @@ class SequenceController(object):
             maxLen = max(self.legQueue[x].qsize(), maxLen)
 
         return maxLen
-

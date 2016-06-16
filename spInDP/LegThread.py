@@ -46,4 +46,4 @@ class LegThread(threading.Thread):
                 # Mark the task as done in the queue.
                 queue.task_done()
 
-        print ("While loop of " + self.name + " stopped.")
+        print ("While loop of " + self.name + " stopped")
