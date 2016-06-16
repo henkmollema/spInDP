@@ -1,5 +1,6 @@
 <ion-view view-title="Scarjo Monitor">
   <ion-content class="padding">
+  <ion-toggle ng-model="shouldUpdate.value" toggle-class="toggle-calm">Update data</ion-toggle>
     <div class='spiderImage'>
 		<img class="fullwidthImage" src="img/spider_render.png"/>
 		<div class='' ng-repeat="servo in servodata">
@@ -14,10 +15,6 @@
 				<br>
 			</div>
 		</div>
-		
     </div>
-	
-	<ion-toggle ng-model="shouldUpdate.value" toggle-class="toggle-calm">Update data</ion-toggle>
-    
   </ion-content>
 </ion-view>
