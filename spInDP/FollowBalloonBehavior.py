@@ -1,13 +1,14 @@
-from spInDP.AutonomeBehavior import AutonomeBehavior
-import time
 import math
+import time
+
+from spInDP.AutonomeBehavior import AutonomeBehavior
 
 
 class FollowBalloonBehavior(AutonomeBehavior):
     """Provides autonome behavior for destroying a red balloon."""
 
     CENTER_DEVIATION = 100
-    BLOB_SIZE = 200
+    BLOB_SIZE = 175
     _frameNr = 0
     _lastX = 1
 
@@ -25,7 +26,7 @@ class FollowBalloonBehavior(AutonomeBehavior):
 
             else:
                 x = coords[0]
-                y = coords[1]
+                #y = coords[1]
                 a = 240
                 b = x
 
@@ -33,28 +34,25 @@ class FollowBalloonBehavior(AutonomeBehavior):
                 angle = math.atan(b / a) * (180 / math.pi)
                 angle *= 1.5
 
-                #if(angle < 25):
-                # Walk towards balloon
-                #    execTime = self.spider.animationController.strafeWalk(angle, frameNr=self._frameNr, speedMod=3)
-                # else:
-                #     turnDir = 1
-                #     if(x < 0):
-                #         turnDir = -1
-                #     execTime = self.spider.animationController.turn(turnDir, frameNr=self._frameNr, speedMod=2)
-
-                execTime = self.spider.animationController.turnWalk(xDirection=(b/a), yDirection=1, frameNr=self._frameNr, speedMod = ())
+                execTime = self.spider.animationController.turnWalk(xDirection=(b / a),
+                                                                    yDirection=1,
+                                                                    frameNr=self._frameNr,
+                                                                    speedMod=())
 
                 time.sleep(execTime)
                 self._frameNr += 1
-
                 self._lastX = x
 
         else:
-            print ("Balloon not found")
+            #print ("Balloon not found, turning")
             turnDir = 1
-            if(self._lastX < 0): turnDir = -1
+            if self._lastX < 0:
+                turnDir = -1
 
-            execTime = self.spider.animationController.turn(turnDir, frameNr=self._frameNr, speedMod=2)
+            execTime = self.spider.animationController.turnWalk(xDirection=turnDir,
+                                                                yDirection=0,
+                                                                frameNr=self._frameNr,
+                                                                speedMod=2)
             time.sleep(execTime)
 
             self._frameNr += 1

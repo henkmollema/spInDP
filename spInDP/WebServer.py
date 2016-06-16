@@ -2,14 +2,15 @@ import time
 import json
 import glob
 import psutil
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, request, Response
 
 webserverinstance = None
+
 
 class WebServer:
     app = Flask(__name__)
     spider = None
-    spiderLegs = [0,0,0,0,0,0]
+    spiderLegs = [0, 0, 0, 0, 0, 0]
 
     def __init__(self, spider):
         global webserverinstance
@@ -23,13 +24,14 @@ class WebServer:
         resp = Response(message, status=200, mimetype=mimetype)
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return resp
- 
+
     def gen_cam(self):
         while True:
             frame = self.spider.visioncontroller.GetImage()
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             time.sleep(0.01)
+
     def gen_cam_vision(self):
         while True:
             frame = self.spider.visioncontroller.GetImageVision()
@@ -45,26 +47,31 @@ class WebServer:
     @staticmethod
     @app.route("/camera")
     def api_camera():
-        return webserverinstance.format_response(webserverinstance.gen_cam(), mimetype='multipart/x-mixed-replace; boundary=frame')
+        return webserverinstance.format_response(webserverinstance.gen_cam(),
+                                                 mimetype='multipart/x-mixed-replace; boundary=frame')
+
     @staticmethod
     @app.route("/vision")
     def api_vision():
-        return webserverinstance.format_response(webserverinstance.gen_cam_vision(), mimetype='multipart/x-mixed-replace; boundary=frame')
+        return webserverinstance.format_response(webserverinstance.gen_cam_vision(),
+                                                 mimetype='multipart/x-mixed-replace; boundary=frame')
 
     @staticmethod
     @app.route("/app/servodata")
     def api_servodata():
         return webserverinstance.format_response(webserverinstance.spider.servoController.getServoDataJSON())
-        
+
     @staticmethod
     @app.route("/app/getsystemdata")
     def api_getsystemdata():
         retVal = {}
         cpuData = psutil.cpu_percent(interval=1, percpu=True)
         tiltVals = webserverinstance.spider.sensorDataProvider.getAccelerometer()
-        batteryPercentage = round((webserverinstance.spider.servoController.getVoltage(1) - 9.2) / (2.8), 2) #based on voltage read on servo
+        batteryPercentage = round((webserverinstance.spider.servoController.getVoltage(1) - 9.2) / (2.8),
+                                  2)  # based on voltage read on servo
 
-        retVal['cpu'] = {"core1": cpuData[0], "core2": cpuData[1], "core3": cpuData[2], "core4": cpuData[3], "time": time.time()}
+        retVal['cpu'] = {"core1": cpuData[0], "core2": cpuData[1], "core3": cpuData[2], "core4": cpuData[3],
+                         "time": time.time()}
         retVal['battery'] = batteryPercentage
         retVal['tilt'] = {'x': tiltVals[0], 'y': tiltVals[1], 'z': tiltVals[2]}
 
@@ -106,8 +113,9 @@ class WebServer:
     @app.route("/erwin/turnwalk/<xdirection>/<ydirection>/<count>/<speed>")
     def api_erwin_turnwalk(xdirection, ydirection, count, speed):
         frameNr = 0
-        for x in range(0, 6*int(count)):
-            execTime = webserverinstance.spider.animationController.turnWalk(float(xdirection), float(ydirection), frameNr, float(speed))
+        for x in range(0, 6 * int(count)):
+            execTime = webserverinstance.spider.animationController.turnWalk(float(xdirection), float(ydirection),
+                                                                             frameNr, float(speed))
             time.sleep(execTime)
             frameNr += 1
         return webserverinstance.format_response("TurnWalk executed")
@@ -117,7 +125,8 @@ class WebServer:
     def api_erwin_turnrun(xdirection, ydirection, count, speed):
         frameNr = 0
         for x in range(0, 8 * int(count)):
-            execTime = webserverinstance.spider.animationController.turnRun(float(xdirection), float(ydirection), frameNr, float(speed))
+            execTime = webserverinstance.spider.animationController.turnRun(float(xdirection), float(ydirection),
+                                                                            frameNr, float(speed))
             time.sleep(execTime)
             frameNr += 1
         return webserverinstance.format_response("TurnRun executed")
@@ -135,7 +144,7 @@ class WebServer:
         print("Got control joystick command: " + jX + ", " + jY)
         webserverinstance.spider.remoteController.context.JoystickX = jX
         webserverinstance.spider.remoteController.context.JoystickY = jY
-        return webserverinstance.format_response( jX + "," + jY)
+        return webserverinstance.format_response(jX + "," + jY)
 
     @staticmethod
     @app.route("/control/reset")
@@ -150,7 +159,7 @@ class WebServer:
         print("Got control stop command")
         webserverinstance.spider.stop()
         return webserverinstance.format_response("stop")
-        
+
     @staticmethod
     @app.route("/control/sequencelist/")
     def api_control_getSequences():
@@ -158,7 +167,6 @@ class WebServer:
         seqObj['sequenceFiles'] = glob.glob("../sequences/*.txt")
         return json.dumps(seqObj, separators=(',', ':'))
 
-        
     @staticmethod
     @app.route("/kinematics/")
     def api_kinematics():
@@ -185,7 +193,7 @@ class WebServer:
     @staticmethod
     @app.route("/jquery.min.js")
     def api_kinematics_jquery():
-        with open ("spInDP/templates/jquery.min.js") as jquery:
+        with open("spInDP/templates/jquery.min.js") as jquery:
             data = jquery.readlines()
 
         return webserverinstance.format_response(data)
@@ -195,3 +203,17 @@ class WebServer:
     def api_emotive_command(command):
         webserverinstance.spider.emotiveContext.currentCommand = command
         return webserverinstance.format_response("emo: " + command)
+
+    @staticmethod
+    @app.route("/stop")
+    def api_stop():
+        print ("Stop the spider")
+        webserverinstance.spider.stop()
+
+    @staticmethod
+    @app.route("/shutdown")
+    def api_shutdown():
+        print ("Shutdown the spider")
+        webserverinstance.spider.stop()
+        import os
+        os.system("sudo shutdown -h now")

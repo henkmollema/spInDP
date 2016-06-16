@@ -57,6 +57,10 @@ class RemoteController(object):
         if not connected:
             print("Initializing bluetooth failed: " + str(ex))
 
+    def shutdownBluetooth(self):
+        print("Shutdown Blueooth socket")
+        self._socket.shutdown(2)
+
     def _updateContextLoop(self):
         """Starts an indefinitive loop to receive messages from the Bluetooth socket."""
 
@@ -82,6 +86,12 @@ class RemoteController(object):
             try:
                 # Read joystick position
                 xs = data.split(',')
+
+                if len(xs) != 7:
+                    print("Wrong message, expected 7 arguments. Goto next message.")
+                    msg = msg[msgEnd + 1:]
+                    continue
+
                 self.context.jX = float((float(xs[0]) - 512.0) / 512.0)
                 self.context.jY = float((float(xs[1]) - 512.0) / 512.0)
                 self.context.jZ = float(xs[2])
@@ -192,5 +202,4 @@ class RemoteController(object):
             # Continue with next message
             msg = msg[msgEnd + 1:]
 
-        print("Closing socket")
-        self._socket.close()
+        self.shutdownBluetooth()
