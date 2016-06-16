@@ -127,7 +127,7 @@ class AnimationController:
     def setWideWalking(self, value):
         """Adjust midpoint of each leg, mainly to fit through 'het poortje'"""
         self.wideWalking = value
-        self.shouldSafeTransition = True
+        #self.shouldSafeTransition = True
 
     def setHighWalking(self, value):
         """Adjust the height of the legs when they are airborne"""
