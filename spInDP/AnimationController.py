@@ -342,8 +342,8 @@ class AnimationController:
             zGround = 7 + self.zOffset
             zAir = 5 + self.zOffset
 
-            cAccelY = float(self.spider.sensorDataProvider.getSmoothAccelerometer()[1] * math.pi / 180)
-            self.realYAngle = self.spider.remoteController.context.accelY
+            #cAccelY = float(self.spider.sensorDataProvider.getSmoothAccelerometer()[1] * math.pi / 180)
+            self.realYAngle = self.spider.remoteController.context.aY * 90 * math.pi / 180
 
         else:
             #Stop measuring accel
