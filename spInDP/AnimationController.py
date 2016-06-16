@@ -182,28 +182,29 @@ class AnimationController:
         elif yDirection == 0:
             midXOffset = 0
         else:
-            midXOffset = 100 * abs(yDirection) * (1 / xDirection)
-
-        stepSizeCm = 3.5
+            midXOffset = 50 * abs(yDirection) * (1 / xDirection)
 
         legMid = {}
         stepRangeVert = 0.0
         stepRangeHor = 0.0
         zGround = 0  # When not using keepLeveled
         zAir = 0  # When not using keepLeveled
+        stepSizeCm = 0
         if self.highWalking and self.wideWalking:
             legMid = self.legWideMid
             zGround = self.legGround + self.zOffset
             zAir = self.legAirHigh + self.zOffset
+            stepSizeCm = 3.5
         elif self.wideWalking:
             legMid = self.legWideMid
             zGround = self.legGround + self.zOffset
             zAir = self.legAir + self.zOffset
+            stepSizeCm = 3.5
         else:
             legMid = self.legNarrowMid
-            zGround = self.legGround - 2 + self.zOffset
+            zGround = self.legGround + self.zOffset - 2
             zAir = self.legAir + self.zOffset - 1
-            stepSizeCm = 2
+            stepSizeCm = 1.5
 
         turnWalkInfo = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}}
         highestTotalDistance = 0
@@ -274,7 +275,9 @@ class AnimationController:
 
         subCorner = math.acos((highestTotalDistance ** 2 + stepSizeCm ** 2 - highestTotalDistance ** 2) / (2 * highestTotalDistance * stepSizeCm)) / math.pi * 180
         stepSizeDegrees = 180 - (subCorner * 2)
-        if (yDirection == -1) ^ (xDirection < 0):
+        #if (yDirection == -1) ^ (xDirection < 0):
+        #    stepSizeDegrees *= -1
+        if (yDirection < 0) ^ (xDirection < 0):
             stepSizeDegrees *= -1
 
         frameNr = frameNr % 6
