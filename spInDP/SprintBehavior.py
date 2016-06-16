@@ -20,7 +20,7 @@ class SprintBehavior(Behavior):
         jMagnitude = self.remoteContext.jMagnitude
 
         if jMagnitude > 0.2:
-            speedModifier = jMagnitude * 2
+            speedModifier = jMagnitude * 5.5
 
             if self.spider.sequenceController.legQueueSize() < 2:
                 execTime = self.spider.animationController.turnRun(xDirection=-jY,

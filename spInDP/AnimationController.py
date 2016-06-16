@@ -187,13 +187,23 @@ class AnimationController:
         stepSizeCm = 3.5
 
         legMid = {}
-        if self.wideWalking:
+        stepRangeVert = 0.0
+        stepRangeHor = 0.0
+        zGround = 0  # When not using keepLeveled
+        zAir = 0  # When not using keepLeveled
+        if self.highWalking and self.wideWalking:
             legMid = self.legWideMid
+            zGround = self.legGround + self.zOffset
+            zAir = self.legAirHigh + self.zOffset
+        elif self.wideWalking:
+            legMid = self.legWideMid
+            zGround = self.legGround + self.zOffset
+            zAir = self.legAir + self.zOffset
         else:
             legMid = self.legNarrowMid
-
-        zGround = self.legGround
-        zAir = self.legAir
+            zGround = self.legGround - 2 + self.zOffset
+            zAir = self.legAir + self.zOffset - 1
+            stepSizeCm = 2
 
         turnWalkInfo = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}}
         highestTotalDistance = 0
@@ -471,17 +481,17 @@ class AnimationController:
 
     def turnRun(self, xDirection, yDirection, frameNr, speedMod=1):
         if xDirection < -1:
-            xDirection = -1
             print("xDirection in turnRun can't be lower than -1. It was modified from " + str(xDirection) + " to -1")
+            xDirection = -1
         if xDirection > 1:
-            xDirection = 1
             print("xDirection in turnRun can't be higher than 1. It was modified from " + str(xDirection) + " to 1")
+            xDirection = 1
         if yDirection < -1:
-            yDirection = -1
             print("yDirection in turnRun can't be lower than -1. It was modified from " + str(yDirection) + " to -1")
+            yDirection = -1
         if yDirection > 1:
-            yDirection = 1
             print("yDirection in turnRun can't be higher than 1. It was modified from " + str(yDirection) + " to 1")
+            yDirection = 1
 
         xDirection = round(xDirection, 2)
         yDirection = round(yDirection, 2)
