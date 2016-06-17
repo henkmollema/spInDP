@@ -43,7 +43,7 @@ class RemoteController(object):
         while tries <= maxTries:
             try:
                 self._socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-                self._socket.settimeout(5.0)
+                #self._socket.settimeout(5.0)
                 self._socket.connect(("20:16:03:30:80:85", 1))
                 connected = True
                 print ("Connected to Bluetooth")
