@@ -159,7 +159,7 @@ class AnimationController:
 
         return ret
 
-    def turnWalk(self, xDirection, yDirection, frameNr, speedMod=1):
+    def turnWalk(self, xDirection, yDirection, frameNr, speedMod=1, stepSize = 3.5):
         if xDirection < -1:
             print("xDirection in turnWalk can't be lower than -1. It was modified from " + str(xDirection) + " to -1")
             xDirection = -1
@@ -194,17 +194,17 @@ class AnimationController:
             legMid = self.legWideMid
             zGround = self.legGround + self.zOffset
             zAir = self.legAirHigh + self.zOffset
-            stepSizeCm = 3.5
+            stepSizeCm = stepSize
         elif self.wideWalking:
             legMid = self.legWideMid
             zGround = self.legGround + self.zOffset
             zAir = self.legAir + self.zOffset
-            stepSizeCm = 3.5
+            stepSizeCm = stepSize
         else:
             legMid = self.legNarrowMid
             zGround = self.legGround + self.zOffset - 2
             zAir = self.legAir + self.zOffset - 1
-            stepSizeCm = 1.5
+            stepSizeCm = stepSize
 
         turnWalkInfo = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}}
         highestTotalDistance = 0
