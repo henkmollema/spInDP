@@ -3,6 +3,7 @@ import threading
 import time
 
 import smbus
+import Adafruit_ADS1x15
 
 
 class SensorDataProvider(object):
@@ -65,7 +66,7 @@ class SensorDataProvider(object):
 
         # Create ADS1015 ADC (12-bit) instance.
         try:
-            self._adc = smbus.Adafruit_ADS1x15.ADS1015()
+            self._adc = Adafruit_ADS1x15.ADS1015()
         except BaseException as ex:
             print("Initializing ADC failed: " + str(ex))
 
