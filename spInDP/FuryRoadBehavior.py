@@ -12,20 +12,38 @@ class FuryRoadBehavior(Behavior):
         """Initializes a new instance of the FuryRoadBehavior class."""
 
         super(FuryRoadBehavior, self).__init__(spider)
+        self.spider.animationController.zOffset = -2.5
 
     def update(self):
         # Get sensor data
-        leftSensorData, rightSensorData = self.spider.sensorDataProvider.readADC()
+        rightSensorData, leftSensorData = self.spider.sensorDataProvider.readADC()
+        leftSensorData -= 60
 
-        if leftSensorData >= 600:
+        print("left: ", leftSensorData, "; right: ", rightSensorData)
+        #leftOnLine = True
+        #rightOnLine = True
+        if (abs(leftSensorData - rightSensorData)) < 20:
+            print("Its on line")
             leftOnLine = True
-        else:
-            leftOnLine = False
-
-        if rightSensorData >= 600:
             rightOnLine = True
-        else:
+        elif leftSensorData < rightSensorData:
+            print("Goto left")
+            leftOnLine = True
             rightOnLine = False
+        else:
+            print("Goto right")
+            leftOnLine = False
+            rightOnLine = True
+
+        # if leftSensorData >= 600:
+        #     leftOnLine = True
+        # else:
+        #     leftOnLine = False
+        #
+        # if rightSensorData >= 600:
+        #     rightOnLine = True
+        # else:
+        #     rightOnLine = False
 
         execTime = 0
         if leftOnLine and rightOnLine:
@@ -37,10 +55,10 @@ class FuryRoadBehavior(Behavior):
             execTime = 0
         elif leftOnLine:
             # only left is on line, turn right a little
-            execTime = self.spider.animationController.turnWalk(xDirection=0.35, yDirection=1, frameNr=self.frameNr)
+            execTime = self.spider.animationController.turnWalk(xDirection=-1.0, yDirection=1, frameNr=self.frameNr, speedMod=2.0)
         elif rightOnLine:
             # only right is on line, turn left a little
-            execTime = self.spider.animationController.turnWalk(xDirection=-0.35, yDirection=1, frameNr=self.frameNr)
+            execTime = self.spider.animationController.turnWalk(xDirection=1.0, yDirection=1, frameNr=self.frameNr, speedMod=2.0)
 
         time.sleep(execTime)
         self.frameNr += 1
