@@ -13,11 +13,18 @@ class FuryRoadBehavior(Behavior):
         super(FuryRoadBehavior, self).__init__(spider)
 
     def update(self):
-
-        #Get sensor data
-        leftOnLine = True
-        rightOnLine = True
-
+		#Get sensor data
+		leftSensorData, rightSensorData = self.spider.sensorDataProvider.readADC()
+		
+        if(leftSensorData >= 600)
+			leftOnLine = True
+		else
+			leftOnLine = False
+			
+		if(rightSensorData >= 600)
+			rightOnLine = True
+		else
+			rightOnLine = False
 
         if(leftOnLine and rightOnLine):
             #left and right on line, take a step forward

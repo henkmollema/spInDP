@@ -7,8 +7,7 @@ import threading
 class SensorDataProvider(object):
     """Provides data from sensors attached to the spider."""
 	
-	# Create ADS1015 ADC (12-bit) instance.
-    adc = Adafruit_ADS1x15.ADS1015()	
+	
 	# Choose a gain of 1 for reading voltages from 0 to 4.09V.
 	# Or pick a different gain to change the range of voltages that are read:
 	#  - 2/3 = +/-6.144V
@@ -53,15 +52,19 @@ class SensorDataProvider(object):
     _lastUpdate = 0.0
 
     def __init__(self):
-        """Initializes the SensorDataProvider."""
-        # Now wake the 6050 up as it starts in sleep mode
-        # TODO: Check if the device will go to sleep mode automatically, this will cause problems
+        """Initializes the SensorDataProvider."""             
         print ("Init sensordataprovider")
-        try:
+        # Now wake the 6050 up as it starts in sleep mode   
+		try:
             self._bus.write_byte_data(SensorDataProvider.BUS_ADDRESS, SensorDataProvider.POWER_MGMT_1, 0)
         except BaseException as ex:
-            print("Waking up sensor failed: " + str(ex))
-
+            print("Waking up gyro sensor failed: " + str(ex))
+		# Create ADS1015 ADC (12-bit) instance.
+		try:			
+			self.adc = Adafruit_ADS1x15.ADS1015()
+		except BaseException as ex:
+            print("Starting up ADC failed: " + str(ex))		
+		
     def stopMeasuring(self):
         """Stop measuring the sensors."""
 
@@ -107,6 +110,7 @@ class SensorDataProvider(object):
 
 	def readADC(self):
 		"""Start reading ADC values"""
+		'''
 		print('Reading ADS1x15 values, press Ctrl-C to quit...')
 		# Print nice channel column headers.
 		print('| {0:>6} | {1:>6} | {2:>6} | {3:>6} |'.format(*range(4)))
@@ -120,8 +124,13 @@ class SensorDataProvider(object):
 			# Print the ADC values.
 			print('| {0:>6} | {1:>6} | {2:>6} | {3:>6} |'.format(*values))
 			# Pause for half a second.
-			time.sleep(0.5)			
-			
+			time.sleep(0.5)					
+		'''
+		lightSensorR = self.adc.read_adc(2, gain=GAIN)
+		lightSensorL = self.adc.read_adc(3, gain=GAIN)
+		
+		return lightSensorR, lightSensorL
+		
     def getSmoothAccelerometer(self):
         """Gets the smoothed accelerometer value."""
 
