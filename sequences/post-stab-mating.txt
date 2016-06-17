@@ -2,10 +2,10 @@ Sequence post-stab-mating offset 0
 framebegin
 l:1 0,0,0 100
 l:2 0,0,0 100
-l:3 -3.6,-12.1,10 100
+l:3 -7,-12.1,10 100
 l:4 0,0,5 100
 l:5 0,0,5 100
-l:6 -3.6,-12.1,10 100
+l:6 -7,-12.1,10 100
 frameend
 
 framebegin
