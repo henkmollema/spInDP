@@ -1,5 +1,6 @@
 import time
 from threading import Thread
+import RPi.GPIO as GPIO
 
 from spInDP.AnimationController import AnimationController
 from spInDP.BehaviorType import BehaviorType
@@ -49,6 +50,11 @@ class Spider(object):
 
     def start(self):
         """Starts the spider."""
+
+        print ("Turn on LEDs")
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(10, GPIO.OUT)
+        GPIO.output(10, GPIO.HIGH)
 
         print("Starting the spider...")
         time.sleep(self.sequenceController.parseSequence('sequences/startup.txt'))
@@ -148,3 +154,10 @@ class Spider(object):
             self._updateThread.join()
 
         self.sequenceController.stop()
+
+    def shutdown(self):
+        """Stops the spider and shuts down the RPi."""
+
+        self.stop()
+        import os
+        os.system("sudo shutdown -h now")

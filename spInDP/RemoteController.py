@@ -126,6 +126,11 @@ class RemoteController(object):
                         self._spider.switchBehavior(BehaviorType.Manual)
                         self._spider.animationController.setWideWalking(True)
 
+                    elif action == "shutdown":
+                        print("Goodbye.")
+                        self._spider.shutdown()
+                        break
+
                 elif mode == "limbo":
                     wideWalk = action == "stop"
                     print ("Enable wide walk: " + str(wideWalk))
