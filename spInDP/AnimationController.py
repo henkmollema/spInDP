@@ -657,7 +657,7 @@ class AnimationController:
             self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(x, y, zAir, 6, speedMod * 100)
         return self.endFrame()
 
-    def push(self, frameNr, speedMod = 1, direction=1):
+    def push(self, frameNr, speedMod = 1):
         totalTime = 0
         speed = speedMod * 100
         frontLegAngleModifier = 0
@@ -666,135 +666,170 @@ class AnimationController:
         zDown = 1
         remoteContext = self.spider.remoteController.context
         angleController = remoteContext.aY
-        if abs(angleController) > 0.2:
+        if abs(angleController) > 0.3:
             if angleController > 0:
-                #frontLegAngleModifier = angleController * -4
                 frontLegAngleModifier = 1
-                print("frontLegAngleModifier:", frontLegAngleModifier)
             else:
-                #backLegAngleModifier = abs(angleController) * -4
                 backLegAngleModifier = 1
-                print("backLegAngleModifier:", backLegAngleModifier)
 
-
-        #leg cordinates
         pushFrames = {
-            1: { #out
-                1: [-4,-10,zUp],
-                2: [-4,-10,zUp],
-                3: [0,0,zUp],
-                4: [-4,0,zUp],
-                5: [-4,0,zUp],
-                6: [0,0,zUp]
+            1: {  # out
+                1: [-12, -10, zUp],
+                2: [-12, -10, zUp],
+                3: [0, 0, zUp],
+                4: [-12, 10, zUp],
+                5: [-12, 10, zUp],
+                6: [0, 0, zUp]
             },
-            2: { #out
-                1: [-7,-20,zUp],
-                2: [-7,-20,zUp],
-                3: [0,0,zUp],
-                4: [-7,0,zUp],
-                5: [-7,0,zUp],
-                6: [0,0,zUp]
+            2: {  # out
+                1: [-4, -20, zUp],
+                2: [-4, -20, zUp],
+                3: [0, -5, zUp],
+                4: [-12, 10, zUp],
+                5: [-12, 10, zUp],
+                6: [0, -5, zUp]
             },
-            3: { #in
-                1: [-7,-16,zDown],
-                2: [-7,-16,zDown],
-                3: [0,0,zUp],
-                4: [-7,4,zDown],
-                5: [-7,4,zDown],
-                6: [0,0,zUp]
+            3: {  # in
+                1: [-4, -20, zDown],
+                2: [-4, -20, zDown],
+                3: [0, -5, zUp],
+                4: [-12, 10, zDown],
+                5: [-12, 10, zDown],
+                6: [0, -5, zUp]
             },
-            4: { #in
-                1: [-7,-12,zDown],
-                2: [-7,-12,zDown],
-                3: [0,0,zUp],
-                4: [-7,8,zDown],
-                5: [-7,8,zDown],
-                6: [0,0,zUp]
-            },
-            5: { #in
-                1: [-7,-8,zDown],
-                2: [-7,-8,zDown],
-                3: [0,0,zUp],
-                4: [-7,12,zDown],
-                5: [-7,12,zDown],
-                6: [0,0,zUp]
-            },
-            6: { #in
-                1: [-7,-4,zDown],
-                2: [-7,-4,zDown],
-                3: [0,0,zUp],
-                4: [-7,16,zDown],
-                5: [-7,16,zDown],
-                6: [0,0,zUp]
-            },
-            0: { #in
-                1: [-7,0,zDown],
-                2: [-7,0,zDown],
-                3: [0,0,zUp],
-                4: [-7,20,zDown],
-                5: [-7,20,zDown],
-                6: [0,0,zUp]
+            4: {  # in
+                1: [-12, -10, zDown],
+                2: [-12, -10, zDown],
+                3: [0, 5, zUp],
+                4: [-4, 20, zDown],
+                5: [-4, 20, zDown],
+                6: [0, 5, zUp]
             }
         }
 
-        #leg cordinates 2
-        pushFrames2 = {
-            1: {
-                1: [-16, -20, 1],
-                2: [-16, -20, 1],
+        pushFramesFrontAdjustment = {
+            1: {  # out
+                1: [0, 0, 0],
+                2: [0, 0, 0],
                 3: [0, 0, 0],
-                4: [-16, 20, 1],
-                5: [-16, 20, 1],
+                4: [0, 0, 0],
+                5: [0, 0, 0],
                 6: [0, 0, 0]
             },
-            2: {
-                1: [-16, -12, 1],
-                2: [-16, -12, 1],
-                3: [0, 0, 0],
-                4: [-16, 12, 1],
-                5: [-16, 12, 1],
-                6: [0, 0, 0]
+            2: {  # out
+                1: [0, 0, 0],
+                2: [0, 0, 0],
+                3: [0, -5, 0],
+                4: [0, 0, 0],
+                5: [0, 0, 0],
+                6: [0, -5, 0]
             },
-            3: {
-                1: [-16, -12, -3],
-                2: [-16, -12, -3],
-                3: [0, 0, 0],
-                4: [-16, 12, 1],
-                5: [-16, 12, 1],
-                6: [0, 0, 0]
+            3: {  # in
+                1: [0, 0, 0],
+                2: [0, 0, 0],
+                3: [0, -5, 0],
+                4: [0, 0, 0],
+                5: [0, 0, 0],
+                6: [0, -5, 0]
             },
-            0: {
-                1: [-16, -20, 1],
-                2: [-16, -20, 1],
-                3: [0, 0, 0],
-                4: [-16, 20, 1],
-                5: [-16, 20, 1],
-                6: [0, 0, 0]
+            4: {  # in
+                1: [0, 0, 0],
+                2: [0, 0, 0],
+                3: [0, -5, 0],
+                4: [0, 0, 0],
+                5: [0, 0, 0],
+                6: [0, -5, 0]
             }
         }
-        if direction == 1:
-            frameNr = frameNr % len(pushFrames)
-        else:
-            frameNr = 7 - frameNr % len(pushFrames)
 
-        print("frameNr: ", frameNr)
+        pushFramesBackAdjustment = {
+            1: {  # out
+                1: [0, 0, 0],
+                2: [0, 0, 0],
+                3: [0, 0, 0],
+                4: [0, 0, 0],
+                5: [0, 0, 0],
+                6: [0, 0, 0]
+            },
+            2: {  # out
+                1: [0, 0, 0],
+                2: [0, 0, 0],
+                3: [0, 5, 0],
+                4: [0, 0, 0],
+                5: [0, 0, 0],
+                6: [0, 5, 0]
+            },
+            3: {  # in
+                1: [0, 0, 0],
+                2: [0, 0, 0],
+                3: [0, 5, 0],
+                4: [0, 0, 0],
+                5: [0, 0, 0],
+                6: [0, 5, 0]
+            },
+            4: {  # in
+                1: [0, 0, 0],
+                2: [0, 0, 0],
+                3: [0, 5, 0],
+                4: [0, 0, 0],
+                5: [0, 0, 0],
+                6: [0, 5, 0]
+            }
+        }
+
+        pushFramesUpAdjustment = {
+            1: {  # out
+                1: [0, 0, 0],
+                2: [0, 0, 0],
+                3: [0, 0, 0],
+                4: [0, 0, 0],
+                5: [0, 0, 0],
+                6: [0, 0, 0]
+            },
+            2: {  # out
+                1: [0, 0, 0],
+                2: [0, 0, 0],
+                3: [0, 5, 0],
+                4: [0, 0, 0],
+                5: [0, 0, 0],
+                6: [0, 5, 0]
+            },
+            3: {  # in
+                1: [0, 0, 0],
+                2: [0, 0, 0],
+                3: [0, 5, 3],
+                4: [0, 0, 0],
+                5: [0, 0, 0],
+                6: [0, 5, 3]
+            },
+            4: {  # in
+                1: [0, 0, 0],
+                2: [0, 0, 0],
+                3: [0, -5, 3],
+                4: [0, 0, 0],
+                5: [0, 0, 0],
+                6: [0, -5, 3]
+            }
+        }
+
+        frameNr = frameNr % len(pushFrames) + 1
         self.startFrame()
+        self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][1][0], y=pushFrames[frameNr][1][1], z=pushFrames[frameNr][1][2],legID=1,speed=speed)
+        self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][2][0], y=pushFrames[frameNr][2][1], z=pushFrames[frameNr][2][2], legID=2, speed=speed)
         if frontLegAngleModifier == 1:
-            print("Frontleg")
-            self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(x=-7, y=-20, z=-4, legID=1, speed=speed)
-            self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(x=-7, y=-20, z=-4, legID=2, speed=speed)
+            self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][3][0] + pushFramesFrontAdjustment[frameNr][3][0], y=pushFrames[frameNr][3][1] + pushFramesFrontAdjustment[frameNr][3][1], z=pushFrames[frameNr][3][2] + pushFramesFrontAdjustment[frameNr][3][2], legID=3, speed=speed)
+        elif backLegAngleModifier == 1:
+            self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][3][0] + pushFramesBackAdjustment[frameNr][3][0], y=pushFrames[frameNr][3][1] + pushFramesBackAdjustment[frameNr][3][1], z=pushFrames[frameNr][3][2] + pushFramesBackAdjustment[frameNr][3][2], legID=3, speed=speed)
         else:
-            self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][1][0],y=pushFrames[frameNr][1][1],z=pushFrames[frameNr][1][2] + frontLegAngleModifier,legID=1, speed=speed)
-            self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][2][0],y=pushFrames[frameNr][2][1],z=pushFrames[frameNr][2][2] + frontLegAngleModifier,legID=2, speed=speed)
-        self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][3][0], y=pushFrames[frameNr][3][1], z=pushFrames[frameNr][3][2], legID=3, speed=speed)
-        self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][6][0],y=pushFrames[frameNr][6][1],z=pushFrames[frameNr][6][2], legID=6,speed=speed)
-        if backLegAngleModifier == 1:
-            print("Backleg")
-            self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(x=-7, y=20, z=-4, legID=5, speed=speed)
-            self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(x=-7, y=20, z=-4, legID=4, speed=speed)
+            self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][3][0] + pushFramesUpAdjustment[frameNr][3][0], y=pushFrames[frameNr][3][1] + pushFramesUpAdjustment[frameNr][3][1], z=pushFrames[frameNr][3][2] + pushFramesUpAdjustment[frameNr][3][2], legID=3, speed=speed)
+        self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][4][0], y=pushFrames[frameNr][4][1], z=pushFrames[frameNr][4][2], legID=4, speed=speed)
+        self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][5][0], y=pushFrames[frameNr][5][1], z=pushFrames[frameNr][5][2], legID=5, speed=speed)
+        if frontLegAngleModifier == 1:
+            self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][6][0] + pushFramesFrontAdjustment[frameNr][6][0], y=pushFrames[frameNr][6][1] + pushFramesFrontAdjustment[frameNr][6][1], z=pushFrames[frameNr][6][2] + pushFramesFrontAdjustment[frameNr][6][2], legID=3, speed=speed)
+        elif backLegAngleModifier == 1:
+            self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][6][0] + pushFramesBackAdjustment[frameNr][6][0], y=pushFrames[frameNr][6][1] + pushFramesBackAdjustment[frameNr][6][1], z=pushFrames[frameNr][6][2] + pushFramesBackAdjustment[frameNr][6][2], legID=3, speed=speed)
         else:
-            self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][5][0],y=pushFrames[frameNr][5][1],z=pushFrames[frameNr][5][2] + backLegAngleModifier, legID=5,speed=speed)
-            self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][4][0],y=pushFrames[frameNr][4][1],z=pushFrames[frameNr][4][2] + backLegAngleModifier, legID=4,speed=speed)
+            self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(x=pushFrames[frameNr][6][0] + pushFramesUpAdjustment[frameNr][6][0], y=pushFrames[frameNr][6][1] + pushFramesUpAdjustment[frameNr][6][1], z=pushFrames[frameNr][6][2] + pushFramesUpAdjustment[frameNr][6][2], legID=3, speed=speed)
         totalTime += self.endFrame()
 
         return totalTime

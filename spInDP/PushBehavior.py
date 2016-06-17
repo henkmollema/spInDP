@@ -20,9 +20,9 @@ class PushBehavior(Behavior):
         if(jMagnitude > 0.4):
             speedModifier = jMagnitude * 2
             if self.spider.remoteController.context.jX > 0:
-                time.sleep(self.spider.animationController.push(frameNr=self.frameNr, speedMod=speedModifier, direction=1))
+                time.sleep(self.spider.animationController.push(frameNr=self.frameNr, speedMod=speedModifier))
             else:
-                time.sleep(self.spider.animationController.push(frameNr=self.frameNr, speedMod=speedModifier, direction=0))
+                time.sleep(self.spider.animationController.push(frameNr=self.frameNr, speedMod=speedModifier))
             self.frameNr += 1
 
         return
