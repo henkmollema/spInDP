@@ -26,7 +26,7 @@ class ServoController(object):
         tryCount = 0
         maxTryCount = 3
         pos = -1
-        while pos == None and tryCount < maxTryCount:
+        while pos == -1 and tryCount < maxTryCount:
             try:
                 pos = self.ax12.readPosition(servo)
             except:
