@@ -34,7 +34,13 @@ class WebServer:
 
     def gen_cam_vision_redballoon(self):
         while True:
-            frame = self.spider.visioncontroller.GetImageVision()
+            frame = self.spider.visioncontroller.GetImageVisionRedBalloon()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            time.sleep(0.01)
+    def gen_cam_vision_blueballoon(self):
+        while True:
+            frame = self.spider.visioncontroller.GetImageVisionBlueBalloon()
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             time.sleep(0.01)
@@ -58,6 +64,10 @@ class WebServer:
     @app.route("/vision/redballoon")
     def api_vision_redballoon():
         return webserverinstance.format_response(webserverinstance.gen_cam_vision_redballoon(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    @staticmethod
+    @app.route("/vision/blueballoon")
+    def api_vision_blueballoon():
+        return webserverinstance.format_response(webserverinstance.gen_cam_vision_blueballoon(), mimetype='multipart/x-mixed-replace; boundary=frame')
     @staticmethod
     @app.route("/vision/line")
     def api_vision_line():

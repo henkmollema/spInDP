@@ -17,7 +17,7 @@ class VisionController:
         self.__vision = Vision(self, self.__camera.resolution)
 
     def FindBalloon(self):
-        foundBlob, frame, coords, size = self.__vision.getBalloonValues()
+        foundBlob, redBalloonFrame, blueBalloonFrame, coords, size = self.__vision.getBalloonValues()
         return foundBlob, coords, size
     def getBalloonIsLeft(self):
         return self.__vision.getBalloonIsLeft()
@@ -26,11 +26,14 @@ class VisionController:
         frame = self.__camera.getFrame()
         return frame
         
-    def GetImageVision(self):
-        """Get image from the vision part which contains threshold and is available as a JPEG"""
-        foundBlob, frame, coords, size = self.__vision.getBalloonValues()
-        #print("coords: " + str(coords) + " size: " + str(size))
-        return cv2.imencode('.jpeg', frame)[1].tostring()
+    def GetImageVisionRedBalloon(self):
+        """Get image from the vision part which contains the threshold for the RED balloon and is available as a JPEG"""
+        foundBlob, redBalloonFrame, blueBalloonFrame, coords, size = self.__vision.getBalloonValues()
+        return cv2.imencode('.jpeg', redBalloonFrame)[1].tostring()
+    def GetImageVisionBlueBalloon(self):
+        """Get image from the vision part which contains the threshold for the BLUE balloon and is available as a JPEG"""
+        foundBlob, redBalloonFrame, blueBalloonFrame, coords, size = self.__vision.getBalloonValues()
+        return cv2.imencode('.jpeg', blueBalloonFrame)[1].tostring()
     def GetImageLine(self):
         frame = self.__vision.getLineValues()
         return cv2.imencode('.jpeg', frame)[1].tostring()
@@ -111,6 +114,7 @@ class Vision:
 
     foundRedBlob = None
     redBalloonImage = None
+    blueBalloonImage = None
     redBalloonCoords = None
     redBalloonSize = None
     redleftCount = 0
@@ -141,7 +145,7 @@ class Vision:
             frame = np.fromstring(frame, dtype=np.uint8)
             frame = cv2.imdecode(frame, 1)
             self.foundRedBlob, self.redBalloonImage, self.redBalloonCoords, self.redBalloonSize = self.detectRed(frame)
-            foundBlueBlob, blueCoords = self.detectBlue(frame)
+            foundBlueBlob, self.blueBalloonImage, blueCoords = self.detectBlue(frame)
             if foundBlueBlob:
                 if blueCoords[0] > self.redBalloonCoords[0]:
                     self.redleftCount += 1
@@ -151,7 +155,7 @@ class Vision:
     def getBalloonValues(self):
         Vision.last_balloon_access = time.time()
         self.initializeBalloon()
-        return self.foundRedBlob, self.redBalloonImage, self.redBalloonCoords, self.redBalloonSize
+        return self.foundRedBlob, self.redBalloonImage, self.blueBalloonImage, self.redBalloonCoords, self.redBalloonSize
     def getBalloonIsLeft(self):
         return self.redleftCount > self.redRightCount
 
@@ -228,7 +232,7 @@ class Vision:
             size = -1
 
         if foundBlob:
-            image = cv2.drawKeypoints(imageBin, keypoints, np.array([]), (255, 0, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+            image = imageBin
 
         return foundBlob, image, coords, size
     def detectBlue(self, image):
@@ -271,7 +275,10 @@ class Vision:
         else:
             coords = (-1, -1)
 
-        return foundBlob, coords
+        if foundBlob:
+            image = imageBin
+
+        return foundBlob, image, coords
 
     def detectLine(self, image):
         imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
