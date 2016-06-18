@@ -148,7 +148,7 @@ class Vision:
             self.foundRedBlob, self.redBalloonImage, self.redBalloonCoords, self.redBalloonSize = self.detectRedBalloon(frame)
             foundBlueBlob = False
             if self.detectBlue:
-                foundBlueBlob, self.blueBalloonImage, blueCoords = self.detectBlue(frame)
+                foundBlueBlob, self.blueBalloonImage, blueCoords = self.detectBlueBalloon(frame)
             if foundBlueBlob:
                 if blueCoords[0] > self.redBalloonCoords[0]:
                     self.redleftCount += 1
@@ -157,7 +157,8 @@ class Vision:
         Vision.balloonThread = None
     def getBalloonValues(self, detectBlue = True):
         Vision.last_balloon_access = time.time()
-        self.detectBlue = detectBlue
+        if self.detectBlue is not detectBlue:
+            self.detectBlue = detectBlue
         self.initializeBalloon()
         return self.foundRedBlob, self.redBalloonImage, self.blueBalloonImage, self.redBalloonCoords, self.redBalloonSize
     def getBalloonIsLeft(self):
@@ -171,10 +172,12 @@ class Vision:
                 time.sleep(0)
     def _lineThread(self):
         while time.time() - self.last_line_access < 5:
-            frame = self.visionController.GetImage()
+            #frame = self.visionController.GetImage()
+            frame = cv2.imread("linetest.jpg", 0)
             frame = np.fromstring(frame, dtype=np.uint8)
             frame = cv2.imdecode(frame, 1)
-            cropFrame = frame[self.__resolution[1] - 50:self.__resolution[1], 0:self.__resolution[0]]
+            #cropFrame = frame[self.__resolution[1] - 50:self.__resolution[1], 0:self.__resolution[0]]
+            cropFrame = frame
             self.lineImage = self.detectLineNew(cropFrame)
         Vision.lineThread = None
     def getLineValues(self):
@@ -193,11 +196,12 @@ class Vision:
         return result
 
     def detectRedBalloon(self, image):
+        print("detectRedBalloon called")
         imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         h,s,v = cv2.split(imagehsv)
         h = self.thresholdRange(h, 170, 10)
-        s = self.thresholdRange(s, 110, 250)
-        v = self.thresholdRange(v, 140, 255)
+        s = self.thresholdRange(s, 110, 255)
+        v = self.thresholdRange(v, 110, 255)
         imageBin = h * s * v
 
         imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7,7)))
@@ -242,9 +246,9 @@ class Vision:
     def detectBlueBalloon(self, image):
         imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         h, s, v = cv2.split(imagehsv)
-        h = self.thresholdRange(h, 100, 125) #TODO
-        s = self.thresholdRange(s, 110, 250) #TODO
-        v = self.thresholdRange(v, 140, 255) #TODO
+        h = self.thresholdRange(h, 90, 110) #TODO
+        s = self.thresholdRange(s, 200, 255) #TODO
+        v = self.thresholdRange(v, 160, 255) #TODO
         imageBin = h * s * v
 
         imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
