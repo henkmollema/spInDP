@@ -32,9 +32,15 @@ class WebServer:
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             time.sleep(0.01)
 
-    def gen_cam_vision(self):
+    def gen_cam_vision_redballoon(self):
         while True:
             frame = self.spider.visioncontroller.GetImageVision()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            time.sleep(0.01)
+    def gen_cam_vision_line(self):
+        while True:
+            frame = self.spider.visioncontroller.GetImageLine()
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             time.sleep(0.01)
@@ -47,14 +53,15 @@ class WebServer:
     @staticmethod
     @app.route("/camera")
     def api_camera():
-        return webserverinstance.format_response(webserverinstance.gen_cam(),
-                                                 mimetype='multipart/x-mixed-replace; boundary=frame')
-
+        return webserverinstance.format_response(webserverinstance.gen_cam(), mimetype='multipart/x-mixed-replace; boundary=frame')
     @staticmethod
-    @app.route("/vision")
-    def api_vision():
-        return webserverinstance.format_response(webserverinstance.gen_cam_vision(),
-                                                 mimetype='multipart/x-mixed-replace; boundary=frame')
+    @app.route("/vision/redballoon")
+    def api_vision_redballoon():
+        return webserverinstance.format_response(webserverinstance.gen_cam_vision_redballoon(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    @staticmethod
+    @app.route("/vision/line")
+    def api_vision_line():
+        return webserverinstance.format_response(webserverinstance.gen_cam_vision_line(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
     @staticmethod
     @app.route("/app/servodata")

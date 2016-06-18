@@ -31,6 +31,9 @@ class VisionController:
         foundBlob, frame, coords, size = self.__vision.getBalloonValues()
         #print("coords: " + str(coords) + " size: " + str(size))
         return cv2.imencode('.jpeg', frame)[1].tostring()
+    def GetImageLine(self):
+        frame = self.__vision.getLineValues()
+        return cv2.imencode('.jpeg', frame)[1].tostring()
 
 class Camera(object):
     """Camera object for the VisionController. Is made so frames can be send multiple times"""
@@ -107,9 +110,9 @@ class Vision:
     last_balloon_access = 0
 
     foundRedBlob = None
-    image = None
-    coords = None
-    size = None
+    redBalloonImage = None
+    redBalloonCoords = None
+    redBalloonSize = None
     redleftCount = 0
     redRightCount = 0
 
@@ -119,6 +122,7 @@ class Vision:
 
     foundLineBlob = None
     lineCoords = None
+    lineImage = None
     
     def __init__(self, visionController, resolution):
         self.visionController = visionController
@@ -127,7 +131,7 @@ class Vision:
         if Vision.balloonThread is None:
             Vision.balloonThread = threading.Thread(target=self._balloonThread)
             Vision.balloonThread.start()
-            while self.image is None:
+            while self.redBalloonImage is None:
                 time.sleep(0)
     def _balloonThread(self):
         self.redleftCount = 0
@@ -136,10 +140,10 @@ class Vision:
             frame = self.visionController.GetImage()
             frame = np.fromstring(frame, dtype=np.uint8)
             frame = cv2.imdecode(frame, 1)
-            self.foundRedBlob, self.image, self.coords, self.size = self.detectRed(frame)
+            self.foundRedBlob, self.redBalloonImage, self.redBalloonCoords, self.redBalloonSize = self.detectRed(frame)
             foundBlueBlob, blueCoords = self.detectBlue(frame)
             if foundBlueBlob:
-                if blueCoords[0] > self.coords[0]:
+                if blueCoords[0] > self.redBalloonCoords[0]:
                     self.redleftCount += 1
                 else:
                     self.redRightCount += 1
@@ -147,7 +151,7 @@ class Vision:
     def getBalloonValues(self):
         Vision.last_balloon_access = time.time()
         self.initializeBalloon()
-        return self.foundRedBlob, self.image, self.coords, self.size
+        return self.foundRedBlob, self.redBalloonImage, self.redBalloonCoords, self.redBalloonSize
     def getBalloonIsLeft(self):
         return self.redleftCount > self.redRightCount
 
@@ -155,26 +159,25 @@ class Vision:
         if Vision.lineThread is None:
             Vision.lineThread = threading.Thread(target=self._lineThread)
             Vision.lineThread.start()
-            while self.lineCoords is None:
+            while self.lineImage is None:
                 time.sleep(0)
     def _lineThread(self):
         while time.time() - self.last_line_access < 5:
             frame = self.visionController.GetImage()
             frame = np.fromstring(frame, dtype=np.uint8)
             frame = cv2.imdecode(frame, 1)
-            cropFrame = frame[self.__resolution[1] - 20:self.__resolution[1], 0:self.__resolution[0]]
-            self.foundLineBlob, self.lineCoords = self.detectLine(cropFrame)
+            cropFrame = frame[self.__resolution[1] - 50:self.__resolution[1], 0:self.__resolution[0]]
+            self.lineImage = self.detectLineNew(cropFrame)
         Vision.lineThread = None
     def getLineValues(self):
-        print("Warning: you are using an untested function (getLineValues in vision)")
         Vision.last_line_access = time.time()
         self.initializeLine()
-        return self.foundLineBlob, self.lineCoords
+        return self.lineImage
 
     def thresholdRange(self, img, min, max):
         """Makes it possible to give a range when thresholding instead of a min or max"""
-        ret,img1 = cv2.threshold(img, min, 1, cv2.THRESH_BINARY)
-        ret,img2 = cv2.threshold(img, max, 1, cv2.THRESH_BINARY_INV)
+        ret, img1 = cv2.threshold(img, min, 1, cv2.THRESH_BINARY)
+        ret, img2 = cv2.threshold(img, max, 1, cv2.THRESH_BINARY_INV)
         if max >= min:
             result = cv2.multiply(img1, img2)
         else:
@@ -221,11 +224,11 @@ class Vision:
             coords = (coords[0] - (self.__resolution[0] / 2), coords[1] - (self.__resolution[1] / 2))
             size = keypoints[biggest].size
         else:
-            coords = (-1,-1)
+            coords = (-1, -1)
             size = -1
 
         if foundBlob:
-            image = cv2.drawKeypoints(imageBin, keypoints, np.array([]), (255,0,0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+            image = cv2.drawKeypoints(imageBin, keypoints, np.array([]), (255, 0, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
         return foundBlob, image, coords, size
     def detectBlue(self, image):
@@ -311,3 +314,45 @@ class Vision:
             coords = (-1, -1)
 
         return foundBlob, coords
+    def detectLineNew(self, image):
+        imagegray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        ret, imageBin = cv2.threshold(imagegray, 220, 255, cv2.THRESH_BINARY)
+
+        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
+        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
+
+        params = cv2.SimpleBlobDetector_Params()
+        params.filterByColor = True
+        params.blobColor = 255
+        params.filterByCircularity = False
+        params.filterByArea = False
+        params.filterByCircularity = False
+        params.filterByConvexity = False
+        params.filterByInertia = False
+
+        detector = cv2.SimpleBlobDetector(params)
+        keypoints = detector.detect(imageBin)
+
+        foundBlob = False
+        coords = None
+        size = None
+        if keypoints:
+            i = 0
+            biggest = 0
+            for p in keypoints:
+                if (p.size > keypoints[biggest].size):
+                    biggest = i
+                i += 1
+            foundBlob = True
+            coords = keypoints[biggest].pt
+            coords = (coords[0] - (self.__resolution[0] / 2), coords[1] - (self.__resolution[1] / 2))
+            size = keypoints[biggest].size
+        else:
+            coords = (-1, -1)
+            size = -1
+
+        if foundBlob:
+            image = cv2.drawKeypoints(imageBin, keypoints, np.array([]), (255, 0, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+        #return foundBlob, image, coords, size
+        return image
