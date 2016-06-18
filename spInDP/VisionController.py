@@ -16,8 +16,8 @@ class VisionController:
         self.__camera = Camera()
         self.__vision = Vision(self, self.__camera.resolution)
 
-    def FindBalloon(self):
-        foundBlob, redBalloonFrame, blueBalloonFrame, coords, size = self.__vision.getBalloonValues()
+    def FindBalloon(self, detectBlue = True):
+        foundBlob, redBalloonFrame, blueBalloonFrame, coords, size = self.__vision.getBalloonValues(detectBlue)
         return foundBlob, coords, size
     def getBalloonIsLeft(self):
         return self.__vision.getBalloonIsLeft()
@@ -112,6 +112,7 @@ class Vision:
     balloonThread = None
     last_balloon_access = 0
 
+    detectBlue = False
     foundRedBlob = None
     redBalloonImage = None
     blueBalloonImage = None
@@ -144,16 +145,19 @@ class Vision:
             frame = self.visionController.GetImage()
             frame = np.fromstring(frame, dtype=np.uint8)
             frame = cv2.imdecode(frame, 1)
-            self.foundRedBlob, self.redBalloonImage, self.redBalloonCoords, self.redBalloonSize = self.detectRed(frame)
-            foundBlueBlob, self.blueBalloonImage, blueCoords = self.detectBlue(frame)
+            self.foundRedBlob, self.redBalloonImage, self.redBalloonCoords, self.redBalloonSize = self.detectRedBalloon(frame)
+            foundBlueBlob = False
+            if self.detectBlue:
+                foundBlueBlob, self.blueBalloonImage, blueCoords = self.detectBlue(frame)
             if foundBlueBlob:
                 if blueCoords[0] > self.redBalloonCoords[0]:
                     self.redleftCount += 1
                 else:
                     self.redRightCount += 1
         Vision.balloonThread = None
-    def getBalloonValues(self):
+    def getBalloonValues(self, detectBlue = True):
         Vision.last_balloon_access = time.time()
+        self.detectBlue = detectBlue
         self.initializeBalloon()
         return self.foundRedBlob, self.redBalloonImage, self.blueBalloonImage, self.redBalloonCoords, self.redBalloonSize
     def getBalloonIsLeft(self):
@@ -188,7 +192,7 @@ class Vision:
             result = cv2.add(img1, img2)
         return result
 
-    def detectRed(self, image):
+    def detectRedBalloon(self, image):
         imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         h,s,v = cv2.split(imagehsv)
         h = self.thresholdRange(h, 170, 10)
@@ -235,7 +239,7 @@ class Vision:
             image = imageBin
 
         return foundBlob, image, coords, size
-    def detectBlue(self, image):
+    def detectBlueBalloon(self, image):
         imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         h, s, v = cv2.split(imagehsv)
         h = self.thresholdRange(h, 100, 125) #TODO
