@@ -357,3 +357,5 @@ sysinfo.txt
 *.unitypackage
 /.idea/*
 App/.idea/*
+
+.vscode/

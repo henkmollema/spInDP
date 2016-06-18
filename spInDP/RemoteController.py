@@ -26,6 +26,7 @@ class RemoteController(object):
         self._spider = spider
         self.context = RemoteContext()
 
+        print("Initializing Bluetooth connection")
         self._tryConnect()
 
         self._updateLoop = threading.Thread(target=self._updateContextLoop)
@@ -34,18 +35,18 @@ class RemoteController(object):
     def _tryConnect(self):
         """Attempts to connect the socket with the the Arduino using Bluetooth."""
 
-        print("Initializing Bluetooth connection")
-
         tries = 0
-        maxTries = 5
+        maxTries = 10
         connected = False
         ex = None
 
         while tries <= maxTries:
             try:
                 self._socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+                #self._socket.settimeout(5.0)
                 self._socket.connect(("20:16:03:30:80:85", 1))
                 connected = True
+                print ("Connected to Bluetooth")
                 break
             except BaseException as e:
                 print("Bluetooth connection failed. Retrying..." + str(e))
@@ -70,6 +71,8 @@ class RemoteController(object):
                 msg += self._socket.recv(1024)
             except BaseException as e:
                 print("Error receiving bluetooth data: " + str(e))
+                print("Attempting to reconnect...")
+                self._tryConnect()
                 continue
 
             # New line characaters is the end of the message
@@ -125,6 +128,11 @@ class RemoteController(object):
                         print("Reset spider status")
                         self._spider.switchBehavior(BehaviorType.Manual)
                         self._spider.animationController.setWideWalking(True)
+
+                    elif action == "shutdown":
+                        print("Goodbye.")
+                        self._spider.shutdown()
+                        break
 
                 elif mode == "limbo":
                     wideWalk = action == "stop"

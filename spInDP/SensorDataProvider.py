@@ -1,17 +1,32 @@
-import smbus
-import time
 import math
 import threading
+import time
+
+import smbus
+import Adafruit_ADS1x15
 
 
 class SensorDataProvider(object):
     """Provides data from sensors attached to the spider."""
 
+    _bus = None
+    _adc = None
+
+    # Choose a gain of 1 for reading voltages from 0 to 4.09V.
+    # Or pick a different gain to change the range of voltages that are read:
+    #  - 2/3 = +/-6.144V
+    #  -   1 = +/-4.096V
+    #  -   2 = +/-2.048V
+    #  -   4 = +/-1.024V
+    #  -   8 = +/-0.512V
+    #  -  16 = +/-0.256V
+    # See table 3 in the ADS1015/ADS1115 datasheet for more info on gain.
+    GAIN = 1
+
     # Power management registers
     POWER_MGMT_1 = 0x6b
     # POWER_MGMT_2 = 0x6c
 
-    _bus = smbus.SMBus(1)
     BUS_ADDRESS = 0x68  # This is the address value read via the i2cdetect command
 
     """
@@ -41,13 +56,19 @@ class SensorDataProvider(object):
 
     def __init__(self):
         """Initializes the SensorDataProvider."""
-        # Now wake the 6050 up as it starts in sleep mode
-        # TODO: Check if the device will go to sleep mode automatically, this will cause problems
         print ("Init sensordataprovider")
+        # Now wake the 6050 up as it starts in sleep mode
         try:
+            self._bus = smbus.SMBus(1)
             self._bus.write_byte_data(SensorDataProvider.BUS_ADDRESS, SensorDataProvider.POWER_MGMT_1, 0)
         except BaseException as ex:
-            print("Waking up sensor failed: " + str(ex))
+            print("Waking up gyro sensor failed: " + str(ex))
+
+        # Create ADS1015 ADC (12-bit) instance.
+        try:
+            self._adc = Adafruit_ADS1x15.ADS1015()
+        except BaseException as ex:
+            print("Initializing ADC failed: " + str(ex))
 
     def stopMeasuring(self):
         """Stop measuring the sensors."""
@@ -91,6 +112,29 @@ class SensorDataProvider(object):
             print ("gyroY: " + str(self._smoothAccelY) + " delta: " + str(yDeg))
             self._lastUpdate = time.time()
             time.sleep(0.0032)  # Update at 30hz
+
+    def readADC(self):
+        """Start reading ADC values"""
+        '''
+        print('Reading ADS1x15 values, press Ctrl-C to quit...')
+        # Print nice channel column headers.
+        print('| {0:>6} | {1:>6} | {2:>6} | {3:>6} |'.format(*range(4)))
+        print('-' * 37)
+        # Main loop.
+        while (self._shouldMeasure):
+            # Read all the ADC channel values in a list.
+            values = [0]*4
+            for i in range(4):
+                values[i] = adc.read_adc(i, gain=GAIN)
+            # Print the ADC values.
+            print('| {0:>6} | {1:>6} | {2:>6} | {3:>6} |'.format(*values))
+            # Pause for half a second.
+            time.sleep(0.5)
+        '''
+        lightSensorR = self._adc.read_adc(2, gain=SensorDataProvider.GAIN)
+        lightSensorL = self._adc.read_adc(3, gain=SensorDataProvider.GAIN)
+
+        return lightSensorR, lightSensorL
 
     def getSmoothAccelerometer(self):
         """Gets the smoothed accelerometer value."""

@@ -220,7 +220,5 @@ class WebServer:
     @staticmethod
     @app.route("/shutdown")
     def api_shutdown():
-        print ("Shutdown the spider")
-        webserverinstance.spider.stop()
-        import os
-        os.system("sudo shutdown -h now")
+        print("Shutdown the spider.")
+        webserverinstance.spider.shutdown()

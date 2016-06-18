@@ -1,0 +1,54 @@
+<audio id="audioPlayer" controls>
+  <source src="ScarjoMuziek.ogg" type="audio/ogg">
+  <source src="ScarjoMuziek.mp3" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio>
+
+<script type="text/javascript">
+	function load(url, callback) {
+        var xhr;
+         
+        if(typeof XMLHttpRequest !== 'undefined') xhr = new XMLHttpRequest();
+        else {
+            var versions = ["MSXML2.XmlHttp.5.0", 
+                            "MSXML2.XmlHttp.4.0",
+                            "MSXML2.XmlHttp.3.0", 
+                            "MSXML2.XmlHttp.2.0",
+                            "Microsoft.XmlHttp"]
+ 
+             for(var i = 0, len = versions.length; i < len; i++) {
+                try {
+                    xhr = new ActiveXObject(versions[i]);
+                    break;
+                }
+                catch(e){}
+             } // end for
+        }
+         
+        xhr.onreadystatechange = ensureReadiness;
+         
+        function ensureReadiness() {
+            if(xhr.readyState < 4) {
+                return;
+            }
+             
+            if(xhr.status !== 200) {
+                return;
+            }
+ 
+            // all is well  
+            if(xhr.readyState === 4) {
+                callback(xhr);
+            }           
+        }
+         
+        xhr.open('GET', url, true);
+        xhr.send('');
+    }
+
+
+	var player = document.getElementById("audioPlayer");
+	player.onplay = function() {
+		load("http://192.168.42.1/startDance", undefined)
+	};
+</script>
