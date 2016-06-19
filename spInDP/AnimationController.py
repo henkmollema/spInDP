@@ -884,3 +884,130 @@ class AnimationController:
         self.spider.sequenceController.coxaOffset = 45
 
         return totalTime
+
+    def turn4Legs(self, xDirection, yDirection, frameNr, speedMod=1):
+        if xDirection < -1:
+            print("xDirection in turnWalk can't be lower than -1. It was modified from " + str(xDirection) + " to -1")
+            xDirection = -1
+        if xDirection > 1:
+            print("xDirection in turnWalk can't be higher than 1. It was modified from " + str(xDirection) + " to 1")
+            xDirection = 1
+        if yDirection < -1:
+            print("yDirection in turnWalk can't be lower than -1. It was modified from " + str(yDirection) + " to -1")
+            yDirection = -1
+        if yDirection > 1:
+            print("yDirection in turnWalk can't be higher than 1. It was modified from " + str(yDirection) + " to 1")
+            yDirection = 1
+
+        xDirection = round(xDirection, 2)
+        yDirection = round(yDirection, 2)
+
+        midXOffset = 0
+        if xDirection == 0:
+            midXOffset = 10000000
+        elif yDirection == 0:
+            midXOffset = 0
+        else:
+            midXOffset = 50 * abs(yDirection) * (1 / xDirection)
+
+        legMid = self.legWideMid
+        zGround = self.legGround
+        zAir = self.legAir
+        stepSizeCm = 2
+
+        turnWalkInfo = {1: {}, 2: {}, 4: {}, 5: {}}
+        highestTotalDistance = 0
+        for x in [1,2,4,5]:
+            legDistanceFromCenter = 0.0  # 6
+            if x == 1 or x == 5:  # left corners
+                legDistanceFromCenter = math.sqrt((self.cornerCoxaXDistanceFromCenter + midXOffset) ** 2 + self.cornerCoxaYDistanceFromCenter ** 2)
+            elif x == 2 or x == 4:  # right corners
+                legDistanceFromCenter = math.sqrt((self.cornerCoxaXDistanceFromCenter - midXOffset) ** 2 + self.cornerCoxaYDistanceFromCenter ** 2)
+
+            legLength = math.sqrt((self.stockLegLength + legMid[x][0]) ** 2 + legMid[x][1] ** 2)
+            positionDifference = math.sqrt(legMid[x][0] ** 2 + legMid[x][1] ** 2)
+            extraCoxaAngle = math.acos((legLength ** 2 + self.stockLegLength ** 2 - positionDifference ** 2) / (2 * legLength * self.stockLegLength)) / math.pi * 180
+            coxaAngle = 0
+            if x == 1 or x == 5:
+                if midXOffset < -self.cornerCoxaYDistanceFromCenter:
+                    coxaAngle = 90 - math.acos(
+                        self.cornerCoxaYDistanceFromCenter / legDistanceFromCenter) / math.pi * 180  # 4
+                else:
+                    coxaAngle = 90 + math.acos(
+                        self.cornerCoxaYDistanceFromCenter / legDistanceFromCenter) / math.pi * 180  # 4
+            elif x == 2 or x == 4:
+                if midXOffset < self.cornerCoxaYDistanceFromCenter:
+                    coxaAngle = 90 + math.acos(
+                        self.cornerCoxaYDistanceFromCenter / legDistanceFromCenter) / math.pi * 180  # 4
+                else:
+                    coxaAngle = 90 - math.acos(
+                        self.cornerCoxaYDistanceFromCenter / legDistanceFromCenter) / math.pi * 180  # 4
+
+            actualCoxaAngle = coxaAngle + extraCoxaAngle
+
+            totalDistance = math.sqrt(legDistanceFromCenter ** 2 + legLength ** 2 - 2 * legDistanceFromCenter * legLength * math.cos(actualCoxaAngle * math.pi / 180))
+
+            if totalDistance > highestTotalDistance:
+                highestTotalDistance = totalDistance
+
+            angleFromCenter1 = coxaAngle
+            angleFromCenter2 = math.acos((totalDistance ** 2 + legDistanceFromCenter ** 2 - legLength ** 2) / (2 * totalDistance * legDistanceFromCenter)) / math.pi * 180
+            angleFromCenter = angleFromCenter1 + angleFromCenter2
+
+            angleCompensatorX = totalDistance * math.cos(angleFromCenter * math.pi / 180) - totalDistance
+            angleCompensatorY = totalDistance * math.sin(angleFromCenter * math.pi / 180) - totalDistance
+
+            turnWalkInfo[x]["totalDistance"] = totalDistance
+            turnWalkInfo[x]["angleFromCenter"] = angleFromCenter
+            turnWalkInfo[x]["angleCompensatorX"] = angleCompensatorX
+            turnWalkInfo[x]["angleCompensatorY"] = angleCompensatorY
+
+        subCorner = math.acos((highestTotalDistance ** 2 + stepSizeCm ** 2 - highestTotalDistance ** 2) / (2 * highestTotalDistance * stepSizeCm)) / math.pi * 180
+        stepSizeDegrees = 180 - (subCorner * 2)
+        #if (yDirection == -1) ^ (xDirection < 0):
+        #    stepSizeDegrees *= -1
+        if (yDirection < 0) ^ (xDirection < 0):
+            stepSizeDegrees *= -1
+
+        #not neccesary anymore because it gets split into seperate vars for each leg
+        #frameNr = frameNr % 4
+
+        leg1FrameNr = (frameNr - 0) % 4
+        leg2FrameNr = (frameNr - 1) % 4
+        leg4FrameNr = (frameNr - 2) % 4
+        leg5FrameNr = (frameNr - 3) % 4
+
+        self.startFrame()
+
+        self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(5, 0, -5, 3, 100)
+        self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(5, 0, -5, 3, 100)
+
+        if leg1FrameNr == 3:
+            self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(legMid[1][0], legMid[1][1], zAir, 1, speedMod * 200)
+        else:
+            x = legMid[1][0] - (turnWalkInfo[1]["totalDistance"] * math.cos((turnWalkInfo[1]["angleFromCenter"] - (1 - leg1FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[1]["totalDistance"] - turnWalkInfo[1]["angleCompensatorX"])
+            y = legMid[1][1] - (turnWalkInfo[1]["totalDistance"] * math.sin((turnWalkInfo[1]["angleFromCenter"] - (1 - leg1FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[1]["totalDistance"] - turnWalkInfo[1]["angleCompensatorY"])
+            self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(x, y, zGround, 1, speedMod * 200 if leg1FrameNr == 0 else speedMod * 100)
+
+        if leg2FrameNr == 3:
+            self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(legMid[2][0], legMid[2][1], zAir, 2, speedMod * 200)
+        else:
+            x = legMid[2][0] + (turnWalkInfo[2]["totalDistance"] * math.cos((turnWalkInfo[2]["angleFromCenter"] - (1 - leg2FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[2]["totalDistance"] - turnWalkInfo[2]["angleCompensatorX"])
+            y = legMid[2][1] + (turnWalkInfo[2]["totalDistance"] * math.sin((turnWalkInfo[2]["angleFromCenter"] - (1 - leg2FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[2]["totalDistance"] - turnWalkInfo[2]["angleCompensatorY"])
+            self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(x, y, zGround, 2, speedMod * 200 if leg2FrameNr == 0 else speedMod * 100)
+
+        if leg4FrameNr == 3:
+            self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(legMid[4][0], legMid[4][1], zAir, 4, speedMod * 200)
+        else:
+            x = legMid[4][0] - (turnWalkInfo[4]["totalDistance"] * math.cos((turnWalkInfo[4]["angleFromCenter"] - (1 - leg4FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[4]["totalDistance"] - turnWalkInfo[4]["angleCompensatorX"])
+            y = legMid[4][1] + (turnWalkInfo[4]["totalDistance"] * math.sin((turnWalkInfo[4]["angleFromCenter"] - (1 - leg4FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[4]["totalDistance"] - turnWalkInfo[4]["angleCompensatorY"])
+            self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(x, y, zGround, 4, speedMod * 200 if leg4FrameNr == 0 else speedMod * 100)
+
+        if leg5FrameNr == 3:
+            self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(legMid[5][0], legMid[5][1], zAir, 5, speedMod * 200)
+        else:
+            x = legMid[5][0] + (turnWalkInfo[5]["totalDistance"] * math.cos((turnWalkInfo[5]["angleFromCenter"] - (1 - leg5FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[5]["totalDistance"] - turnWalkInfo[5]["angleCompensatorX"])
+            y = legMid[5][1] - (turnWalkInfo[5]["totalDistance"] * math.sin((turnWalkInfo[5]["angleFromCenter"] - (1 - leg5FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[5]["totalDistance"] - turnWalkInfo[5]["angleCompensatorY"])
+            self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(x, y, zGround, 5, speedMod * 200 if leg5FrameNr == 0 else speedMod * 100)
+
+        return self.endFrame()
