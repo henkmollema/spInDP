@@ -172,13 +172,19 @@ class Vision:
                 time.sleep(0)
     def _lineThread(self):
         while time.time() - self.last_line_access < 5:
-            #frame = self.visionController.GetImage()
-            frame = cv2.imread("linetest.jpg", 0)
+            """
+            fd = open('linetest.jpg')
+            img_str = fd.read()
+            frame = np.fromstring(img_str, dtype=np.uint8)
+            frame = cv2.imdecode(frame, cv2.CV_LOAD_IMAGE_COLOR)
+            self.foundLineBlob, self.lineImage, self.lineCoords = self.detectLineNew(frame)
+            """
+            frame = self.visionController.GetImage()
             frame = np.fromstring(frame, dtype=np.uint8)
-            frame = cv2.imdecode(frame, 1)
-            #cropFrame = frame[self.__resolution[1] - 50:self.__resolution[1], 0:self.__resolution[0]]
-            cropFrame = frame
-            self.lineImage = self.detectLineNew(cropFrame)
+            frame = cv2.imdecode(frame, cv2.CV_LOAD_IMAGE_COLOR)
+            cropFrame = frame[self.__resolution[1] - 50:self.__resolution[1], 0:self.__resolution[0]]
+            self.foundLineBlob, self.lineImage, self.lineCoords = self.detectLineNew(cropFrame)
+
         Vision.lineThread = None
     def getLineValues(self):
         Vision.last_line_access = time.time()
@@ -196,7 +202,6 @@ class Vision:
         return result
 
     def detectRedBalloon(self, image):
-        print("detectRedBalloon called")
         imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         h,s,v = cv2.split(imagehsv)
         h = self.thresholdRange(h, 170, 10)
@@ -289,51 +294,10 @@ class Vision:
         return foundBlob, image, coords
 
     def detectLine(self, image):
-        imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        h, s, v = cv2.split(imagehsv)
-        h = self.thresholdRange(h, 0, 179) #TODO
-        s = self.thresholdRange(s, 230, 255) #TODO
-        v = self.thresholdRange(v, 230, 255) #TODO
-        imageBin = h * s * v
-
-        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
-        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9)))
-
-        imageBin = imageBin * 255
-
-        params = cv2.SimpleBlobDetector_Params()
-        params.filterByColor = True
-        params.blobColor = 255
-        params.filterByCircularity = False
-        params.filterByArea = False
-        params.filterByCircularity = False
-        params.filterByConvexity = False
-        params.filterByInertia = False
-
-        detector = cv2.SimpleBlobDetector(params)
-        keypoints = detector.detect(imageBin)
-
-        foundBlob = False
-        coords = None
-        if keypoints:
-            i = 0
-            biggest = 0
-            for p in keypoints:
-                if (p.size > keypoints[biggest].size):
-                    biggest = i
-                i += 1
-            foundBlob = True
-            coords = keypoints[biggest].pt
-            coords = (coords[0] - (self.__resolution[0] / 2), coords[1] - (self.__resolution[1] / 2))
-        else:
-            coords = (-1, -1)
-
-        return foundBlob, coords
-    def detectLineNew(self, image):
         imagegray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        ret, imageBin = cv2.threshold(imagegray, 220, 255, cv2.THRESH_BINARY)
+        ret, imageBin = cv2.threshold(imagegray, 120, 255, cv2.THRESH_BINARY)
 
-        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
+        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
         imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
 
         params = cv2.SimpleBlobDetector_Params()
@@ -371,3 +335,41 @@ class Vision:
 
         #return foundBlob, image, coords, size
         return image
+    def detectLineNew(self, image):
+        print("detectLineNew called")
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        blur = cv2.GaussianBlur(gray, (3, 3), 0)
+        ret, imageBin = cv2.threshold(blur, 120, 255, cv2.THRESH_BINARY)
+
+        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
+        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
+
+        params = cv2.SimpleBlobDetector_Params()
+        params.filterByColor = True
+        params.blobColor = 255
+        params.filterByCircularity = False
+        params.filterByArea = False
+        params.filterByCircularity = False
+        params.filterByConvexity = False
+        params.filterByInertia = False
+
+        detector = cv2.SimpleBlobDetector(params)
+        keypoints = detector.detect(imageBin)
+
+        foundBlob = False
+        coords = None
+        if keypoints:
+            i = 0
+            biggest = 0
+            for p in keypoints:
+                if (p.size > keypoints[biggest].size):
+                    biggest = i
+                i += 1
+            foundBlob = True
+            coords = keypoints[biggest].pt
+            coords = (coords[0] - (self.__resolution[0] / 2), coords[1] - (self.__resolution[1] / 2))
+        else:
+            coords = (-1, -1)
+
+        return foundBlob, imageBin, coords
