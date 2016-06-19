@@ -888,6 +888,7 @@ class AnimationController:
         return totalTime
 
     def turn4Legs(self, xDirection, yDirection, frameNr, speedMod=1):
+        raise("Dont use this plz. Its bad. Im ashamed.")
         if xDirection < -1:
             print("xDirection in turnWalk can't be lower than -1. It was modified from " + str(xDirection) + " to -1")
             xDirection = -1
@@ -915,7 +916,7 @@ class AnimationController:
         legMid = self.legWideMid
         zGround = self.legGround
         zAir = self.legAir
-        stepSizeCm = 2
+        stepSizeCm = 4
 
         turnWalkInfo = {1: {}, 2: {}, 4: {}, 5: {}}
         highestTotalDistance = 0
@@ -975,17 +976,20 @@ class AnimationController:
         #frameNr = frameNr % 4
 
         leg1FrameNr = (frameNr - 0) % 4
-        leg2FrameNr = (frameNr - 1) % 4
-        leg4FrameNr = (frameNr - 2) % 4
+        leg2FrameNr = (frameNr - 2) % 4
+        leg4FrameNr = (frameNr - 1) % 4
         leg5FrameNr = (frameNr - 3) % 4
 
         self.startFrame()
 
-        self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(5, 0, -5, 3, 100)
-        self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(5, 0, -5, 3, 100)
+        #self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(0, 0, -5, 3, 200)
+        #self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(0, 0, -5, 6, 200)
 
         if leg1FrameNr == 3:
             self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(legMid[1][0], legMid[1][1], zAir, 1, speedMod * 200)
+
+            self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(12, 10, -5, 3, 200)
+            self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(12, 10, -5, 6, 200)
         else:
             x = legMid[1][0] - (turnWalkInfo[1]["totalDistance"] * math.cos((turnWalkInfo[1]["angleFromCenter"] - (1 - leg1FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[1]["totalDistance"] - turnWalkInfo[1]["angleCompensatorX"])
             y = legMid[1][1] - (turnWalkInfo[1]["totalDistance"] * math.sin((turnWalkInfo[1]["angleFromCenter"] - (1 - leg1FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[1]["totalDistance"] - turnWalkInfo[1]["angleCompensatorY"])
@@ -993,6 +997,9 @@ class AnimationController:
 
         if leg2FrameNr == 3:
             self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(legMid[2][0], legMid[2][1], zAir, 2, speedMod * 200)
+
+            self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(12, 10, -5, 3, 200)
+            self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(12, 10, -5, 6, 200)
         else:
             x = legMid[2][0] + (turnWalkInfo[2]["totalDistance"] * math.cos((turnWalkInfo[2]["angleFromCenter"] - (1 - leg2FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[2]["totalDistance"] - turnWalkInfo[2]["angleCompensatorX"])
             y = legMid[2][1] + (turnWalkInfo[2]["totalDistance"] * math.sin((turnWalkInfo[2]["angleFromCenter"] - (1 - leg2FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[2]["totalDistance"] - turnWalkInfo[2]["angleCompensatorY"])
@@ -1000,6 +1007,9 @@ class AnimationController:
 
         if leg4FrameNr == 3:
             self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(legMid[4][0], legMid[4][1], zAir, 4, speedMod * 200)
+
+            self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(12, -10, -5, 3, 200)
+            self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(12, -10, -5, 6, 200)
         else:
             x = legMid[4][0] - (turnWalkInfo[4]["totalDistance"] * math.cos((turnWalkInfo[4]["angleFromCenter"] - (1 - leg4FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[4]["totalDistance"] - turnWalkInfo[4]["angleCompensatorX"])
             y = legMid[4][1] + (turnWalkInfo[4]["totalDistance"] * math.sin((turnWalkInfo[4]["angleFromCenter"] - (1 - leg4FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[4]["totalDistance"] - turnWalkInfo[4]["angleCompensatorY"])
@@ -1007,6 +1017,9 @@ class AnimationController:
 
         if leg5FrameNr == 3:
             self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(legMid[5][0], legMid[5][1], zAir, 5, speedMod * 200)
+
+            self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(12, -10, -5, 3, 200)
+            self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(12, -10, -5, 6, 200)
         else:
             x = legMid[5][0] + (turnWalkInfo[5]["totalDistance"] * math.cos((turnWalkInfo[5]["angleFromCenter"] - (1 - leg5FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[5]["totalDistance"] - turnWalkInfo[5]["angleCompensatorX"])
             y = legMid[5][1] - (turnWalkInfo[5]["totalDistance"] * math.sin((turnWalkInfo[5]["angleFromCenter"] - (1 - leg5FrameNr) * stepSizeDegrees) * math.pi / 180) - turnWalkInfo[5]["totalDistance"] - turnWalkInfo[5]["angleCompensatorY"])
