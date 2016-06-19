@@ -117,36 +117,14 @@ class WebServer:
         return webserverinstance.format_response("animation executed: sequences/" + animation)
 
     @staticmethod
-    @app.route("/erwin/walk/<direction>")
-    def api_erwin_walk(direction):
+    @app.route("/erwin/turn4legs/<count>/<speed>")
+    def api_erwin_turnwalk(count, speed):
         frameNr = 0
-        for x in range(1, 50):
-            execTime = webserverinstance.spider.animationController.strafeWalk(direction, frameNr, 1)
+        for x in range(0, 4 * int(count)):
+            execTime = webserverinstance.spider.animationController.turn4Legs(1, 0, frameNr, float(speed))
             time.sleep(execTime)
             frameNr += 1
-        return webserverinstance.format_response("Walk executed")
-
-    @staticmethod
-    @app.route("/erwin/turnwalk/<xdirection>/<ydirection>/<count>/<speed>")
-    def api_erwin_turnwalk(xdirection, ydirection, count, speed):
-        frameNr = 0
-        for x in range(0, 6 * int(count)):
-            execTime = webserverinstance.spider.animationController.turnWalk(float(xdirection), float(ydirection),
-                                                                             frameNr, float(speed))
-            time.sleep(execTime)
-            frameNr += 1
-        return webserverinstance.format_response("TurnWalk executed")
-
-    @staticmethod
-    @app.route("/erwin/turnrun/<xdirection>/<ydirection>/<count>/<speed>")
-    def api_erwin_turnrun(xdirection, ydirection, count, speed):
-        frameNr = 0
-        for x in range(0, 8 * int(count)):
-            execTime = webserverinstance.spider.animationController.turnRun(float(xdirection), float(ydirection),
-                                                                            frameNr, float(speed))
-            time.sleep(execTime)
-            frameNr += 1
-        return webserverinstance.format_response("TurnRun executed")
+        return webserverinstance.format_response("turn4legs executed")
 
     @staticmethod
     @app.route("/behavior/<behaviortype>")
