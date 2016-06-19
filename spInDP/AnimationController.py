@@ -373,7 +373,7 @@ class AnimationController:
 
     realYAngle = 0
     yAdjustment = 0
-    def strafeWalk(self, direction, frameNr, speedMod = 1, keepLeveled = False):
+    def strafeWalk(self, direction, frameNr, speedMod = 1, keepLeveled = False, danceYAngle = 0):
         """Combination of walking and strafing, wherein the direction is an angle in degrees to which the body should move"""
         totalTime = 0
 
@@ -407,8 +407,10 @@ class AnimationController:
         if(keepLeveled):
             zGround = 7 + self.zOffset
             zAir = 5 + self.zOffset
-
-            self.realYAngle = self.spider.remoteController.context.aY * 90 * math.pi / 180
+            if(danceYAngle != 0):
+                self.realYangle = danceYAngle * 90 * math.pi /180
+            else:
+                self.realYAngle = self.spider.remoteController.context.aY * 90 * math.pi / 180
 
         zGround1 = zGround
         zGround2 = zGround
