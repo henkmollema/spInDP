@@ -8,8 +8,7 @@ class DanceBehavior(Behavior):
         self.dance()
 
     def update(self):
-        print("dance")
-        time.sleep(1)
+        self.spider.switchBehavior("Manual")
 
     def dance(self):
         print("I'm dancing!")
@@ -25,7 +24,9 @@ class DanceBehavior(Behavior):
         print("plie")
         time.sleep(self.execSequence("dance-plie.txt", repeat=1, speedModifier=1))
         print("graceStafe")
-        time.sleep(self.graceStrafe())
+        #time.sleep(self.graceStrafe())
+        print("pirouette")
+        time.sleep(self.pirouette())
 
     def startMusic(self):
         print("start music")
@@ -37,17 +38,32 @@ class DanceBehavior(Behavior):
         totalTime = 0
         frameNr = 0
         execTime = 0
+        angle = 1
         for x in range(1, 28):
-            execTime = self.spider.animationController.strafeWalk(direction=60 + x * 1, frameNr=frameNr, speedMod=1, keepLeveled=False, danceYAngle=0)
+            angle -= 0.074
+            execTime = self.spider.animationController.strafeWalk(direction=60 + x * 5, frameNr=frameNr, speedMod=1.5, keepLeveled=True, danceAngle=True, danceYAngle=angle)
             totalTime += execTime
             print("execTime: ", execTime)
             time.sleep(execTime)
             frameNr += 1
         frameNr = 0
         for x in range(1, 28):
-            execTime = self.spider.animationController.strafeWalk(direction=-240 - x * 1, frameNr=frameNr, speedMod=1, keepLeveled=False, danceYAngle=0)
+            execTime = self.spider.animationController.strafeWalk(direction=240 - x * 5, frameNr=frameNr, speedMod=1.5, keepLeveled=True, danceAngle=True, danceYAngle=angle)
             totalTime += execTime
             time.sleep(execTime)
             frameNr += 1
+
+        return totalTime
+
+    def pirouette(self):
+        frameNr = 0
+        totalTime = 0
+        execTime = 0
+        for i in range(0,12):
+            for x in range(0,6):
+                execTime = self.spider.animationController.turnWalk(xDirection=1,yDirection=0,frameNr=frameNr,speedMod=1,stepSize=3.5,keepLeveled=False)
+                totalTime += execTime
+                time.sleep(execTime)
+                frameNr += 1
 
         return totalTime
