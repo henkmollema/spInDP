@@ -12,3 +12,4 @@ class BehaviorType(object):
     Touch = "Touch"
     Sprint = "Sprint"
     Emotive = "Emotive"
+    Dance = "Dance"

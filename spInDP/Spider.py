@@ -4,6 +4,7 @@ import RPi.GPIO as GPIO
 
 from spInDP.AnimationController import AnimationController
 from spInDP.BehaviorType import BehaviorType
+from spInDP.DanceBehavior import DanceBehavior
 from spInDP.EmotiveBehavior import EmotiveBehavior
 from spInDP.EmotiveContext import EmotiveContext
 from spInDP.FindBalloonBehavior import FindBalloonBehavior
@@ -140,6 +141,10 @@ class Spider(object):
         elif behaviorType == BehaviorType.Emotive:
             print("Switched to emotive behavior")
             self._behavior = EmotiveBehavior(self)
+
+        elif behaviorType == BehaviorType.Dance:
+            print("Switched to dance behavior")
+            self._behavior = DanceBehavior(self)
 
         # Start the loop again
         self._stopLoop = False
