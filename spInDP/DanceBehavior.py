@@ -40,16 +40,14 @@ class DanceBehavior(Behavior):
         totalTime = 0
         frameNr = 0
         execTime = 0
-        aX = 0
         for x in range(1, 28):
-            aX = self.spider.remoteController.context.aX
             execTime = self.spider.animationController.strafeWalk(direction=60 + x * 5, frameNr=frameNr, speedMod=1.5, keepLeveled=True)
             totalTime += execTime
             time.sleep(execTime)
             frameNr += 1
         frameNr = 0
         for x in range(1, 28):
-            execTime = self.spider.animationController.strafeWalk(direction=240 - x * 5, frameNr=frameNr, speedMod=1.5, keepLeveled=True, danceAngle=True, danceYAngle=angle)
+            execTime = self.spider.animationController.strafeWalk(direction=240 - x * 5, frameNr=frameNr, speedMod=1.5, keepLeveled=True)
             totalTime += execTime
             time.sleep(execTime)
             frameNr += 1
