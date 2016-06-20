@@ -159,7 +159,7 @@ class AnimationController:
 
         return ret
 
-    def turnWalk(self, xDirection, yDirection, frameNr, speedMod=1, stepSize = 3.5, keepLeveled = False):
+    def turnWalk(self, xDirection, yDirection, frameNr, speedMod=1, stepSize = -1, keepLeveled = False):
         if xDirection < -1:
             print("xDirection in turnWalk can't be lower than -1. It was modified from " + str(xDirection) + " to -1")
             xDirection = -1
@@ -172,6 +172,13 @@ class AnimationController:
         if yDirection > 1:
             print("yDirection in turnWalk can't be higher than 1. It was modified from " + str(yDirection) + " to 1")
             yDirection = 1
+
+        if stepSize == -1:
+            stepSize = 1.75 * speedMod # 3.5
+        if stepSize < 1:
+            stepSize = 1
+
+        print ("stepsize: " + str(stepSize))
 
         xDirection = round(xDirection, 2)
         yDirection = round(yDirection, 2)
