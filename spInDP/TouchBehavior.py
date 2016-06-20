@@ -50,12 +50,12 @@ class TouchBehavior(Behavior):
         retY = 0
         print("x: ", x, " y", y)
         if x > 0.5:
-            retX = 0.1
+            retX = 0.2
         elif x < -0.5:
-            retX = -0.1
+            retX = -0.2
         if y > 0.7:
-            retY = 0.1
+            retY = 0.2
         elif y < -0.7:
-            retY = -0.1
+            retY = -0.2
         print("retX, ", retX, " retY, ", retY)
         return retX, retY
