@@ -15,24 +15,21 @@ class FuryRoadBehavior(Behavior):
 
         super(FuryRoadBehavior, self).__init__(spider)
 
-        # Move the spider closer to the ground
-        self.spider.animationController.zOffset = -2.7
-
     def update(self):
-        # Get sensor data
-        rightSensorData, leftSensorData = self.spider.sensorDataProvider.readADC()
-        leftSensorData -= 60
+        #get vision line data
+        foundLine, lineCoords = self.spider.visioncontroller.getLine()
+        lineXcoord = lineCoords[0]
 
-        print("left: ", leftSensorData, "; right: ", rightSensorData)
-        if (abs(leftSensorData - rightSensorData)) < 20:
+        print("Vision line data x coord: " + str(lineXcoord) + " foundLine: " + str(foundLine))
+        if  foundLine and lineXcoord >= -80 and lineXcoord <= 80:
             print("Its on line")
             leftOnLine = True
             rightOnLine = True
-        elif leftSensorData >= 600 and rightSensorData >= 500:
+        elif not foundLine:
             print ("Both not on line")
             leftOnLine = False
             rightOnLine = False
-        elif leftSensorData < rightSensorData:
+        elif lineXcoord < -80:
             print("Goto left")
             leftOnLine = True
             rightOnLine = False
@@ -48,8 +45,7 @@ class FuryRoadBehavior(Behavior):
                                                                 yDirection=1,
                                                                 frameNr=self.frameNr,
                                                                 speedMod=1.5,
-                                                                stepSize=1.5,
-                                                                stepOffset=20)
+                                                                stepSize=1.5)
         elif not leftOnLine and not rightOnLine:
             if self._lastRightOnLine:
                 print ("Turn right")
@@ -58,6 +54,7 @@ class FuryRoadBehavior(Behavior):
                 print ("Turn left")
                 xDir = -1.0
 
+            print "both not on line xdir: " + str(xDir)
             execTime = self.spider.animationController.turnWalk(xDirection=xDir,
                                                                 yDirection=0,
                                                                 frameNr=self.frameNr,
@@ -65,6 +62,8 @@ class FuryRoadBehavior(Behavior):
                                                                 stepSize=1.5)
 
         elif leftOnLine:
+
+            print "leftOnline"
             # only left is on line, turn right a little
             execTime = self.spider.animationController.turnWalk(xDirection=-1.0,
                                                                 yDirection=0.5,
@@ -72,6 +71,7 @@ class FuryRoadBehavior(Behavior):
                                                                 speedMod=1.5,
                                                                 stepSize=1.5)
         elif rightOnLine:
+            print "rightOnline"
             # only right is on line, turn left a little
             execTime = self.spider.animationController.turnWalk(xDirection=1.0,
                                                                 yDirection=0.5,
@@ -81,5 +81,6 @@ class FuryRoadBehavior(Behavior):
 
         time.sleep(execTime)
         self.frameNr += 1
-        self._lastLeftOnLine = leftOnLine
-        self._lastRightOnLine = rightOnLine
+        if(foundLine):
+            self._lastLeftOnLine = leftOnLine
+            self._lastRightOnLine = rightOnLine

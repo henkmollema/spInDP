@@ -21,6 +21,9 @@ class VisionController:
         return foundBlob, coords, size
     def getBalloonIsLeft(self):
         return self.__vision.getBalloonIsLeft()
+    def getLine(self):
+        foundLineBlob, frame, coords = self.__vision.getLineValues()
+        return foundLineBlob, coords
 
     def GetImage(self):
         frame = self.__camera.getFrame()
@@ -35,7 +38,7 @@ class VisionController:
         foundBlob, redBalloonFrame, blueBalloonFrame, coords, size = self.__vision.getBalloonValues()
         return cv2.imencode('.jpeg', blueBalloonFrame)[1].tostring()
     def GetImageLine(self):
-        frame = self.__vision.getLineValues()
+        foundLineBlob, frame, coords = self.__vision.getLineValues()
         return cv2.imencode('.jpeg', frame)[1].tostring()
 
 class Camera(object):
@@ -189,7 +192,7 @@ class Vision:
     def getLineValues(self):
         Vision.last_line_access = time.time()
         self.initializeLine()
-        return self.lineImage
+        return self.foundLineBlob, self.lineImage, self.lineCoords
 
     def thresholdRange(self, img, min, max):
         """Makes it possible to give a range when thresholding instead of a min or max"""
@@ -336,11 +339,10 @@ class Vision:
         #return foundBlob, image, coords, size
         return image
     def detectLineNew(self, image):
-        print("detectLineNew called")
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         blur = cv2.GaussianBlur(gray, (3, 3), 0)
-        ret, imageBin = cv2.threshold(blur, 120, 255, cv2.THRESH_BINARY)
+        ret, imageBin = cv2.threshold(blur, 220, 255, cv2.THRESH_BINARY)
 
         imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
         imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))

@@ -18,7 +18,7 @@ class WebServer:
         self.spider = spider
 
     def start(self):
-        self.app.run(host='0.0.0.0', port=80, debug=True, threaded=True)
+        self.app.run(host='0.0.0.0', port=80, debug=False, threaded=True)
 
     def format_response(self, message, mimetype='application/json'):
         resp = Response(message, status=200, mimetype=mimetype)
@@ -210,3 +210,9 @@ class WebServer:
     def api_shutdown():
         print("Shutdown the spider.")
         webserverinstance.spider.shutdown()
+
+    @staticmethod
+    @app.route("/reboot")
+    def api_reboot():
+        print("Rebooting the spider.")
+        webserverinstance.spider.reboot()
