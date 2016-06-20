@@ -210,3 +210,9 @@ class WebServer:
     def api_shutdown():
         print("Shutdown the spider.")
         webserverinstance.spider.shutdown()
+
+    @staticmethod
+    @app.route("/reboot")
+    def api_reboot():
+        print("Rebooting the spider.")
+        webserverinstance.spider.reboot()

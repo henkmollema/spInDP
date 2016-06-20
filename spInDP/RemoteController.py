@@ -134,6 +134,11 @@ class RemoteController(object):
                         self._spider.shutdown()
                         break
 
+                    elif action == "shutdown":
+                        print("Back in a sec.")
+                        self._spider.reboot()
+                        break
+
                 elif mode == "limbo":
                     wideWalk = action == "stop"
                     print ("Enable wide walk: " + str(wideWalk))
