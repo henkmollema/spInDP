@@ -20,6 +20,20 @@ class FuryRoadBehavior(Behavior):
         foundLine, lineCoords = self.spider.visioncontroller.getLine()
         lineXcoord = lineCoords[0]
 
+        xDirection = lineXcoord
+        yDirection = 1
+        if abs(lineXcoord) > 80:
+            yDirection = 1 - (lineXcoord - 80)
+            if yDirection < 0:
+                yDirection = 0
+
+        execTime = self.spider.animationController.turnWalk(xDirection=xDirection,
+                                                            yDirection=yDirection,
+                                                            frameNr=self.frameNr,
+                                                            speedMod=1.5,
+                                                            stepSize=1.5)
+
+        """
         print("Vision line data x coord: " + str(lineXcoord) + " foundLine: " + str(foundLine))
         if  foundLine and lineXcoord >= -80 and lineXcoord <= 80:
             print("Its on line")
@@ -78,9 +92,13 @@ class FuryRoadBehavior(Behavior):
                                                                 frameNr=self.frameNr,
                                                                 speedMod=1.5,
                                                                 stepSize=1.5)
+        """
 
         time.sleep(execTime)
         self.frameNr += 1
+
+        """
         if(foundLine):
             self._lastLeftOnLine = leftOnLine
             self._lastRightOnLine = rightOnLine
+        """
