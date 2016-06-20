@@ -24,7 +24,7 @@ class ServoController(object):
         """Gets the present position of the specified servo."""
 
         tryCount = 0
-        maxTryCount = 3
+        maxTryCount = 5
         pos = -1
         while pos == -1 and tryCount < maxTryCount:
             try:
