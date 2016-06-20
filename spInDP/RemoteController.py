@@ -27,10 +27,10 @@ class RemoteController(object):
         self.context = RemoteContext()
 
         print("Initializing Bluetooth connection")
-        self._tryConnect()
+        #self._tryConnect()
 
-        self._updateLoop = threading.Thread(target=self._updateContextLoop)
-        self._updateLoop.start()
+        #self._updateLoop = threading.Thread(target=self._updateContextLoop)
+        #self._updateLoop.start()
 
     def _tryConnect(self):
         """Attempts to connect the socket with the the Arduino using Bluetooth."""

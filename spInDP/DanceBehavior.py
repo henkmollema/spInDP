@@ -2,13 +2,134 @@ from spInDP.Behavior import Behavior
 import time
 
 class DanceBehavior(Behavior):
+    startTime = 0
+    moveNR = 1
+    frameNr = 0
 
     def __init__(self,spider):
         super(DanceBehavior,self).__init__(spider)
-        self.dance()
+        #self.dance()
+        self.startTime = time.time()
 
     def update(self):
-        self.spider.switchBehavior("Manual")
+        t = time.time() - self.startTime
+
+        #start dance
+        #first move
+        if(t < 3 and self.moveNR == 1):
+            print self.moveNR
+            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-move-1.txt",speedModifier=1.3))
+            self.moveNR += 1
+        if(t > 3 and t < 4.5  and self.moveNR == 2):
+            print self.moveNR
+            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-move-2.txt",speedModifier=1.3))
+            self.moveNR += 1
+            return
+
+        if (t > 4.5 and t < 6.3 and self.moveNR == 3):
+            print self.moveNR
+            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-move-3-6.txt",speedModifier=1.3))
+            self.moveNR += 1
+            return
+
+        if (t > 6.3 and t < 10 and self.moveNR == 4):
+            print self.moveNR
+            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-move-4-plie.txt",speedModifier=1.3))
+            self.moveNR += 1
+            return
+
+        if (t > 10 and t < 12.77 and self.moveNR == 5):
+            print self.moveNR
+            #time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-move-5.txt",speedModifier=1.3))
+            self.moveNR += 1
+            return
+
+        if (t > 12.77 and t < 15.8 and self.moveNR == 6):
+            print self.moveNR
+            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-move-3-6.txt",speedModifier=1.3))
+            self.moveNR += 1
+            return
+
+        if (t > 15.8 and t < 19.23 and self.moveNR == 7):
+            print self.moveNR
+            self.pirouette()
+            self.moveNR += 1
+            return
+
+        if (t > 19.23 and t < 20.7):
+            print self.moveNR
+            time.sleep(self.spider.animationController.strafeWalk(frameNr=self.frameNr, direction=90))
+            return
+
+        if (t > 20.7 and t < 22):
+            print self.moveNR
+            time.sleep(self.spider.animationController.strafeWalk(frameNr=self.frameNr, direction=-90))
+
+            self.moveNR = 10
+            return
+
+        if (t > 22 and t < 26 and self.moveNR == 10):
+            print self.moveNR
+            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-move-3-6.txt"))
+            self.moveNR += 1
+            return
+
+        #EVEN NIET BEWEGEN HIER
+
+        if (t > 28 and t < 29.3 and self.moveNR == 11):
+            # Next note at 28
+            self.moveNR += 1
+            return
+
+        if (t > 29.3 and t < 32.3 and self.moveNR == 12):
+            # Next note at 29.3
+            self.moveNR += 1
+            return
+        if (t > 32.3 and t < 35.63 and self.moveNR == 13):
+            # Next note at 32.3
+            self.moveNR += 1
+            return
+        if (t > 35.63 and t < 38.54 and self.moveNR == 14):
+            # Next note at 35.63
+            self.moveNR += 1
+            return
+
+        if (t > 38.54 and t < 40 and self.moveNR == 15):
+            # Next note at 38.54 high
+            self.moveNR += 1
+            return
+
+        if (t > 40 and t < 45 and self.moveNR == 16):
+            # Next note at 40 low
+            self.moveNR += 1
+            return
+
+        if (t > 45 and t < 47 and self.moveNR == 17):
+            # Next note at 45 high
+            self.moveNR += 1
+            return
+
+        if (t > 47 and t < 51 and self.moveNR == 18):
+            # Next note at 47 high+
+            self.moveNR += 1
+            return
+
+        if (t > 51 and t < 54 and self.moveNR == 19):
+            # Next note at 51 high++
+            self.moveNR += 1
+            return
+
+        if (t > 54 and t < 56 and self.moveNR == 20):
+            # Next note at 51 high+++
+            self.moveNR += 1
+            return
+
+        if (t > 56 and t < 57 and self.moveNR == 21):
+            # Next note at 56 go low
+            self.moveNR += 1
+            return
+
+        #at 57 we need to be low here
 
     def dance(self):
         print("I'm dancing!")
@@ -31,6 +152,7 @@ class DanceBehavior(Behavior):
         time.sleep(self.pirouette())
 
     def startMusic(self):
+        startTime = time.time()
         print("start music")
 
     def execSequence(self, animation, repeat, speedModifier):
@@ -54,8 +176,8 @@ class DanceBehavior(Behavior):
 
         return totalTime
 
-    def pirouette(self,xDirection = 0, speedMod = 1, stepSize = 3.5, keeplevel = False):
-        return self.turn(repeat=12, xDirection=xDirection, speedMod=speedMod, stepSize=stepSize, keepLevel=keeplevel)
+    def pirouette(self, xDirection = 1, speedMod = 5, stepSize = 4, keeplevel = False):
+        return self.turn(repeat=8, xDirection=xDirection, speedMod=speedMod, stepSize=stepSize, keepLevel=keeplevel)
 
     def turn(self, repeat = 0, xDirection = 0, speedMod = 1, stepSize = 3.5, keepLevel= False):
         frameNr = 0

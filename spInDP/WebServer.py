@@ -2,6 +2,7 @@ import time
 import json
 import glob
 import psutil
+from BehaviorType import BehaviorType
 from flask import Flask, render_template, request, Response
 
 webserverinstance = None
@@ -198,6 +199,13 @@ class WebServer:
     def api_emotive_command(command):
         webserverinstance.spider.emotiveContext.currentCommand = command
         return webserverinstance.format_response("emo: " + command)
+
+    @staticmethod
+    @app.route("/startDance")
+    def api_startDance():
+        print ("StartDance")
+        webserverinstance.spider.switchBehavior(BehaviorType.Dance)
+        return webserverinstance.format_response("startdance")
 
     @staticmethod
     @app.route("/stop")
