@@ -26,3 +26,15 @@ class PushBehavior(Behavior):
             self.frameNr += 1
 
         return
+
+    def safeTransition(self):
+        self.filled = False
+        while(self.filled == False):
+            try:
+                self.currentLeg = self.spider.servoController.getAllLegsXYZ()
+                self.filled = True
+            except:
+                print("can not get cords for legs.")
+
+
+
