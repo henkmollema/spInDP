@@ -195,14 +195,14 @@ class RemoteController(object):
                         self._spider.switchBehavior(BehaviorType.Manual)
 
                 elif mode == "mating":
-                    if action == "start":
-                        print("Start mating mode")
-                    elif action == "stop":
-                        print ("Stop mating mode")
+                    if action == "pre-stab":
+                        print("Pre stab")
+                    elif action == "post-stab":
+                        print ("Post stab")
                     elif action == "up":
                         print ("Moving spider up")
-                    elif action == "down":
-                        print ("Moving spider down")
+                    elif action == "stab":
+                        print ("Stab")
 
                     print("Mating not implemented, using walk.")
                     self._spider.switchBehavior(BehaviorType.Manual)
