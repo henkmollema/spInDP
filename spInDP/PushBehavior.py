@@ -13,6 +13,7 @@ class PushBehavior(Behavior):
     def __init__(self, spider):
         print("Initializing push (spider gap) behavior.")
         super(PushBehavior, self).__init__(spider)
+        self.safeTransition()
 
     def update(self):
         jMagnitude = self.spider.remoteController.context.jMagnitude
@@ -28,13 +29,5 @@ class PushBehavior(Behavior):
         return
 
     def safeTransition(self):
-        self.filled = False
-        while(self.filled == False):
-            try:
-                self.currentLeg = self.spider.servoController.getAllLegsXYZ()
-                self.filled = True
-            except:
-                print("can not get cords for legs.")
-
-
-
+        for x in range(0, 7):
+            self.spider.servoController.move(servo= (x * 3 + 1),angle=10,speed=100)
