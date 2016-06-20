@@ -29,5 +29,7 @@ class PushBehavior(Behavior):
         return
 
     def safeTransition(self):
-        for x in range(0, 7):
-            self.spider.servoController.move(servo= (x * 3 + 1),angle=10,speed=100)
+        for x in [2,14,17]:
+            self.spider.servoController.move(servo=x,angle=-10, speed=100)
+        for x in [5,8,11]:
+            self.spider.servoController.move(servo=x,angle=10, speed=100)
