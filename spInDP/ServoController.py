@@ -143,7 +143,6 @@ class ServoController(object):
                 legs[legId] = str(coords[0]) + "," + str(coords[1]) + "," + str(coords[2])
             except:
                 print ("Something went wrong in \"anglesToCoords\"...")
-                raise()
                 continue
         return ' '.join([str(x) for x in legs])
 
