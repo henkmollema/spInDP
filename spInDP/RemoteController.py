@@ -134,7 +134,7 @@ class RemoteController(object):
                         self._spider.shutdown()
                         break
 
-                    elif action == "shutdown":
+                    elif action == "reboot":
                         print("Back in a sec.")
                         self._spider.reboot()
                         break
