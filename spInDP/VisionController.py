@@ -16,8 +16,8 @@ class VisionController:
         self.__camera = Camera()
         self.__vision = Vision(self, self.__camera.resolution)
 
-    def FindBalloon(self):
-        foundBlob, redBalloonFrame, blueBalloonFrame, coords, size = self.__vision.getBalloonValues()
+    def FindBalloon(self, detectBlue = True):
+        foundBlob, redBalloonFrame, blueBalloonFrame, coords, size = self.__vision.getBalloonValues(detectBlue)
         return foundBlob, coords, size
     def getBalloonIsLeft(self):
         return self.__vision.getBalloonIsLeft()
@@ -112,6 +112,7 @@ class Vision:
     balloonThread = None
     last_balloon_access = 0
 
+    detectBlue = False
     foundRedBlob = None
     redBalloonImage = None
     blueBalloonImage = None
@@ -144,16 +145,20 @@ class Vision:
             frame = self.visionController.GetImage()
             frame = np.fromstring(frame, dtype=np.uint8)
             frame = cv2.imdecode(frame, 1)
-            self.foundRedBlob, self.redBalloonImage, self.redBalloonCoords, self.redBalloonSize = self.detectRed(frame)
-            foundBlueBlob, self.blueBalloonImage, blueCoords = self.detectBlue(frame)
+            self.foundRedBlob, self.redBalloonImage, self.redBalloonCoords, self.redBalloonSize = self.detectRedBalloon(frame)
+            foundBlueBlob = False
+            if self.detectBlue:
+                foundBlueBlob, self.blueBalloonImage, blueCoords = self.detectBlueBalloon(frame)
             if foundBlueBlob:
                 if blueCoords[0] > self.redBalloonCoords[0]:
                     self.redleftCount += 1
                 else:
                     self.redRightCount += 1
         Vision.balloonThread = None
-    def getBalloonValues(self):
+    def getBalloonValues(self, detectBlue = True):
         Vision.last_balloon_access = time.time()
+        if self.detectBlue is not detectBlue:
+            self.detectBlue = detectBlue
         self.initializeBalloon()
         return self.foundRedBlob, self.redBalloonImage, self.blueBalloonImage, self.redBalloonCoords, self.redBalloonSize
     def getBalloonIsLeft(self):
@@ -167,11 +172,19 @@ class Vision:
                 time.sleep(0)
     def _lineThread(self):
         while time.time() - self.last_line_access < 5:
+            """
+            fd = open('linetest.jpg')
+            img_str = fd.read()
+            frame = np.fromstring(img_str, dtype=np.uint8)
+            frame = cv2.imdecode(frame, cv2.CV_LOAD_IMAGE_COLOR)
+            self.foundLineBlob, self.lineImage, self.lineCoords = self.detectLineNew(frame)
+            """
             frame = self.visionController.GetImage()
             frame = np.fromstring(frame, dtype=np.uint8)
-            frame = cv2.imdecode(frame, 1)
+            frame = cv2.imdecode(frame, cv2.CV_LOAD_IMAGE_COLOR)
             cropFrame = frame[self.__resolution[1] - 50:self.__resolution[1], 0:self.__resolution[0]]
-            self.lineImage = self.detectLineNew(cropFrame)
+            self.foundLineBlob, self.lineImage, self.lineCoords = self.detectLineNew(cropFrame)
+
         Vision.lineThread = None
     def getLineValues(self):
         Vision.last_line_access = time.time()
@@ -188,12 +201,12 @@ class Vision:
             result = cv2.add(img1, img2)
         return result
 
-    def detectRed(self, image):
+    def detectRedBalloon(self, image):
         imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         h,s,v = cv2.split(imagehsv)
         h = self.thresholdRange(h, 170, 10)
-        s = self.thresholdRange(s, 110, 250)
-        v = self.thresholdRange(v, 140, 255)
+        s = self.thresholdRange(s, 110, 255)
+        v = self.thresholdRange(v, 110, 255)
         imageBin = h * s * v
 
         imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7,7)))
@@ -235,12 +248,12 @@ class Vision:
             image = imageBin
 
         return foundBlob, image, coords, size
-    def detectBlue(self, image):
+    def detectBlueBalloon(self, image):
         imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         h, s, v = cv2.split(imagehsv)
-        h = self.thresholdRange(h, 100, 125) #TODO
-        s = self.thresholdRange(s, 110, 250) #TODO
-        v = self.thresholdRange(v, 140, 255) #TODO
+        h = self.thresholdRange(h, 90, 110) #TODO
+        s = self.thresholdRange(s, 200, 255) #TODO
+        v = self.thresholdRange(v, 160, 255) #TODO
         imageBin = h * s * v
 
         imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
@@ -281,51 +294,10 @@ class Vision:
         return foundBlob, image, coords
 
     def detectLine(self, image):
-        imagehsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        h, s, v = cv2.split(imagehsv)
-        h = self.thresholdRange(h, 0, 179) #TODO
-        s = self.thresholdRange(s, 230, 255) #TODO
-        v = self.thresholdRange(v, 230, 255) #TODO
-        imageBin = h * s * v
-
-        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
-        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9)))
-
-        imageBin = imageBin * 255
-
-        params = cv2.SimpleBlobDetector_Params()
-        params.filterByColor = True
-        params.blobColor = 255
-        params.filterByCircularity = False
-        params.filterByArea = False
-        params.filterByCircularity = False
-        params.filterByConvexity = False
-        params.filterByInertia = False
-
-        detector = cv2.SimpleBlobDetector(params)
-        keypoints = detector.detect(imageBin)
-
-        foundBlob = False
-        coords = None
-        if keypoints:
-            i = 0
-            biggest = 0
-            for p in keypoints:
-                if (p.size > keypoints[biggest].size):
-                    biggest = i
-                i += 1
-            foundBlob = True
-            coords = keypoints[biggest].pt
-            coords = (coords[0] - (self.__resolution[0] / 2), coords[1] - (self.__resolution[1] / 2))
-        else:
-            coords = (-1, -1)
-
-        return foundBlob, coords
-    def detectLineNew(self, image):
         imagegray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        ret, imageBin = cv2.threshold(imagegray, 220, 255, cv2.THRESH_BINARY)
+        ret, imageBin = cv2.threshold(imagegray, 120, 255, cv2.THRESH_BINARY)
 
-        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
+        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
         imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
 
         params = cv2.SimpleBlobDetector_Params()
@@ -363,3 +335,41 @@ class Vision:
 
         #return foundBlob, image, coords, size
         return image
+    def detectLineNew(self, image):
+        print("detectLineNew called")
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        blur = cv2.GaussianBlur(gray, (3, 3), 0)
+        ret, imageBin = cv2.threshold(blur, 120, 255, cv2.THRESH_BINARY)
+
+        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
+        imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
+
+        params = cv2.SimpleBlobDetector_Params()
+        params.filterByColor = True
+        params.blobColor = 255
+        params.filterByCircularity = False
+        params.filterByArea = False
+        params.filterByCircularity = False
+        params.filterByConvexity = False
+        params.filterByInertia = False
+
+        detector = cv2.SimpleBlobDetector(params)
+        keypoints = detector.detect(imageBin)
+
+        foundBlob = False
+        coords = None
+        if keypoints:
+            i = 0
+            biggest = 0
+            for p in keypoints:
+                if (p.size > keypoints[biggest].size):
+                    biggest = i
+                i += 1
+            foundBlob = True
+            coords = keypoints[biggest].pt
+            coords = (coords[0] - (self.__resolution[0] / 2), coords[1] - (self.__resolution[1] / 2))
+        else:
+            coords = (-1, -1)
+
+        return foundBlob, imageBin, coords
