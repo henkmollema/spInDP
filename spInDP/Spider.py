@@ -163,6 +163,14 @@ class Spider(object):
     def shutdown(self):
         """Stops the spider and shuts down the RPi."""
 
-        self.stop()
+        #self.stop()
         import os
         os.system("sudo shutdown -h now")
+
+    def reboot(self):
+        """Stops the spider and reboots the RPi."""
+
+        #self.stop()
+        import os
+        os.system("sudo reboot -r now")
+
