@@ -7,9 +7,11 @@ from spInDP.AutonomeBehavior import AutonomeBehavior
 class FindBalloonBehavior(AutonomeBehavior):
     """Provides autonome behavior for destroying a red balloon."""
 
-    BLOB_SIZE = 175
+    BLOB_SIZE = 200
     _frameNr = 0
     _stabPosition = False
+
+    _lastX = 1
 
     def __init__(self, spider):
         """Initializes a new instance of the FindBalloonBehavior class."""
@@ -31,9 +33,9 @@ class FindBalloonBehavior(AutonomeBehavior):
                     print ("Move the spider into stab position. Left: " + str(balloonIsLeft))
 
                     if balloonIsLeft:
-                        time.sleep(self.spider.sequenceController.parseSequence('sequences/pre-stab-left.txt'))
+                        time.sleep(self.spider.sequenceController.parseSequence('sequences/pre-stab-left.txt', speedModifier=2))
                     else:
-                        time.sleep(self.spider.sequenceController.parseSequence('sequences/pre-stab-right.txt'))
+                        time.sleep(self.spider.sequenceController.parseSequence('sequences/pre-stab-right.txt', speedModifier=2))
 
                     self._stabPosition = True
 
@@ -43,10 +45,6 @@ class FindBalloonBehavior(AutonomeBehavior):
                 else:
                     time.sleep(self.spider.sequenceController.parseSequence('sequences/stab-right.txt'))
             else:
-                if self._stabPosition:
-                    print ("Execute post stab")
-                    time.sleep(self.spider.sequenceController.parseSequence('sequences/post-stab.txt'))
-
                 x = coords[0]
                 # y = coords[1]
                 a = 240
@@ -56,7 +54,32 @@ class FindBalloonBehavior(AutonomeBehavior):
                 angle = math.atan(b / a) * (180 / math.pi)
                 angle *= 1.5
 
-                # Walk towards balloon
-                time.sleep(self.spider.animationController.strafeWalk(angle, frameNr=self._frameNr, speedMod=1))
-                self._stabPosition = False
+                execTime = self.spider.animationController.turnWalk(xDirection=(b / a),
+                                                                    yDirection=1.0,
+                                                                    frameNr=self._frameNr,
+                                                                    speedMod=2)
+
+                time.sleep(execTime)
                 self._frameNr += 1
+                self._lastX = x
+
+        else:
+            if self._stabPosition:
+                print ("Execute post stab")
+                time.sleep(self.spider.sequenceController.parseSequence('sequences/post-stab.txt'))
+
+            # print ("Balloon not found, turning")
+            turnDir = 1
+            if self._lastX < 0:
+                turnDir = -1
+
+            execTime = self.spider.animationController.turnWalk(xDirection=turnDir,
+                                                                yDirection=0.0,
+                                                                frameNr=self._frameNr,
+                                                                speedMod=1,
+                                                                stepSize=1.5)
+            time.sleep(execTime)
+
+
+            self._stabPosition = False
+            self._frameNr += 1
