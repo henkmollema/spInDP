@@ -55,7 +55,8 @@ class ManualBehavior(Behavior):
                 if (self.spider.sequenceController.legQueueSize() < 2):
                     execTime = self.spider.animationController.turnWalk(xDirection=-jY, yDirection=-jX,
                                                                     frameNr=self.frameNr,
-                                                                    speedMod=speedModifier) #- self.spider.UPDATE_SLEEP_TIME
+                                                                    speedMod=speedModifier,
+                                                                    keepLeveled=self.keepLeveled) #- self.spider.UPDATE_SLEEP_TIME
                     time.sleep(max(execTime, 0))
 
             self.frameNr += 1
