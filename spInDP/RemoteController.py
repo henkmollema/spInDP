@@ -27,10 +27,10 @@ class RemoteController(object):
         self.context = RemoteContext()
 
         print("Initializing Bluetooth connection")
-        #self._tryConnect()
+        self._tryConnect()
 
-        #self._updateLoop = threading.Thread(target=self._updateContextLoop)
-        #self._updateLoop.start()
+        self._updateLoop = threading.Thread(target=self._updateContextLoop)
+        self._updateLoop.start()
 
     def _tryConnect(self):
         """Attempts to connect the socket with the the Arduino using Bluetooth."""
@@ -105,7 +105,7 @@ class RemoteController(object):
                 # Only read AX/AY when it's sent with Bluetooth
                 if axStr != "" and ayStr != "":
                     self.context.aX = float(axStr)
-                    self.context.aY = float(ayStr)
+                    self.context.aY = -float(ayStr) #Note: the y angle is inversed here
             except:
                 # Skip error and continue with next message
                 msg = msg[msgEnd + 1:]
