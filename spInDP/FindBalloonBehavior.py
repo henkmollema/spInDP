@@ -7,7 +7,7 @@ from spInDP.AutonomeBehavior import AutonomeBehavior
 class FindBalloonBehavior(AutonomeBehavior):
     """Provides autonome behavior for destroying a red balloon."""
 
-    BLOB_SIZE = 200
+    BLOB_SIZE = 125
     _frameNr = 0
     _stabPosition = False
 
