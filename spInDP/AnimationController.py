@@ -408,8 +408,8 @@ class AnimationController:
             legMid = self.legNarrowMid
             stepRangeVert = cosDirection * 7 #7 is stepsize for vertical walking
             stepRangeHor = sinDirection * 7 #7 is stepsize for horizontal walking
-            zGround = self.legGround - 2 + self.zOffset
-            zAir = self.legAir + self.zOffset
+            zGround = self.legGround + self.zOffset - 2
+            zAir = self.legAir + self.zOffset - 1
 
         if(keepLeveled):
             zGround = 7 + self.zOffset
