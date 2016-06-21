@@ -146,6 +146,20 @@ class DanceBehavior(Behavior):
             self.moveNR += 1
             return
 
+        #start MC-Hammer
+
+        if (t > 81 and t < 86 and self.moveNR == 25):
+            time.sleep(self.spider.sequenceController.parseSequence("sequence/dance-step.txt"))
+            self.moveNR += 1
+            return
+
+        if (t > 86 and t < 96 and self.moveNR == 26):
+            time.sleep(self.spider.animationController.strafeWalk(direction=,frameNr=,speedMod=)
+
+
+       #slow donw 117
+       #end time 122
+
     def dance(self):
         print("I'm dancing!")
         # stretch
