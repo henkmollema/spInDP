@@ -40,25 +40,27 @@ class DanceBehavior(Behavior):
 
         if (t > 10 and t < 12.77 and self.moveNR == 5):
             print self.moveNR
-            #time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-move-5.txt",speedModifier=1.3))
+            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-move-4-plie.txt", speedModifier=1.3))
             self.moveNR += 1
             return
 
         if (t > 12.77 and t < 15.8 and self.moveNR == 6):
             print self.moveNR
-            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-move-3-6.txt",speedModifier=1.3))
+            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-stretchwave-5seconds.txt",speedModifier=2))
             self.moveNR += 1
             return
 
         if (t > 15.8 and t < 19.23 and self.moveNR == 7):
             print self.moveNR
-            self.pirouette()
+            #self.pirouette()
+            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-move-3-6.txt", speedModifier=1.3))
             self.moveNR += 1
             return
 
         # if (t > 19.23 and t < 20.7):
         if (t > 19.23 and t < 22):
             time.sleep(self.spider.animationController.strafeWalk(frameNr=self.frameNr, direction=90))
+            self.frameNr += 1
             self.moveNR = 10
             return
 
@@ -77,15 +79,15 @@ class DanceBehavior(Behavior):
 
         #EVEN NIET BEWEGEN HIER
 
-        if (t > 28 and t < 29.3 and self.moveNR == 11):
-            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-wave.txt"))
-            self.moveNR += 1
+        if (t > 26 and t < 32.3 and self.moveNR == 11):
+            time.sleep(self.spider.sequenceController.parseSequence(filePath="sequences/dance-twerk.txt",repeat=5))
+            self.moveNR = 13
             return
 
-        if (t > 29.3 and t < 32.3 and self.moveNR == 12):
-            # Empty move for now
-            self.moveNR += 1
-            return
+        # if (t > 29.3 and t < 32.3 and self.moveNR == 12):
+        #     # Empty move for now
+        #     self.moveNR = 13
+        #     return
         if (t > 32.3 and t < 35.63 and self.moveNR == 13):
             time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-circle-air.txt"))
             self.moveNR += 1
@@ -114,7 +116,7 @@ class DanceBehavior(Behavior):
 
         if (t > 47 and t < 51):
             time.sleep(self.spider.animationController.strafeWalk(frameNr=self.frameNr, direction=-90))
-
+            self.frameNr += 1
             self.moveNR = 19
             return
 
