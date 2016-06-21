@@ -17,13 +17,13 @@ class VisionController:
         self.__vision = Vision(self, self.__camera.resolution)
 
     def FindBalloon(self, detectBlue = True):
-        self.__camera.useAutoBrightness = False
+        Camera.useAutoBrightness = False
         foundBlob, redBalloonFrame, blueBalloonFrame, coords, size = self.__vision.getBalloonValues(detectBlue)
         return foundBlob, coords, size
     def getBalloonIsLeft(self):
         return self.__vision.getBalloonIsLeft()
     def getLine(self):
-        self.__camera.useAutoBrightness = True
+        Camera.useAutoBrightness = True
         foundLineBlob, frame, xCoord = self.__vision.getLineValues()
         return foundLineBlob, xCoord
 
@@ -33,16 +33,16 @@ class VisionController:
         
     def GetImageVisionRedBalloon(self):
         """Get image from the vision part which contains the threshold for the RED balloon and is available as a JPEG"""
-        self.__camera.useAutoBrightness = False
+        Camera.useAutoBrightness = False
         foundBlob, redBalloonFrame, blueBalloonFrame, coords, size = self.__vision.getBalloonValues()
         return cv2.imencode('.jpeg', redBalloonFrame)[1].tostring()
     def GetImageVisionBlueBalloon(self):
         """Get image from the vision part which contains the threshold for the BLUE balloon and is available as a JPEG"""
-        self.__camera.useAutoBrightness = False
+        Camera.useAutoBrightness = False
         foundBlob, redBalloonFrame, blueBalloonFrame, coords, size = self.__vision.getBalloonValues()
         return cv2.imencode('.jpeg', blueBalloonFrame)[1].tostring()
     def GetImageLine(self):
-        self.__camera.useAutoBrightness = True
+        Camera.useAutoBrightness = True
         foundLineBlob, frame, coords = self.__vision.getLineValues()
         return cv2.imencode('.jpeg', frame)[1].tostring()
 

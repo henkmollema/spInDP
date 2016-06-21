@@ -565,7 +565,7 @@ class AnimationController:
         legMid = self.legRunMid
 
         zGround = 5
-        zAir = 3
+        zAir = 2.5
 
         turnWalkInfo = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}}
         highestTotalDistance = 0
