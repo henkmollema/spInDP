@@ -27,10 +27,10 @@ class RemoteController(object):
         self.context = RemoteContext()
 
         print("Initializing Bluetooth connection")
-        #self._tryConnect()
+        self._tryConnect()
 
-        #self._updateLoop = threading.Thread(target=self._updateContextLoop)
-        #self._updateLoop.start()
+        self._updateLoop = threading.Thread(target=self._updateContextLoop)
+        self._updateLoop.start()
 
     def _tryConnect(self):
         """Attempts to connect the socket with the the Arduino using Bluetooth."""
@@ -43,7 +43,7 @@ class RemoteController(object):
         while tries <= maxTries:
             try:
                 self._socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-                #self._socket.settimeout(5.0)
+                # self._socket.settimeout(5.0)
                 self._socket.connect(("20:16:03:30:80:85", 1))
                 connected = True
                 print ("Connected to Bluetooth")
@@ -105,7 +105,7 @@ class RemoteController(object):
                 # Only read AX/AY when it's sent with Bluetooth
                 if axStr != "" and ayStr != "":
                     self.context.aX = float(axStr)
-                    self.context.aY = float(ayStr)
+                    self.context.aY = -float(ayStr) #Note: the y angle is inversed here
             except:
                 # Skip error and continue with next message
                 msg = msg[msgEnd + 1:]
@@ -122,12 +122,12 @@ class RemoteController(object):
             mode = mode.lower().strip()
             action = action.lower().strip()
 
+            resetBehavior = False
             if mode != self._oldMode or action != self._oldAction:
                 if mode == "":
                     if action == "":
                         print("Reset spider status")
-                        self._spider.switchBehavior(BehaviorType.Manual)
-                        self._spider.animationController.setWideWalking(True)
+                        resetBehavior = True
 
                     elif action == "shutdown":
                         print("Goodbye.")
@@ -150,8 +150,7 @@ class RemoteController(object):
                         self._spider.switchBehavior(BehaviorType.Sprint)
                     else:
                         print("Stop sprint mode")
-                        self._spider.switchBehavior(BehaviorType.Manual)
-                        self._spider.animationController.setWideWalking(True)
+                        resetBehavior = True
 
                 elif mode == "gravel":
                     highWalk = action == "start"
@@ -160,8 +159,7 @@ class RemoteController(object):
 
                 elif mode == "spider-gap":
                     if action == "walk":
-                        self._spider.switchBehavior(BehaviorType.Manual)
-                        self._spider.animationController.setWideWalking(True)
+                        resetBehavior = True
 
                     elif action == "horizontal":
                         print ("Keeping body horizontal")
@@ -184,7 +182,7 @@ class RemoteController(object):
                         self._spider.switchBehavior(BehaviorType.AutonomeFollowBalloon)
                     else:
                         print("Stop vision behavior")
-                        self._spider.switchBehavior(BehaviorType.Manual)
+                        resetBehavior = True
 
                 elif mode == "fury-road":
                     if action == "start":
@@ -192,21 +190,33 @@ class RemoteController(object):
                         self._spider.switchBehavior(BehaviorType.AutonomeFuryRoad)
                     else:
                         print("Stop fury road")
-                        self._spider.switchBehavior(BehaviorType.Manual)
+                        resetBehavior = True
 
                 elif mode == "mating":
+                    resetBehavior = True
+
                     if action == "pre-stab":
-                        print("Pre stab")
+                        print ("Pre stab mating")
+                        self._spider.sequenceController.parseSequence('../sequences/pre-stab-mating.txt')
                     elif action == "post-stab":
-                        print ("Post stab")
+                        print ("Post stab mating")
+                        self._spider.sequenceController.parseSequence('../sequences/post-stab-mating.txt')
                     elif action == "up":
                         print ("Moving spider up")
+                        self.context.zOffset = 3
+                        self._spider.switchBehavior(BehaviorType.Manual)
+                        self._spider.animationController.setWideWalking(True)
+                        self._spider.animationController.setHighWalking(False)
+                        resetBehavior = False
                     elif action == "stab":
-                        print ("Stab")
+                        print ("Stab mating")
+                        self._spider.sequenceController.parseSequence('../sequences/stab-mating.txt')
 
-                    print("Mating not implemented, using walk.")
+                if resetBehavior:
                     self._spider.switchBehavior(BehaviorType.Manual)
                     self._spider.animationController.setWideWalking(True)
+                    self._spider.animationController.setHighWalking(False)
+                    self.context.zOffset = 0
 
                 # Save current action and messages
                 self._oldMode = mode
