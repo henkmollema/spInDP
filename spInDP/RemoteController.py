@@ -204,9 +204,9 @@ class RemoteController(object):
                         print ("Post stab mating")
                         self._spider.sequenceController.parseSequence('sequences/post-stab-mating.txt', speedModifier=2.0)
                     elif action == "up":
-                        print ("Moving spider up")
-                        self.context.zOffset = 3
-                        self._spider.switchBehavior(BehaviorType.Manual)
+                        print ("Moving spider up (actually just sprinting)")
+                        #self.context.zOffset = 3
+                        self._spider.switchBehavior(BehaviorType.Sprint)
                         self._spider.animationController.setWideWalking(True)
                         self._spider.animationController.setHighWalking(False)
                         resetBehavior = False
