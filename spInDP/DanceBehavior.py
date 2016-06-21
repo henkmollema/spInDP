@@ -135,6 +135,21 @@ class DanceBehavior(Behavior):
 
         #at 57 we need to be low here
 
+        if (t > 57 and t < 72.1 and self.moveNR == 22):
+            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-transition.txt"))
+            self.moveNR += 1
+            return
+
+        if (t > 72.1 and t < 77.6 and self.moveNR == 23):
+            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-mechanic.txt"))
+            self.moveNR += 1
+            return
+
+        if (t > 77.6 and t < 81 and self.moveNR == 24):
+            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-mechanic2.txt"))
+            self.moveNR += 1
+            return
+
     def dance(self):
         print("I'm dancing!")
         # stretch
