@@ -20,21 +20,24 @@ class EmotiveBehavior(Behavior):
         if(command != "s"):
             execTime = 0
             if(command == "f"):
-                execTime = self.spider.animationController.walk(direction=0,
+                execTime = self.spider.animationController.turnWalk(xDirection=0,
+                                                                yDirection=1,
                                                                 frameNr=self.frameNr,
                                                                 speedMod=1,
                                                                 keepLeveled=False) - self.spider.UPDATE_SLEEP_TIME
 
             elif(command == "l"):
                 turnAngle = -1
-                execTime = self.spider.animationController.turn(direction=turnAngle,
+                execTime = self.spider.animationController.turnWalk(xDirection=-1,
+                                                                yDirection=0,
                                                                 frameNr=self.frameNr,
                                                                 speedMod=1,
                                                                 keepLeveled=False) - self.spider.UPDATE_SLEEP_TIME
 
             elif(command == "r"):
                 turnAngle = 1
-                execTime = self.spider.animationController.turn(direction=turnAngle,
+                execTime = self.spider.animationController.turnWalk(xDirection=1,
+                                                                yDirection=0,
                                                                 frameNr=self.frameNr,
                                                                 speedMod=1,
                                                                 keepLeveled=False) - self.spider.UPDATE_SLEEP_TIME
