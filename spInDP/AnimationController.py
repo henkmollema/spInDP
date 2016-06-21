@@ -1030,29 +1030,3 @@ class AnimationController:
 
         return self.endFrame()
 
-    def spiderGapTransition(self):
-        behavior = type(self.spider._behavior).__name__
-        if(behavior == 'PushBehavior'):
-            succes = False
-            currentPos = None
-            while succes == False:
-                try:
-                    currentPos = self.spider.servoController.getAllLegsXYZ()
-                    succes = True
-                except:
-                    print("can not get currentPos of all legs.")
-
-        self.startFrame()
-        leg = currentPos[0].split(',')
-        self.sequenceFrame.movements[1] = self.seqCtrl.coordsToLegMovement(x=leg[0], y=leg[1], z=-2, legID=1,speedMod=1)
-        leg = currentPos[1].split(',')
-        self.sequenceFrame.movements[2] = self.seqCtrl.coordsToLegMovement(x=leg[0], y=leg[1], z=-2, legID=2, speedMod=1)
-        leg = currentPos[2].split(',')
-        self.sequenceFrame.movements[3] = self.seqCtrl.coordsToLegMovement(x=leg[0], y=leg[1], z=-2, legID=3, speedMod=1)
-        leg = currentPos[3].split(',')
-        self.sequenceFrame.movements[4] = self.seqCtrl.coordsToLegMovement(x=leg[0], y=leg[1], z=-2, legID=4, speedMod=1)
-        leg = currentPos[4].split(',')
-        self.sequenceFrame.movements[5] = self.seqCtrl.coordsToLegMovement(x=leg[0], y=leg[1], z=-2, legID=5, speedMod=1)
-        leg = currentPos[5].split(',')
-        self.sequenceFrame.movements[6] = self.seqCtrl.coordsToLegMovement(x=leg[0], y=leg[1], z=-2, legID=6, speedMod=1)
-        return self.endFrame();

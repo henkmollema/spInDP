@@ -46,6 +46,7 @@ class Spider(object):
 
         # Private fields
         self._behavior = ManualBehavior(self)
+        self._behaviorType = BehaviorType.Manual
         self._updateThread = None
         self._webserverThread = None
 
@@ -95,7 +96,9 @@ class Spider(object):
         if self._updateThread is None:
             return
 
-        print("SwitchBehavior invoked: " + behaviorType)
+        if self._behaviorType == behaviorType:
+            # It's already on the desired behavior
+            return
 
         # Stop the update loop
         self._stopLoop = True
@@ -105,46 +108,57 @@ class Spider(object):
         if behaviorType == BehaviorType.Manual:
             print("Switched to manual behavior")
             self._behavior = ManualBehavior(self)
+            self._behaviorType = BehaviorType.Manual
 
         elif behaviorType == BehaviorType.ManualHorizontal:
             print("Switched to manual horizontal behavior")
             self._behavior = ManualHorizontalBehavior(self)
+            self._behaviorType = BehaviorType.ManualHorizontal
 
         elif behaviorType == BehaviorType.AutonomeDestroyBalloon:
             print("Switched to destroy balloon behavior.")
             self._behavior = FindBalloonBehavior(self)
+            self._behaviorType = BehaviorType.AutonomeDestroyBalloon
 
         elif behaviorType == BehaviorType.AutonomeFollowBalloon:
             print("Switched to follow balloon behavior.")
             self._behavior = FollowBalloonBehavior(self)
+            self._behaviorType = BehaviorType.AutonomeFollowBalloon
 
         elif behaviorType == BehaviorType.AutonomeFuryRoad:
             print("Switched to autonome fury road behavior")
             self._behavior = FuryRoadBehavior(self)
+            self._behaviorType = BehaviorType.AutonomeFuryRoad
 
         elif behaviorType == BehaviorType.Immediate:
             print("Switched to immediate behavior.")
             self._behavior = ImmediateBehavior(self)
+            self._behaviorType = BehaviorType.Immediate
 
         elif behaviorType == BehaviorType.Push:
             print("Switched to push behavior.")
             self._behavior = PushBehavior(self)
+            self._behaviorType = BehaviorType.Push
 
         elif behaviorType == BehaviorType.Touch:
             print("Switched to touch behavior.")
             self._behavior = TouchBehavior(self)
+            self._behaviorType = BehaviorType.Touch
 
         elif behaviorType == BehaviorType.Sprint:
             print("Switched to sprint behavior")
             self._behavior = SprintBehavior(self)
+            self._behaviorType = BehaviorType.Sprint
 
         elif behaviorType == BehaviorType.Emotive:
             print("Switched to emotive behavior")
             self._behavior = EmotiveBehavior(self)
+            self._behaviorType = BehaviorType.Emotive
 
         elif behaviorType == BehaviorType.Dance:
             print("Switched to dance behavior")
             self._behavior = DanceBehavior(self)
+            self._behaviorType = BehaviorType.Dance
 
         # Start the loop again
         self._stopLoop = False
@@ -163,14 +177,13 @@ class Spider(object):
     def shutdown(self):
         """Stops the spider and shuts down the RPi."""
 
-        #self.stop()
+        # self.stop()
         import os
         os.system("sudo shutdown -h now")
 
     def reboot(self):
         """Stops the spider and reboots the RPi."""
 
-        #self.stop()
+        # self.stop()
         import os
         os.system("sudo reboot -r now")
-
