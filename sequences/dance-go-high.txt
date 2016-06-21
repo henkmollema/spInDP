@@ -1,0 +1,9 @@
+Sequence dance-go-high offset 45
+framebegin 2800
+l:1 -7,0,5 100
+l:2 -7,0,5 100
+l:3 -7,0,5 100
+l:4 -7,0,5 100
+l:5 -7,0,5 100
+l:6 -7,0,5 100
+frameend
