@@ -33,10 +33,6 @@ class TouchBehavior(Behavior):
         yInput = self.spider.remoteController.context.jY
 
         if (jMagnitude > 0.4):
-            print("manual touch")
-
-            print("coxa angle ",self.currentAngleCoxa)
-            print("femur angle ", self.currentAngleFemur)
             self.frameNr += 1
             x, y = self.cap(xInput, yInput)
             self.currentAngleCoxa += y
