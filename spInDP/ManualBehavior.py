@@ -31,6 +31,8 @@ class ManualBehavior(Behavior):
                 self.turnMode = not self.turnMode
                 print ("Switch turnmode " + str(self.turnMode))
 
+        self.spider.animationController.zOffset = self.remoteContext.zOffset
+
         # print "Joystick = X: " + str(jX) + ", Y: " + str(jY) + ", Z: " + str(jZ) + " magnitude: " + str(magnitute) + " angle: " + str(angle)
 
         # DEBUG

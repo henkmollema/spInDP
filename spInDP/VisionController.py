@@ -17,13 +17,15 @@ class VisionController:
         self.__vision = Vision(self, self.__camera.resolution)
 
     def FindBalloon(self, detectBlue = True):
+        Camera.useAutoBrightness = False
         foundBlob, redBalloonFrame, blueBalloonFrame, coords, size = self.__vision.getBalloonValues(detectBlue)
         return foundBlob, coords, size
     def getBalloonIsLeft(self):
         return self.__vision.getBalloonIsLeft()
     def getLine(self):
-        foundLineBlob, frame, coords = self.__vision.getLineValues()
-        return foundLineBlob, coords
+        Camera.useAutoBrightness = True
+        foundLineBlob, frame, xCoord = self.__vision.getLineValues()
+        return foundLineBlob, xCoord
 
     def GetImage(self):
         frame = self.__camera.getFrame()
@@ -31,13 +33,16 @@ class VisionController:
         
     def GetImageVisionRedBalloon(self):
         """Get image from the vision part which contains the threshold for the RED balloon and is available as a JPEG"""
+        Camera.useAutoBrightness = False
         foundBlob, redBalloonFrame, blueBalloonFrame, coords, size = self.__vision.getBalloonValues()
         return cv2.imencode('.jpeg', redBalloonFrame)[1].tostring()
     def GetImageVisionBlueBalloon(self):
         """Get image from the vision part which contains the threshold for the BLUE balloon and is available as a JPEG"""
+        Camera.useAutoBrightness = False
         foundBlob, redBalloonFrame, blueBalloonFrame, coords, size = self.__vision.getBalloonValues()
         return cv2.imencode('.jpeg', blueBalloonFrame)[1].tostring()
     def GetImageLine(self):
+        Camera.useAutoBrightness = True
         foundLineBlob, frame, coords = self.__vision.getLineValues()
         return cv2.imencode('.jpeg', frame)[1].tostring()
 
@@ -47,7 +52,11 @@ class Camera(object):
     frame = None  # current frame is stored here by background thread
     last_access = 0  # time of last client access to the camera
     resolution = (640, 480)
-    
+    useAutoBrightness = False
+
+    def setAutoBrightness(self, val):
+        self.useAutoBrightness = val
+
     def initialize(self):
         if Camera.thread is None:
             # start background frame thread
@@ -70,13 +79,14 @@ class Camera(object):
             camera.framerate = 30
             camera.sharpness = 0
             camera.contrast = 0
-            camera.brightness = 50
             camera.saturation = 0
-            camera.ISO = 800
             camera.exposure_compensation = 0
             camera.awb_mode = 'off'
             camera.awb_gains = (1.19, 1.43)
-            camera.shutter_speed = 20000
+            if not self.useAutoBrightness:
+                camera.brightness = 50
+                camera.ISO = 800
+                camera.shutter_speed = 20000
 
             camera.hflip = True
             camera.vflip = True
@@ -129,7 +139,7 @@ class Vision:
     last_line_access = 0
 
     foundLineBlob = None
-    lineCoords = None
+    lineXCoord = None
     lineImage = None
     
     def __init__(self, visionController, resolution):
@@ -180,19 +190,19 @@ class Vision:
             img_str = fd.read()
             frame = np.fromstring(img_str, dtype=np.uint8)
             frame = cv2.imdecode(frame, cv2.CV_LOAD_IMAGE_COLOR)
-            self.foundLineBlob, self.lineImage, self.lineCoords = self.detectLineNew(frame)
+            self.foundLineBlob, self.lineImage, self.lineXCoord = self.detectLineNew(frame)
             """
             frame = self.visionController.GetImage()
             frame = np.fromstring(frame, dtype=np.uint8)
             frame = cv2.imdecode(frame, cv2.CV_LOAD_IMAGE_COLOR)
             cropFrame = frame[self.__resolution[1] - 50:self.__resolution[1], 0:self.__resolution[0]]
-            self.foundLineBlob, self.lineImage, self.lineCoords = self.detectLineNew(cropFrame)
+            self.foundLineBlob, self.lineImage, self.lineXCoord = self.detectLineNew(cropFrame)
 
         Vision.lineThread = None
     def getLineValues(self):
         Vision.last_line_access = time.time()
         self.initializeLine()
-        return self.foundLineBlob, self.lineImage, self.lineCoords
+        return self.foundLineBlob, self.lineImage, self.lineXCoord
 
     def thresholdRange(self, img, min, max):
         """Makes it possible to give a range when thresholding instead of a min or max"""
@@ -342,7 +352,7 @@ class Vision:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         blur = cv2.GaussianBlur(gray, (3, 3), 0)
-        ret, imageBin = cv2.threshold(blur, 220, 255, cv2.THRESH_BINARY)
+        ret, imageBin = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 
         imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
         imageBin = cv2.morphologyEx(imageBin, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
@@ -360,7 +370,7 @@ class Vision:
         keypoints = detector.detect(imageBin)
 
         foundBlob = False
-        coords = None
+        xCoord = 0
         if keypoints:
             i = 0
             biggest = 0
@@ -369,9 +379,9 @@ class Vision:
                     biggest = i
                 i += 1
             foundBlob = True
-            coords = keypoints[biggest].pt
-            coords = (coords[0] - (self.__resolution[0] / 2), coords[1] - (self.__resolution[1] / 2))
+            xCoord = keypoints[biggest].pt[0]
+            xCoord = xCoord - self.__resolution[0] / 2
         else:
-            coords = (-1, -1)
+            xCoord = 0
 
-        return foundBlob, imageBin, coords
+        return foundBlob, imageBin, xCoord

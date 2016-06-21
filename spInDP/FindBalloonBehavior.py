@@ -7,7 +7,7 @@ from spInDP.AutonomeBehavior import AutonomeBehavior
 class FindBalloonBehavior(AutonomeBehavior):
     """Provides autonome behavior for destroying a red balloon."""
 
-    BLOB_SIZE = 200
+    BLOB_SIZE = 100
     _frameNr = 0
     _stabPosition = False
 
@@ -41,13 +41,13 @@ class FindBalloonBehavior(AutonomeBehavior):
 
                 print("Steek 'm in z'n rug!")
                 if balloonIsLeft:
-                    time.sleep(self.spider.sequenceController.parseSequence('sequences/stab-left.txt'))
+                    time.sleep(self.spider.sequenceController.parseSequence('sequences/stab-left.txt', speedModifier=2))
                 else:
-                    time.sleep(self.spider.sequenceController.parseSequence('sequences/stab-right.txt'))
+                    time.sleep(self.spider.sequenceController.parseSequence('sequences/stab-right.txt', speedModifier=2))
             else:
                 x = coords[0]
                 # y = coords[1]
-                a = 240
+                a = 320
                 b = x
 
                 # Angle to balloon in degrees
@@ -57,7 +57,7 @@ class FindBalloonBehavior(AutonomeBehavior):
                 execTime = self.spider.animationController.turnWalk(xDirection=(b / a),
                                                                     yDirection=1.0,
                                                                     frameNr=self._frameNr,
-                                                                    speedMod=2)
+                                                                    speedMod=3)
 
                 time.sleep(execTime)
                 self._frameNr += 1
@@ -66,7 +66,7 @@ class FindBalloonBehavior(AutonomeBehavior):
         else:
             if self._stabPosition:
                 print ("Execute post stab")
-                time.sleep(self.spider.sequenceController.parseSequence('sequences/post-stab.txt'))
+                time.sleep(self.spider.sequenceController.parseSequence('sequences/post-stab.txt',speedModifier=2))
 
             # print ("Balloon not found, turning")
             turnDir = 1

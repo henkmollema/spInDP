@@ -17,15 +17,23 @@ class FuryRoadBehavior(Behavior):
 
     def update(self):
         #get vision line data
-        foundLine, lineCoords = self.spider.visioncontroller.getLine()
-        lineXcoord = lineCoords[0]
+        foundLine, lineXcoord = self.spider.visioncontroller.getLine()
+        try:
+            test = int(lineXcoord)
+        except:
+            print("lineXcoord cant be converted to int. Setting to 0")
+            lineXcoord = 0
 
-        xDirection = lineXcoord
+        print("lineXCoord = " + str(lineXcoord))
+        #"""
+        xDirection = 0
         yDirection = 1
-        if abs(lineXcoord) > 80:
-            yDirection = 1 - (lineXcoord - 80)
-            if yDirection < 0:
-                yDirection = 0
+        if foundLine:
+            xDirection = lineXcoord / 100
+            if abs(lineXcoord) > 100:
+                yDirection = 1 - (abs(lineXcoord) - 100) / 75
+                if yDirection < 0:
+                    yDirection = 0
 
         execTime = self.spider.animationController.turnWalk(xDirection=xDirection,
                                                             yDirection=yDirection,

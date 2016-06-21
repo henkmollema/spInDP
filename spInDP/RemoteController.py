@@ -155,15 +155,17 @@ class RemoteController(object):
                 elif mode == "gravel":
                     highWalk = action == "start"
                     print ("Set gravel mode: " + str(highWalk))
+                    self._spider.switchBehavior(BehaviorType.Manual)
                     self._spider.animationController.setHighWalking(highWalk)
 
                 elif mode == "spider-gap":
                     if action == "walk":
                         resetBehavior = True
 
-                    elif action == "horizontal":
-                        print ("Keeping body horizontal")
-                        self._spider.switchBehavior(BehaviorType.ManualHorizontal)
+                    elif action == "high":
+                        print ("Enable high walking")
+                        self._spider.switchBehavior(BehaviorType.Manual)
+                        self._spider.animationController.setHighWalking(True)
 
                     elif action == "cross":
                         print ("Cross spider gap")
@@ -197,10 +199,10 @@ class RemoteController(object):
 
                     if action == "pre-stab":
                         print ("Pre stab mating")
-                        self._spider.sequenceController.parseSequence('../sequences/pre-stab-mating.txt')
+                        self._spider.sequenceController.parseSequence('sequences/pre-stab-mating.txt', speedModifier=2.0)
                     elif action == "post-stab":
                         print ("Post stab mating")
-                        self._spider.sequenceController.parseSequence('../sequences/post-stab-mating.txt')
+                        self._spider.sequenceController.parseSequence('sequences/post-stab-mating.txt', speedModifier=2.0)
                     elif action == "up":
                         print ("Moving spider up")
                         self.context.zOffset = 3
@@ -210,7 +212,7 @@ class RemoteController(object):
                         resetBehavior = False
                     elif action == "stab":
                         print ("Stab mating")
-                        self._spider.sequenceController.parseSequence('../sequences/stab-mating.txt')
+                        self._spider.sequenceController.parseSequence('sequences/stab-mating.txt', speedModifier=2.0)
 
                 if resetBehavior:
                     self._spider.switchBehavior(BehaviorType.Manual)
