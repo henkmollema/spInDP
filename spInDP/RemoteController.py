@@ -199,10 +199,10 @@ class RemoteController(object):
 
                     if action == "pre-stab":
                         print ("Pre stab mating")
-                        self._spider.sequenceController.parseSequence('../sequences/pre-stab-mating.txt')
+                        self._spider.sequenceController.parseSequence('sequences/pre-stab-mating.txt')
                     elif action == "post-stab":
                         print ("Post stab mating")
-                        self._spider.sequenceController.parseSequence('../sequences/post-stab-mating.txt')
+                        self._spider.sequenceController.parseSequence('sequences/post-stab-mating.txt')
                     elif action == "up":
                         print ("Moving spider up")
                         self.context.zOffset = 3
@@ -212,7 +212,7 @@ class RemoteController(object):
                         resetBehavior = False
                     elif action == "stab":
                         print ("Stab mating")
-                        self._spider.sequenceController.parseSequence('../sequences/stab-mating.txt')
+                        self._spider.sequenceController.parseSequence('sequences/stab-mating.txt')
 
                 if resetBehavior:
                     self._spider.switchBehavior(BehaviorType.Manual)
