@@ -155,15 +155,17 @@ class RemoteController(object):
                 elif mode == "gravel":
                     highWalk = action == "start"
                     print ("Set gravel mode: " + str(highWalk))
+                    self._spider.switchBehavior(BehaviorType.Manual)
                     self._spider.animationController.setHighWalking(highWalk)
 
                 elif mode == "spider-gap":
                     if action == "walk":
                         resetBehavior = True
 
-                    elif action == "horizontal":
-                        print ("Keeping body horizontal")
-                        self._spider.switchBehavior(BehaviorType.ManualHorizontal)
+                    elif action == "high":
+                        print ("Enable high walking")
+                        self._spider.switchBehavior(BehaviorType.Manual)
+                        self._spider.animationController.setHighWalking(True)
 
                     elif action == "cross":
                         print ("Cross spider gap")
