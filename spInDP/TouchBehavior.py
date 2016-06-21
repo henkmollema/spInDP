@@ -15,11 +15,11 @@ class TouchBehavior(Behavior):
         print("Initializing touch behavior.")
         super(TouchBehavior, self).__init__(spider)
         if self.leftTouch:
-            time.sleep(self.spider.sequenceController.parseSequence('sequences/pre-touch-left.txt'))
+            time.sleep(self.spider.sequenceController.parseSequence('sequences/pre-touch-left.txt', speedModifier=3))
             self.servoIdCoxa = 1
             self.servoIdFemur = 2
         else:
-            time.sleep(self.spider.sequenceController.parseSequence('sequences/pre-touch-right.txt'))
+            time.sleep(self.spider.sequenceController.parseSequence('sequences/pre-touch-right.txt', speedModifier=3))
             self.servoIdCoxa = 4
             self.servoIdFemur = 5
         self.currentAngleCoxa = self.spider.sequenceController.servoController.getPosition(servo=self.servoIdCoxa)
