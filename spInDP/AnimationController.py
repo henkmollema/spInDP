@@ -168,6 +168,8 @@ class AnimationController:
             stepSize = 1.75 * speedMod # 3.5
         if stepSize < 1:
             stepSize = 1
+        if stepSize > 3.5:
+            stepSize = 3.5
 
         #print ("stepsize: " + str(stepSize))
 
