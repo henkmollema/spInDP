@@ -105,8 +105,8 @@ class SequenceController(object):
                     for line in lines:
                         totalTime += self.interpretLine(line, lineNr, speedModifier)
                         lineNr += 1
-        except:
-            print("Exception while parsing: " + filePath)
+        except BaseException as ex:
+            print("Exception while parsing: ", ex)
 
         self.coxaOffset = oldOffset
 

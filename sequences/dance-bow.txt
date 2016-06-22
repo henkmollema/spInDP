@@ -1,4 +1,4 @@
-Sequence bow
+Sequence bow offset 0
 framebegin
 l:1 0,0,5 100
 l:2 0,0,5 100
