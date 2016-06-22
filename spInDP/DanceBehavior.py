@@ -155,12 +155,44 @@ class DanceBehavior(Behavior):
         #start MC-Hammer
 
         if (t > 81 and t < 86 and self.moveNR == 25):
-            time.sleep(self.spider.sequenceController.parseSequence("sequence/dance-step.txt"))
+            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-step.txt"))
             self.moveNR += 1
             return
 
-        if (t > 86 and t < 96 and self.moveNR == 26):
-            time.sleep(self.spider.animationController.strafeWalk(direction=,frameNr=,speedMod=)
+        if (t > 86.5 and t < 96 and self.moveNR == 26):
+            time.sleep(self.spider.sequenceController.parseSequence("sequences/dance-upDownWave.txt")
+            self.moveNR += 1
+            return
+
+        if (t > 96 and t < 99.5):
+            time.sleep(self.spider.animationController.strafeWalk(direction=90,frameNr=self.frameNr, speedMod=3, keepLeveled=True))
+            self.frameNr += 1
+            self.moveNR += 1
+
+        if (t> 99.5 and t < 103):
+            time.sleep(self.spider.animationController.strafeWalk(direction=-90, frameNr=self.frameNr, speedMod=3,keepLeveled=True))
+            self.frameNr += 1
+            self.moveNR += 1
+
+        if (t > 103 and t < 106.5):
+            time.sleep(self.spider.animationController.strafeWalk(direction=-90, frameNr=self.frameNr, speedMod=3,keepLeveled=True))
+            self.frameNr += 1
+            self.moveNR += 1
+
+        if (t > 106.5 and t < 110):
+            time.sleep(self.spider.animationController.strafeWalk(direction=-90, frameNr=self.frameNr, speedMod=3,keepLeveled=True))
+            self.frameNr += 1
+            self.moveNR += 1
+
+        if (t > 110 and t < 117):
+            time.sleep(self.pirouette(xDirection=1, speedMod=5, stepSize=3.5))
+            self.frameNr += 1
+            self.moveNR += 1
+
+        if (t > 117 and t < 122):
+            time.sleep(self.spider.sequenceController.parseSequence("dance-bow.txt"))
+            self.moveNR += 1
+
 
 
        #slow donw 117
